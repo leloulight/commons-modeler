@@ -3,7 +3,7 @@
 
 <!--
         "Modeler" component of the Jakarta Commons Subproject
-        $Id: build.xml,v 1.10 2003/03/13 21:21:58 costin Exp $
+        $Id: build.xml,v 1.11 2003/03/13 21:53:44 costin Exp $
 -->
 
 
@@ -225,8 +225,10 @@
     description="Create binary distribution">
     <copy      file="../LICENSE"
               todir="${dist.home}"/>
-    <copy      file="RELEASE-NOTES**"
-              todir="${dist.home}"/>
+    <copy todir="${dist.home}" >
+       <fileset dir="." includes="RELEASE-NOTES**"/>
+    </copy>
+
     <copy      file="src/java/org/apache/commons/modeler/mbeans-descriptors.dtd"
               todir="${dist.home}"/>
     <mkdir      dir="${build.home}/classes/META-INF"/>
