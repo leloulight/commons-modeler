@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.1 2002/04/30 20:58:51 craigmcc Exp $
- * $Revision: 1.1 $
- * $Date: 2002/04/30 20:58:51 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.2 2002/06/15 18:17:02 craigmcc Exp $
+ * $Revision: 1.2 $
+ * $Date: 2002/06/15 18:17:02 $
  *
  * ====================================================================
  *
@@ -102,7 +102,7 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
 
 /**
  * <p>Basic implementation of the <code>ModelMBean</code> interface, which
- * supports the minimal requirements of the interface contract as follows:</p>
+ * supports the minimal requirements of the interface contract as follows.</p>
  * <ul>
  * <li>Only managed resources of type <code>objectReference</code> are
  *     supportd.</li>
@@ -122,7 +122,7 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  * </ul>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.1 $ $Date: 2002/04/30 20:58:51 $
+ * @version $Revision: 1.2 $ $Date: 2002/06/15 18:17:02 $
  */
 
 public class BaseModelMBean implements ModelMBean {

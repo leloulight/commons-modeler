@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseAttributeFilter.java,v 1.1 2002/04/30 20:58:51 craigmcc Exp $
- * $Revision: 1.1 $
- * $Date: 2002/04/30 20:58:51 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseAttributeFilter.java,v 1.2 2002/06/15 18:17:02 craigmcc Exp $
+ * $Revision: 1.2 $
+ * $Date: 2002/06/15 18:17:02 $
  *
  * ====================================================================
  *
@@ -78,7 +78,7 @@ import javax.management.NotificationFilter;
  * supplied by the application.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.1 $ $Date: 2002/04/30 20:58:51 $
+ * @version $Revision: 1.2 $ $Date: 2002/06/15 18:17:02 $
  */
 
 public class BaseAttributeFilter implements NotificationFilter {
@@ -158,7 +158,8 @@ public class BaseAttributeFilter implements NotificationFilter {
 
 
     /**
-     * <p>Is notification enabled for this event?  Return true if:</p>
+     * <p>Test whether notification enabled for this event.
+     * Return true if:</p>
      * <ul>
      * <li>This is an attribute change notification</li>
      * <li>Either the set of accepted names is empty (implying that all
