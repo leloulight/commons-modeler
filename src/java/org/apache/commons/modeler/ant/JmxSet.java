@@ -57,6 +57,7 @@ package org.apache.commons.modeler.ant;
 import org.apache.tools.ant.*;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.modeler.Registry;
 
 import javax.management.*;
 import javax.management.MBeanServer;
@@ -74,6 +75,7 @@ public class JmxSet extends Task {
     String valueRef;
     Object objValue;
     String objectName;
+    ObjectName oname;
     String type;
 
 
@@ -82,6 +84,14 @@ public class JmxSet extends Task {
 
     public void setAttribute(String attribute) {
         this.attribute = attribute;
+    }
+
+    public void setName( String name ) {
+        this.attribute=name;
+    }
+
+    public String getName() {
+        return attribute;
     }
 
     public void setValue(String value) {
@@ -108,30 +118,30 @@ public class JmxSet extends Task {
         this.objectName = name;
     }
 
+    public void setObjectName( ObjectName oname ) {
+        this.oname=oname;
+    }
 
     public void execute() {
         try {
-            MBeanServer server=(MBeanServer)project.getReference("jmx.server");
+            Registry registry=Registry.getRegistry();
+            MBeanServer server=registry.getMBeanServer();
 
-            if (server == null) {
-                if( MBeanServerFactory.findMBeanServer(null).size() > 0 ) {
-                    server=(MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
-                } else {
-                    if( log.isDebugEnabled())
-                        log.debug("Creating mbean server");
-                    server=MBeanServerFactory.createMBeanServer();
-                }
-                project.addReference("jmx.server", server);
+            if( oname==null )
+                oname=new ObjectName(objectName);
+            if( type==null ) {
+                type=registry.getType(oname, attribute);
+                if( log.isDebugEnabled())
+                    log.debug("Discovered type " + type);
             }
 
-            ObjectName oname=new ObjectName(objectName);
-
             // XXX convert value, use meta data to find type
-            if( objValue==null && valueRef != null ) {
+             if( objValue==null && valueRef != null ) {
                  objValue=project.getReference(valueRef);
              }
              if( objValue==null ) {
-                 if( type==null) {// string is default
+                 if( type==null || "java.lang.String".equals( type )) {
+                     // string is default
                      objValue=value;
                  } else if( "ObjectName".equals( type )) {
                      if( log.isTraceEnabled())

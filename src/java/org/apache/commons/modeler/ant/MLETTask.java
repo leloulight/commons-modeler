@@ -83,8 +83,10 @@ public class MLETTask extends Task {
     String archive;
     String codebase;
     String objectName;
+    ObjectName oname;
 
-    Vector args;
+    List args=new ArrayList();
+    List attributes=new ArrayList();
 
     // ant specific
     String loaderRef; // class loader ref
@@ -93,8 +95,11 @@ public class MLETTask extends Task {
     }
 
     public void addArg(Arg arg ) {
-        if( args==null ) args=new Vector();
-        args.addElement(arg);
+        args.add(arg);
+    }
+
+    public void addAttribute( JmxSet arg ) {
+        attributes.add( arg );
     }
 
 
@@ -151,36 +156,62 @@ public class MLETTask extends Task {
         return server;
     }
 
+    boolean modeler=false;
+
+    public void setModeler(boolean modeler) {
+        this.modeler = modeler;
+    }
 
     protected void bindJmx(String objectName, String code,
-                        String arg0, Vector args)
+                           String arg0, List args)
             throws Exception
     {
         MBeanServer server=getMBeanServer();
-        ObjectName oname=new ObjectName( objectName );
+        oname=new ObjectName( objectName );
+        if( modeler ) {
+            Arg codeArg=new Arg();
+            codeArg.setType("java.lang.String");
+            codeArg.setValue( code );
+            if( args==null) args=new ArrayList();
+            args.add(0, codeArg);
+            code="org.apache.commons.modeler.BaseModelMBean";
+        }
+
+        Object argsA[]=new Object[ args.size()];
+        String sigA[]=new String[args.size()];
+        for( int i=0; i<args.size(); i++ ) {
+            Arg arg=(Arg)args.get(i);
+            if( arg.type==null )
+                arg.type="java.lang.String";
+            sigA[i]=arg.getType();
+            argsA[i]=arg.getValue();
+            // XXX Deal with not string types - IntrospectionUtils
+        }
 
         // XXX Use the loader ref, if any
-        if( args==null ) {
+        if( args.size()==0 ) {
             server.createMBean(code, oname);
         } else {
-            Object argsA[]=new Object[ args.size()];
-            String sigA[]=new String[args.size()];
-            for( int i=0; i<args.size(); i++ ) {
-                Arg arg=(Arg)args.elementAt(i);
-                if( arg.type==null )
-                    arg.type="java.lang.String";
-                sigA[i]=arg.getType();
-                argsA[i]=arg.getValue();
-                // XXX Deal with not string types - IntrospectionUtils
-            }
             server.createMBean(code, oname, argsA, sigA );
         }
     }
 
+    public ObjectName getObjectName() {
+        return oname;
+    }
 
     public void execute() throws BuildException {
         try {
+            // create the mbean
             bindJmx( objectName, code, null, args);
+
+            // process attributes
+            for( int i=0; i<attributes.size(); i++ ) {
+                JmxSet att=(JmxSet)attributes.get(i);
+                att.setObjectName( oname );
+                log.info("Setting attribute " + oname + " " + att.getName());
+                att.execute();
+            }
         } catch(Exception ex) {
             log.error("Can't create mbean " + objectName, ex);
         }

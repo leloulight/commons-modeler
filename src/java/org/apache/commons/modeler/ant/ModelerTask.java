@@ -81,12 +81,13 @@ public class ModelerTask extends MLETTask {
             Arg codeArg=new Arg();
             codeArg.setType("java.lang.String");
             codeArg.setValue( code );
-            if( args==null) args=new Vector();
-            args.insertElementAt(codeArg, 0);
-            super.bindJmx(objectName,
-                    "org.apache.commons.modeler.BaseModelMBean",
-                    null,
-                    args );
+            if( args==null) args=new ArrayList();
+            args.add(0, codeArg);
+            super.execute();
+//            super.bindJmx(objectName,
+//                    "org.apache.commons.modeler.BaseModelMBean",
+//                    null,
+//                    args );
         } catch(Exception ex) {
             ex.printStackTrace();
         }
