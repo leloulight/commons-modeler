@@ -90,16 +90,18 @@ public class ServiceTask extends Task {
         return mbeans;
     }
 
-    /*
-    public void addService(ServiceTask service) {
-        //mbeans.add(mbean);
-    }
-    */
-
+    /** Set action to be executed on the mbean collection. 
+     * If null - we'll perform init and start.
+     * 
+     * @param action
+     */ 
     public void setAction(String action) {
         this.action=action;
     }
 
+    /** Perform the action on a previously declared service
+     * 
+     */ 
     public void setRefId( String ref ) {
         this.refId=ref;
     }
@@ -107,20 +109,29 @@ public class ServiceTask extends Task {
     public void execute() throws BuildException {
         try {
             Registry reg=Registry.getRegistry();
+
+            if( refId != null ) {
+                ServiceTask stask=(ServiceTask)project.getReference(refId);
+            }
             // create the mbeans
             List onames=new ArrayList();
+
             for( int i=0; i<mbeans.size(); i++ ) {
                 MLETTask mbean=(MLETTask)mbeans.get(i);
                 mbean.execute();
                 onames.add( mbean.getObjectName());
             }
-            // XXX do other actions...
-            reg.invoke(onames, "init", false);
-            reg.invoke(onames, "start", false);
+
+            if( action==null ) {
+                // default: init and start
+                reg.invoke(onames, "init", false);
+                reg.invoke(onames, "start", false);
+            } else {
+                reg.invoke(onames, action, false );
+            }
 
         } catch(Exception ex) {
             log.error("Error ", ex);
         }
     }
-
 }
