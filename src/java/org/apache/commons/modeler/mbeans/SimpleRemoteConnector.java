@@ -75,6 +75,7 @@ import java.util.jar.Manifest;
 import java.util.jar.Attributes;
 import javax.management.*;
 import javax.management.AttributeNotFoundException;
+import javax.management.loading.ClassLoaderRepository;
 
 import org.apache.commons.modeler.Registry;
 import org.apache.commons.modeler.BaseModelMBean;
@@ -268,7 +269,8 @@ public class SimpleRemoteConnector
             if( is==null ) return;
 
             Manifest mf=new Manifest(is);
-
+            
+            HashMap currentObjects=new HashMap(); // used to remove older ones
             Map entries=mf.getEntries();
             Iterator it=entries.keySet().iterator();
             while( it.hasNext() ) {
@@ -276,6 +278,7 @@ public class SimpleRemoteConnector
                 Attributes attrs=(Attributes)entries.get( name );
 
                 ObjectName oname=new ObjectName(name);
+                currentObjects.put( oname, "");
                 MBeanProxy proxy=(MBeanProxy)mbeans.get(oname);
                 if( proxy==null ) {
                     log.debug( "New object " + name);
@@ -302,6 +305,22 @@ public class SimpleRemoteConnector
                     cnt++;
                 }
             }
+            
+            // Now we have to remove all the mbeans that are no longer there
+            Iterator existingIt=mbeans.keySet().iterator();
+            while( existingIt.hasNext() ) {
+                ObjectName on=(ObjectName)existingIt.next();
+                if(currentObjects.get( on ) != null )
+                    continue; // still alive
+                if( log.isDebugEnabled() )
+                    log.debug("No longer alive " + on);
+                try {
+                    mserver.unregisterMBean(on);
+                } catch( Throwable t ) {
+                    log.info("Error unregistering " + on + " " + t.toString());
+                }
+            }
+            
             log.info( "Refreshing attributes " + cnt);
         } catch( Exception ex ) {
             log.info("Error ", ex);
