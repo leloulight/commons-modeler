@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.4 2002/10/18 15:34:09 patrickl Exp $
- * $Revision: 1.4 $
- * $Date: 2002/10/18 15:34:09 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.5 2002/11/01 23:10:10 costin Exp $
+ * $Revision: 1.5 $
+ * $Date: 2002/11/01 23:10:10 $
  *
  * ====================================================================
  *
@@ -100,6 +100,7 @@ import javax.management.modelmbean.ModelMBeanNotificationBroadcaster;
 import javax.management.modelmbean.ModelMBeanNotificationInfo;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
 
+// TODO: enable ant-like substitutions ? ( or at least discuss it )
 
 /**
  * <p>Basic implementation of the <code>ModelMBean</code> interface, which
@@ -123,7 +124,8 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  * </ul>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.4 $ $Date: 2002/10/18 15:34:09 $
+ * @author Costin Manolache
+ * @version $Revision: 1.5 $ $Date: 2002/11/01 23:10:10 $
  */
 
 public class BaseModelMBean implements ModelMBean {
@@ -208,6 +210,8 @@ public class BaseModelMBean implements ModelMBean {
     // key: operation val: invoke method
     Hashtable invokeAttMap=new Hashtable();
 
+    // All attributes that are set via this interface ( original values )
+    Hashtable attributes=new Hashtable();
 
     /**
      * Obtain and return the value of a specific attribute of this MBean.
@@ -498,7 +502,6 @@ public class BaseModelMBean implements ModelMBean {
         throws AttributeNotFoundException, MBeanException,
         ReflectionException
     {
-        // XXX Send attribute changed notification !!!
         // Validate the input parameters
         if (attribute == null)
             throw new RuntimeOperationsException
@@ -512,7 +515,16 @@ public class BaseModelMBean implements ModelMBean {
                 (new IllegalArgumentException("Attribute name is null"),
                  "Attribute name is null");
 
-        // Extract the method from cache 
+        try {
+            // XXX Is it before or after ?
+            Object oldValue=getAttribute( name );
+            sendAttributeChangeNotification(new Attribute( name, oldValue),
+                    attribute);
+        } catch( Exception ex ) {
+            log.error( "Error sending notification " + name, ex );
+        }
+
+        // Extract the method from cache
         Method m=(Method)setAttMap.get( name );
 
         if( m==null ) {
@@ -578,6 +590,8 @@ public class BaseModelMBean implements ModelMBean {
             throw new MBeanException
                 (e, "Exception invoking method " + name);
         }
+
+        attributes.put( name, value );
     }
 
 
@@ -810,6 +824,8 @@ public class BaseModelMBean implements ModelMBean {
                  "Notification is null");
         if (attributeBroadcaster == null)
             return; // This means there are no registered listeners
+        if( log.isDebugEnabled() )
+            log.debug( "AttributeChangeNotification " + notification );
         attributeBroadcaster.sendNotification(notification);
 
     }
@@ -1068,7 +1084,7 @@ public class BaseModelMBean implements ModelMBean {
      */
     public void load() throws InstanceNotFoundException,
         MBeanException, RuntimeOperationsException {
-
+        // XXX If a context was set, use it to load the data
         throw new MBeanException
             (new IllegalStateException("Persistence is not supported"),
              "Persistence is not supported");
@@ -1095,12 +1111,28 @@ public class BaseModelMBean implements ModelMBean {
     public void store() throws InstanceNotFoundException,
         MBeanException, RuntimeOperationsException {
 
+        // XXX if a context was set, use it to store the data
         throw new MBeanException
             (new IllegalStateException("Persistence is not supported"),
              "Persistence is not supported");
 
     }
 
+    // ------------------- Special methods ----------------------------------
+
+    /** Get all attributes that were set via JMX. This data can be persisted.
+     *
+     */
+    public Hashtable getAttributes() {
+        return attributes;
+    }
+
+    /** "Backdoor"  method to push configuration data that
+     *  was set using other methods ( like digester and direct introspection )
+     */
+    public void putAttribute( String name, Object value ) {
+        attributes.put(name, value );
+    }
 
     // ------------------------------------------------------ Protected Methods
 
