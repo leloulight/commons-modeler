@@ -3,7 +3,7 @@
 
 <!--
         "Modeler" component of the Jakarta Commons Subproject
-        $Id: build.xml,v 1.4 2002/11/12 22:53:41 costin Exp $
+        $Id: build.xml,v 1.5 2002/11/13 06:24:14 costin Exp $
 -->
 
 
@@ -263,6 +263,7 @@
       <pathelement location="target/classes" />
       <fileset dir="${tomcat.home}/common/lib" includes="*.jar"/>
       <fileset dir="${tomcat.home}/server/lib" includes="*.jar"/>
+      <fileset dir="${tomcat.home}/bin" includes="*.jar"/>
       <pathelement location="${commons-logging.jar}" />
       <pathelement location="${jmx.jar}" />
       <pathelement location="${ide.classes}" />
@@ -271,13 +272,9 @@
     <taskdef resource="META-INF/ant.properties"
              classpathref="jmx.test.classpath" />
 
-    <MLET code="org.apache.commons.modeler.BaseModelMBean"
-          name="catalina: type=server" >
-       <arg value="org.apache.catalina.startup.Catalina" />
-    </MLET>
-
     <MLET code="mx4j.adaptor.http.HttpAdaptor"
           name="Http:name=HttpAdaptor" />
+
     <MLET code="mx4j.adaptor.http.XSLTProcessor"
           name="Http:name=XSLTProcessor"/>
 
@@ -293,6 +290,22 @@
 
     <jmx name="Http:name=HttpAdaptor"
          method="start" />
+
+    <!-- start catalina -->
+
+    <MLET code="org.apache.commons.modeler.BaseModelMBean"
+          name="catalina: type=server" >
+       <arg value="org.apache.catalina.startup.Catalina" />
+    </MLET>
+
+    <jmxSet name="catalina: type=server"
+            attribute="catalinaHome"
+            value="${tomcat.home}"/>
+
+    <jmx name="catalina: type=server"
+         method="start" />
+
+    <echo>Tomcat started</echo>
 
     <sleep hours="1"/>
         
