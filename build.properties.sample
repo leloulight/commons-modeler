@@ -1,0 +1,35 @@
+# build.properties.sample - Sample build.properties for "modeler"
+
+# Base properties for expansion below
+commons.home=../../jakarta-commons
+sandbox.home=../../jakarta-commons-sandbox
+jaxp.home=/usr/local/jaxp-1.1
+junit.home=/usr/local/junit3.7
+jmx.home=/usr/local/jmx-ri_1.0.1/jmx
+
+# Derived home directories
+beanutils.home=${commons.home}/beanutils
+collections.home=${commons.home}/collections
+digester.home=${commons.home}/digester
+logging.home=${commons.home}/logging
+
+# Jakarta JAR files
+commons-beanutils.jar=${beanutils.home}/dist/commons-beanutils.jar
+commons-collections.jar=${collections.home}/dist/commons-collections.jar
+commons-digester.jar=${digester.home}/dist/commons-digester.jar
+commons-logging.jar=${logging.home}/dist/commons-logging.jar
+
+# JMX libraries
+# jmx.jar must contain the JMX classes and interfaces, as well as the
+# server implementation. Any JMX compliant implementation can be used.
+jmx.jar=${jmx.home}/lib/jmxri.jar
+# jmxtools.jar from the JMX RI is only used for the demonstration example.
+jmxtools.jar=${jmx.home}/lib/jmxtools.jar
+
+
+# External packages
+jaxp.jaxp.jar=${jaxp.home}/jaxp.jar
+jaxp.parser.jar=${jaxp.home}/crimson.jar
+jaxp.xalan.jar=${jaxp.home}/xalan.jar
+junit.jar=${junit.home}/junit.jar
+

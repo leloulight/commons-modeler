@@ -1,0 +1,133 @@
+<html>
+<head>
+<title>Proposal for Modeler Package</title>
+</head>
+<body bgcolor="white">
+
+<div align="center">
+<h1>Proposal for <em>Modeler</em> Package</h1>
+</div>
+
+<h3>(0) Rationale</h3>
+
+<p>Among the myriad of Java APIs available is the
+<a href="http://java.sun.com/products/JavaManagement/">Java Management
+Extensions</a> (JMX) APIs, which define "an architecture, the design patterns,
+the APIs, and the services for application and network management in the
+Java programming language."  These APIs include standards for designing
+"Managed Beans" (MBeans) that are associated with components of your
+application that you wish to make manageable via a variety of tools (either
+local or remote.</p>
+
+<p>The JMX architecture includes a variety of design patterns for MBeans.  The
+two most commonly used patterns are:</p>
+<ul>
+<li><em>Standard MBeans</em> - The developer designs an interface that
+    corresponds with the class for each managed resource, exposing only the
+    attributes and operations required for management.  The managed resource
+    class must implement this interface, according to standard Java
+    language rules, for this resource to become manageable.</li>
+<li><em>Model MBeans</em> - A generic, configurable MBean which can be
+    used to make almost any resource manageable.  Rather than relying on
+    implementing a Java interface, Model MBeans utilize <em>metadata</em>
+    about the constructors, attributes, and operations that are supported
+    to make calls on the managed resource's class, using Java's reflection
+    APIs to call arbitrary methods with arbitrary arguments.</li>
+</ul>
+
+<p>At first glance, Model MBeans sound incredibly useful -- they require no
+changes at all to the Java class representing the managed resource, and you
+can use a standard base class provided with the JMX implementation to perform
+almost all of your management requirements.  However, the developer is still
+required to provide the metadata, which can be tedious to create when there
+are many managed resources, with many attributes and operations made available
+by those resources.  This is where the <strong>Modeler</strong> comes in.</p>
+
+<p><strong>Modeler</strong> provides the following services to the application
+developer who wishes to make their applications manageable via JMX:</p>
+<ul>
+<li>Reads an XML-based description of the Model MBeans to be provided for a
+    set of managed resource classes, defining all of the constructors,
+    attributes (i.e. properties) and operations (i.e. methods) to be exposed
+    to a management application.  Note that, in many cases, additions to or
+    removals from the set of APIs exposed for management can be made with no
+    code changes.</li>
+<li>Provides a registry of these descriptions that allows the
+    <code>javax.management.modelmbean.ModelMBeanInfo</code> object required
+    by the JMX architecture to be synthesized in one or two lines of
+    code.</li>
+<li>Supplies a base Model MBean implementation class that can be used for
+    all management activities where the attribute accesses or operation calls
+    are simply reflected on to the managed object, but can also serve as a
+    superclass for cases where the MBean needs to perform additional
+    functionality, such as event notification, in addition to calling the
+    appropriate method on the managed resource class.</li>
+</ul>
+
+
+<h3>(1) Scope of the Package</h3>
+
+<p>The <em>Modeler</em> project shall create and maintain a set of Java
+classes to provide the facilities described in the preceeding section, plus
+unit tests and small examples of using these facilities to instrument
+Java classes with Model MBean support.</p>
+
+
+<h3>(1.5) Interaction With Other Packages</h3>
+
+<p><em>Modeler</em> relies on:
+</p>
+
+<ul>
+  <li>Java Development Kit (Version 1.2 or later)</li>
+  <li>A JAXP 1.1 implementation</li>
+  <li>A SAX 2.0 parser conforming to the JAXP 1.1 APIs</li>
+  <li>BeanUtils from Commons - for instrospection information</li>
+  <li>Collections from Commons - for object collections</li>
+  <li>Digester from Commons - for parsing scripts in XML</li>
+  <li>A JMX compliant implementation, like the 
+  <a href="http://java.sun.com/products/JavaManagement/download.html">
+  JMX Instrumentation and Agent Specification reference implementation</a> or 
+  <a href="http://www.open-jmx.org">OpenJMX</a></li>
+</ul>
+
+<h3>(2) Initial Source of the Package</h3>
+
+<p>This package represents original code that will be used initially to
+instrument the Tomcat 4 servlet container with JMX manageability for all
+major components.</p>
+
+<p>The proposed package name for the new component is
+<code>org.apache.commons.modeler</code>.
+
+<h3>(3) Required Jakarta-Commons Resources</h3>
+
+<ul>
+
+<li>CVS Repository - New directory <code>modeler</code> in the 
+<code>jakarta-commons</code> CVS repository.</li>
+
+<li>Mailing List - Discussions will take place on the general
+<em>commons-dev@jakarta.apache.org</em> mailing list. To help list
+subscribers identify messages of interest, it is suggested that the
+message subject of messages about this component be prefixed with
+[Modeler].</li>
+
+<li>Bugzilla - New component "Modeler" under the "Commons" product
+category, with appropriate version identifiers as needed.</li>
+
+<li>Jyve FAQ - New category "commons-modeler" (when available).</li>
+</ul>
+
+
+<h3>(4) Initial Committers</h3>
+
+<p>The initial committers on the Workflow component shall be:</p>
+
+<ul>
+  <li>Craig R. McClanahan</li>
+  <li>Remy Maucherat</li>
+</ul>
+
+</body>
+</html>

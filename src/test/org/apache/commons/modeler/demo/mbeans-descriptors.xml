@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<!DOCTYPE mbeans-descriptors PUBLIC
+ "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+ "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
+
+<!-- Descriptions of JMX MBeans for Catalina -->
+
+<mbeans-descriptors>
+
+  <mbean         name="HttpConnector"
+          description="HTTP/1.1 Connector for Tomcat Standalone"
+                 type="org.apache.commons.modeler.demo.Connector">
+
+    <attribute   name="container"
+          description="Container (Engine) processing our requests"
+                 type="org.apache.commons.modeler.demo.Container"
+            writeable="false"/>
+
+    <attribute   name="port"
+          description="TCP port number to listen on"
+                 type="int"/>
+
+    <attribute   name="scheme"
+          description="Protocol name for this Connector (http, https)"
+                 type="java.lang.String"/>
+
+    <attribute   name="secure"
+          description="Is this a secure (SSL) Connector?"
+                 type="boolean"/>
+
+    <attribute   name="service"
+          description="Service that owns this Connector"
+                 type="org.apache.commons.modeler.demo.Service"/>
+
+    <constructor name="HttpConnector"/>
+
+  </mbean>
+
+
+  <mbean         name="StandardEngine"
+          description="Standard Engine Component"
+                 type="org.apache.commons.modeler.demo.Engine">
+
+    <attribute   name="name"
+          description="Unique name of this Engine"
+                 type="java.lang.String"/>
+
+    <attribute   name="defaultHost"
+          description="Name of the default Host for this Engine"
+                 type="java.lang.String"/>
+
+    <attribute   name="service"
+          description="Service that owns this Engine"
+                 type="org.apache.commons.modeler.demo.Service"/>
+
+    <constructor name="StandardEngine"/>
+
+  </mbean>
+
+
+  <mbean         name="StandardServer"
+          description="Standard Server Component"
+                 type="org.apache.commons.modeler.demo.Server">
+
+    <attribute   name="port"
+          description="TCP port for shutdown messages"
+                 type="int"/>
+
+    <attribute   name="shutdown"
+          description="Shutdown password"
+                 type="java.lang.String"/>
+
+    <constructor name="StandardServer"/>
+
+    <operation   name="addService"
+          description="Add a new child Service"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="service"
+          description="The Service to be added"
+                 type="org.apache.commons.modeler.demo.Service"/>
+    </operation>
+
+    <operation   name="findServices"
+          description="Return all child Services"
+               impact="INFO"
+           returnType="org.apache.commons.modeler.demo.Service[]"/>
+
+    <operation   name="removeService"
+          description="Remove an existing child Service"
+               impact="ACTION"
+           returnType="void"> <!-- void type? -->
+      <parameter name="service"
+          description="The service to be removed"
+                 type="org.apache.commons.modeler.demo.Service"/>
+    </operation>
+
+  </mbean>
+
+
+  <mbean         name="StandardService"
+          description="Standard Service Component"
+                 type="org.apache.commons.modeler.demo.Service">
+
+    <attribute   name="container"
+          description="The Container (Engine) processing requests for this Service"
+                 type="org.apache.commons.modeler.demo.Container"/>
+
+    <attribute   name="name"
+          description="Unique name of this Service"
+                 type="java.lang.String"/>
+
+    <attribute   name="server"
+          description="The Server that owns this Service"
+                 type="org.apache.commons.modeler.demo.Server"
+            writeable="false"/>
+
+    <constructor name="StandardService"/>
+
+    <operation   name="addConnector"
+          description="Add a new associated Connector"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="connector"
+          description="The Connector to be added"
+                 type="org.apache.commons.modeler.demo.Connector"/>
+    </operation>
+
+    <operation   name="findConnectors"
+          description="Return all associated Connectors"
+               impact="ACTION"
+           returnType="org.apache.commons.modeler.demo.Connector[]"/>
+
+    <operation   name="removeConnector"
+          description="Remove an existing associated Connector"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="connector"
+          description="The Connector to be removed"
+                 type="org.apache.commons.modeler.demo.Connector"/>
+    </operation>
+
+  </mbean>
+
+
+</mbeans-descriptors>

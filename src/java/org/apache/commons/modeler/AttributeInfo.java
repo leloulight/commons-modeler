@@ -1,0 +1,316 @@
+/*
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/AttributeInfo.java,v 1.1 2002/04/30 20:58:51 craigmcc Exp $
+ * $Revision: 1.1 $
+ * $Date: 2002/04/30 20:58:51 $
+ *
+ * ====================================================================
+ *
+ * The Apache Software License, Version 1.1
+ *
+ * Copyright (c) 1999 The Apache Software Foundation.  All rights
+ * reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ *
+ * 3. The end-user documentation included with the redistribution, if
+ *    any, must include the following acknowlegement:
+ *       "This product includes software developed by the
+ *        Apache Software Foundation (http://www.apache.org/)."
+ *    Alternately, this acknowlegement may appear in the software itself,
+ *    if and wherever such third-party acknowlegements normally appear.
+ *
+ * 4. The names "The Jakarta Project", "Commons", and "Apache Software
+ *    Foundation" must not be used to endorse or promote products derived
+ *    from this software without prior written permission. For written
+ *    permission, please contact apache@apache.org.
+ *
+ * 5. Products derived from this software may not be called "Apache"
+ *    nor may "Apache" appear in their names without prior written
+ *    permission of the Apache Group.
+ *
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
+ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ * ====================================================================
+ *
+ * This software consists of voluntary contributions made by many
+ * individuals on behalf of the Apache Software Foundation.  For more
+ * information on the Apache Software Foundation, please see
+ * <http://www.apache.org/>.
+ *
+ * [Additional notices, if required by prior licensing conditions]
+ *
+ */
+
+
+package org.apache.commons.modeler;
+
+
+import javax.management.Descriptor;
+import javax.management.modelmbean.ModelMBeanAttributeInfo;
+
+
+/**
+ * <p>Internal configuration information for an <code>Attribute</code>
+ * descriptor.</p>
+ *
+ * @author Craig R. McClanahan
+ * @version $Revision: 1.1 $ $Date: 2002/04/30 20:58:51 $
+ */
+
+public class AttributeInfo extends FeatureInfo {
+
+
+    // ----------------------------------------------------- Instance Variables
+
+
+    /**
+     * The <code>ModelMBeanAttributeInfo</code> object that corresponds
+     * to this <code>AttributeInfo</code> instance.
+     */
+    ModelMBeanAttributeInfo info = null;
+
+
+    // ------------------------------------------------------------- Properties
+
+
+    /**
+     * Override the <code>description</code> property setter.
+     *
+     * @param description The new description
+     */
+    public void setDescription(String description) {
+        super.setDescription(description);
+        this.info = null;
+    }
+
+
+    /**
+     * Override the <code>name</code> property setter.
+     *
+     * @param name The new name
+     */
+    public void setName(String name) {
+        super.setName(name);
+        this.info = null;
+    }
+
+
+    /**
+     * The display name of this attribute.
+     */
+    protected String displayName = null;
+
+    public String getDisplayName() {
+        return (this.displayName);
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+
+    /**
+     * The name of the property getter method, if non-standard.
+     */
+    protected String getMethod = null;
+
+    public String getGetMethod() {
+        return (this.getMethod);
+    }
+
+    public void setGetMethod(String getMethod) {
+        this.getMethod = getMethod;
+        this.info = null;
+    }
+
+
+    /**
+     * Is this a boolean attribute with an "is" getter?
+     */
+    protected boolean is = false;
+
+    public boolean isIs() {
+        return (this.is);
+    }
+
+    public void setIs(boolean is) {
+        this.is = is;
+        this.info = null;
+    }
+
+
+    /**
+     * Is this attribute readable by management applications?
+     */
+    protected boolean readable = true;
+
+    public boolean isReadable() {
+        return (this.readable);
+    }
+
+    public void setReadable(boolean readable) {
+        this.readable = readable;
+        this.info = null;
+    }
+
+
+    /**
+     * The name of the property setter method, if non-standard.
+     */
+    protected String setMethod = null;
+
+    public String getSetMethod() {
+        return (this.setMethod);
+    }
+
+    public void setSetMethod(String setMethod) {
+        this.setMethod = setMethod;
+        this.info = null;
+    }
+
+
+    /**
+     * The fully qualified Java class name of this attribute.
+     */
+    protected String type = null;
+
+    public String getType() {
+        return (this.type);
+    }
+
+    public void setType(String type) {
+        this.type = type;
+        this.info = null;
+    }
+
+
+    /**
+     * Is this attribute writeable by management applications?
+     */
+    protected boolean writeable = true;
+
+    public boolean isWriteable() {
+        return (this.writeable);
+    }
+
+    public void setWriteable(boolean writeable) {
+        this.writeable = writeable;
+        this.info = null;
+    }
+
+
+    // --------------------------------------------------------- Public Methods
+
+
+    /**
+     * Create and return a <code>ModelMBeanAttributeInfo</code> object that
+     * corresponds to the attribute described by this instance.
+     */
+    public ModelMBeanAttributeInfo createAttributeInfo() {
+
+        // Return our cached information (if any)
+        if (info != null)
+            return (info);
+
+        // Create and return a new information object
+        info = new ModelMBeanAttributeInfo
+            (getName(), getType(), getDescription(),
+             isReadable(), isWriteable(), isIs());
+        Descriptor descriptor = info.getDescriptor();
+        if (getDisplayName() != null)
+            descriptor.setField("displayName", getDisplayName());
+        if (isReadable()) {
+            if (getGetMethod() != null)
+                descriptor.setField("getMethod", getGetMethod());
+            else
+                descriptor.setField("getMethod",
+                                    getMethodName(getName(), true, isIs()));
+        }
+        if (isWriteable()) {
+            if (getSetMethod() != null)
+                descriptor.setField("setMethod", getSetMethod());
+            else
+                descriptor.setField("setMethod",
+                                    getMethodName(getName(), false, false));
+        }
+        info.setDescriptor(descriptor);
+        return (info);
+
+    }
+
+
+    /**
+     * Return a string representation of this attribute descriptor.
+     */
+    public String toString() {
+
+        StringBuffer sb = new StringBuffer("AttributeInfo[");
+        sb.append("name=");
+        sb.append(name);
+        sb.append(", description=");
+        sb.append(description);
+        if (!readable) {
+            sb.append(", readable=");
+            sb.append(readable);
+        }
+        sb.append(", type=");
+        sb.append(type);
+        if (!writeable) {
+            sb.append(", writeable=");
+            sb.append(writeable);
+        }
+        sb.append("]");
+        return (sb.toString());
+
+    }
+
+
+    // -------------------------------------------------------- Private Methods
+
+
+    /**
+     * Create and return the name of a default property getter or setter
+     * method, according to the specified values.
+     *
+     * @param name Name of the property itself
+     * @param getter Do we want a get method (versus a set method)?
+     * @param is If returning a getter, do we want the "is" form?
+     */
+    private String getMethodName(String name, boolean getter, boolean is) {
+
+        StringBuffer sb = new StringBuffer();
+        if (getter) {
+            if (is)
+                sb.append("is");
+            else
+                sb.append("get");
+        } else
+            sb.append("set");
+        sb.append(Character.toUpperCase(name.charAt(0)));
+        sb.append(name.substring(1));
+        return (sb.toString());
+
+    }
+
+
+}

@@ -1,0 +1,33 @@
+$Id: RELEASE-NOTES.txt,v 1.1 2002/04/30 20:58:50 craigmcc Exp $
+
+                          Commons Modeler Package
+                                Version 1.0
+                               Release Notes
+
+
+INTRODUCTION:
+============
+
+This document contains the release notes for this version of the Commons
+Modeler package, and highlights changes since the previous version.
+
+
+NEW FEATURES:
+============
+
+This is the initial release of the Commons Modeler package, which supports
+the easy creation and management of Model MBeans that are compatible with
+the Java Management Extensions (JMX) 1.0 specification.  It has been tested
+in conjunction with two different JMX implementations:
+
+* The JMX Reference Implementation (version 1.0.1), available at:
+  <http://java.sun.com/products/JavaManagement/download.html>
+
+* The MX4J Open Source Implementation of JMX (version 1.0-beta-3), from:
+  <http://mx4j.sourceforge.net/>
+
+
+BUG REPORTS ADDRESSED:
+=====================
+
+No bug reports have been filed against Modeler.
