@@ -488,7 +488,7 @@ public final class Registry {
     public List loadMBeans( Object source )
             throws Exception
     {
-        return load("MBeansSource", source, null );
+        return load("MbeansSource", source, null );
     }
 
     /** Experimental.
