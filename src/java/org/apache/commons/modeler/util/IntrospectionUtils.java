@@ -659,10 +659,10 @@ public final class IntrospectionUtils {
     /**
      * add elements from the classpath <i>cp</i> to a Vector
      * <i>jars</i> as file URLs (We use Vector for JDK 1.1 compat).
-     * <p>
-     * @param <b>cp</b> a String classpath of directory or jar file
+     *
+     * @param jars A vector of URLs
+     * @param cp a String classpath of directory or jar file
      *                    elements separated by path.separator delimiters.
-     * @return a Vector of URLs.
      */
     public static void addJarsFromClassPath(Vector jars, String cp)
             throws IOException,MalformedURLException

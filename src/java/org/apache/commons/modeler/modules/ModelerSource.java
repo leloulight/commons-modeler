@@ -24,7 +24,6 @@ public class ModelerSource {
      * @param location
      * @param type
      * @param source Introspected object or some other source
-     * @return
      * @throws Exception
      */ 
     public List loadDescriptors( Registry registry, String location,

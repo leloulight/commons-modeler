@@ -81,8 +81,6 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
     
     /** Return the list of mbeans created by this source.
      *  It can be used to implement runtime services.
-     *
-     * @return
      */
     public List getMBeans() {
         return mbeans;

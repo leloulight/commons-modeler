@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.23 2003/07/20 07:35:12 ggregory Exp $
- * $Revision: 1.23 $
- * $Date: 2003/07/20 07:35:12 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.24 2003/07/21 04:43:16 craigmcc Exp $
+ * $Revision: 1.24 $
+ * $Date: 2003/07/21 04:43:16 $
  *
  * ====================================================================
  *
@@ -139,7 +139,7 @@ import org.apache.commons.modeler.modules.ModelerSource;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.23 $ $Date: 2003/07/20 07:35:12 $
+ * @version $Revision: 1.24 $ $Date: 2003/07/21 04:43:16 $
  */
 
 public class BaseModelMBean implements ModelMBean, MBeanRegistration {
@@ -918,7 +918,7 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
      * this MBean.
      *
      * @param listener The listener to be removed
-     * @param name The attribute name for which no more events are required
+     * @param attributeName The attribute name for which no more events are required
      * @param handback Handback object to be sent along with event
      *  notifications
      *
@@ -1313,8 +1313,6 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
 
     /** Set the type of the mbean. This is used as a key to locate
      * the description in the Registry.
-     *
-     * @param type the type of classname of the modeled object
      */
     protected void createResource() {
         try {
