@@ -3,7 +3,7 @@
 
 <!--
         "Modeler" component of the Jakarta Commons Subproject
-        $Id: build.xml,v 1.17 2003/04/20 20:22:18 costin Exp $
+        $Id: build.xml,v 1.18 2003/04/20 20:37:05 costin Exp $
 -->
 
 
@@ -329,7 +329,7 @@
          package="jakarta-commons/modeler" 
          cvsroot=":pserver:anoncvs@cvs.apache.org:/home/cvspublic"
          dest="release" 
-         tag="{tag}"/> 
+         tag="${tag}"/> 
     <rename src="release/jakarta-commons/modeler" dest="release/commons-modeler-${ver}-src" />
     <delete dir="release/jakarta-commons"/>
     <zip file="release/commons-modeler-${ver}-src.zip" >
