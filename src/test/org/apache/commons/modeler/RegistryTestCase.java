@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/test/org/apache/commons/modeler/RegistryTestCase.java,v 1.6 2003/01/27 19:57:07 craigmcc Exp $
- * $Revision: 1.6 $
- * $Date: 2003/01/27 19:57:07 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/test/org/apache/commons/modeler/RegistryTestCase.java,v 1.7 2003/07/20 07:25:58 ggregory Exp $
+ * $Revision: 1.7 $
+ * $Date: 2003/07/20 07:25:58 $
  *
  * ====================================================================
  *
@@ -64,9 +64,8 @@ package org.apache.commons.modeler;
 
 
 import java.io.FileInputStream;
-import java.util.EmptyStackException;
 import java.util.List;
-import java.util.Map;
+
 import javax.management.Descriptor;
 import javax.management.MBeanConstructorInfo;
 import javax.management.modelmbean.ModelMBeanAttributeInfo;
@@ -74,6 +73,7 @@ import javax.management.modelmbean.ModelMBeanConstructorInfo;
 import javax.management.modelmbean.ModelMBeanInfo;
 import javax.management.modelmbean.ModelMBeanNotificationInfo;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -83,7 +83,7 @@ import junit.framework.TestSuite;
  * <p>Test Case for the Registry class.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.6 $ $Date: 2003/01/27 19:57:07 $
+ * @version $Revision: 1.7 $ $Date: 2003/07/20 07:25:58 $
  */
 
 public class RegistryTestCase extends TestCase {
