@@ -32,7 +32,8 @@ convenient factory methods to instantiate new Model MBean instances for you.
 described in detail below.  You can find some simple usage code in the unit
 tests that come with Modeler (in the <code>src/test</code> subdirectory of the
 source distribution), and much more complex usage code in Tomcat 4.1 (in the
-<code>org.apache.catalina.mbeans</code> package).</p>
+<code>org.apache.catalina.mbeans</code> package).</p>. More advanced uses can
+be found in Tomcat 5 and jakarta-tomcat-connectors.
 
 
 <h3>1.  Acquire a JMX Implementation</h3>
@@ -42,7 +43,7 @@ source distribution), and much more complex usage code in Tomcat 4.1 (in the
 <li>JMX Reference Implementation (version 1.0.1 or later) -
     <a href="http://java.sun.com/products/JavaManagement/download.html">
     http://java.sun.com/products/JavaManagement/download.html</a></li>
-<li>MX4J (version 1.0-beta-3 or later) -
+<li>MX4J (version 1.1 or later) -
     <a href="http://mx4j.sourceforge.net/">http://mx4j.sourceforge.net</a></li>
 <li>JBoss MX
     <a href="http://www.jboss.org/">http://www.jboss.org</a></li>
@@ -186,11 +187,10 @@ described above.  Typically, such a file will be included in the JAR file
 containing the MBean implementation classes themselves, and loaded as follows:
 </p>
 <pre>
-    InputStream stream = this.getClass().getResourceAsStream
+    URL url= this.getClass().getResource
       ("/com/mycompany/mypackage/mbeans-descriptors.xml");
     Registry registry = Registry.getRegistry();
-    registry.loadDescriptors(stream);
-    stream.close();
+    registry.loadMetadata(url);
 </pre>
 
 <p>Besides using the configuration file, it is possible to configure the
@@ -219,7 +219,7 @@ this:</p>
 
   MBeanServer mserver = registry.getMBeanServer();
 
-  ObjectName oname="myDomain:type=Group,name=myGroup";
+  String oname="myDomain:type=Group,name=myGroup";
 
   registry.registerComponent( group, oname, "Group" );
 </pre>
