@@ -3,7 +3,7 @@
 
 <!--
         "Modeler" component of the Jakarta Commons Subproject
-        $Id: build.xml,v 1.13 2003/04/13 17:50:45 costin Exp $
+        $Id: build.xml,v 1.14 2003/04/13 18:52:22 costin Exp $
 -->
 
 
@@ -213,6 +213,8 @@
 
   <target name="jar" depends="compile-only" > 
     <mkdir      dir="${build.home}/classes/META-INF"/>
+    <copy      file="src/java/org/apache/commons/modeler/ant/ant.properties"
+             tofile="${build.home}/classes/META-INF/ant.properties"/>
     <copy      file="LICENSE.txt"
              tofile="${build.home}/classes/META-INF/LICENSE.txt"/>
     <jar jarfile="${commons-modeler.jar}"
@@ -221,6 +223,7 @@
          manifest="src/conf/MANIFEST.MF">
        <include name="org/apache/commons/modeler/**" />
        <include name="META-INF/ant.properties" />
+       <include name="META-INF/LICENSE.txt" />
     </jar>
   </target>
 
