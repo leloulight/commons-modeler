@@ -122,7 +122,7 @@ public class SimpleRemoteConnector
     // XXX Not used - allow translations
     String localDomain;
     String filter;
-    
+
     //
     long lastRefresh=0;
     long updateInterval=5000; // 5 sec - it's min time between updates
@@ -276,7 +276,8 @@ public class SimpleRemoteConnector
                 String name=(String)it.next();
                 Attributes attrs=(Attributes)entries.get( name );
 
-                MBeanProxy proxy=(MBeanProxy)mbeans.get(name);
+                ObjectName oname=new ObjectName(name);
+                MBeanProxy proxy=(MBeanProxy)mbeans.get(oname);
                 if( proxy==null ) {
                     log.debug( "New object " + name);
                     String code=attrs.getValue("modelerType");
@@ -284,13 +285,14 @@ public class SimpleRemoteConnector
                         log.debug("Register " + name  + " " + code );
 
                     proxy= new MBeanProxy(this, code);
-
+                    mbeans.put( oname, proxy );
 
                     // Register
                     MBeanServer mserver=Registry.getRegistry().getMBeanServer();
-                    ObjectName oname=new ObjectName(name);
-                    mserver.registerMBean(proxy, oname);
-                } 
+                    if( ! mserver.isRegistered(oname ) ) {
+                        mserver.registerMBean(proxy, oname);
+                    }
+                }
                 Iterator it2=attrs.keySet().iterator();
                 while( it2.hasNext() ) {
                     Object o=it2.next();
