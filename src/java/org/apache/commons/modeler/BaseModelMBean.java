@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.17 2003/04/07 07:12:02 costin Exp $
- * $Revision: 1.17 $
- * $Date: 2003/04/07 07:12:02 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.18 2003/04/08 04:07:07 costin Exp $
+ * $Revision: 1.18 $
+ * $Date: 2003/04/08 04:07:07 $
  *
  * ====================================================================
  *
@@ -119,7 +119,7 @@ import javax.management.*;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.17 $ $Date: 2003/04/07 07:12:02 $
+ * @version $Revision: 1.18 $ $Date: 2003/04/08 04:07:07 $
  */
 
 public class BaseModelMBean implements ModelMBean, MBeanRegistration {
@@ -1250,12 +1250,13 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
             try {
                 c=Class.forName( type);
             } catch( Throwable t ) {
-                log.error( "Error creating class " + t);
+                log.debug( "Error creating class " + t);
             }
 
             // The class c doesn't need to exist
             ManagedBean descriptor=getRegistry().findManagedBean(c, type);
-
+            if( descriptor==null ) 
+                return;
             this.setModelMBeanInfo(descriptor.createMBeanInfo());
         } catch( Throwable ex) {
             log.error( "TCL: " + Thread.currentThread().getContextClassLoader(),
