@@ -3,7 +3,7 @@
 
 <!--
         "Modeler" component of the Jakarta Commons Subproject
-        $Id: build.xml,v 1.23 2004/07/05 20:45:43 craigmcc Exp $
+        $Id: build.xml,v 1.24 2004/07/08 14:34:17 billbarker Exp $
 -->
 
 
@@ -211,7 +211,7 @@
              tofile="${build.home}/classes/META-INF/ant.properties"/>
     <copy      file="LICENSE.txt"
              tofile="${build.home}/classes/META-INF/LICENSE.txt"/>
-    <jar jarfile="${dist.home}/commons-${component-name}.jar"
+    <jar jarfile="${dist.home}/commons-${component.name}.jar"
          index="true"
          basedir="${build.home}/classes"
          manifest="src/conf/MANIFEST.MF">
