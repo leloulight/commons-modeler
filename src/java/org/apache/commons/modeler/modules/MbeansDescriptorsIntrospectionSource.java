@@ -123,7 +123,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 Class ret=methods[j].getReturnType();
                 if( ! supportedType( ret ) ) {
                     if( log.isDebugEnabled() )
-                        log.debug("Unsupported type " + methods[j] + " " + ret );
+                        log.debug("Unsupported type " + methods[j]);
                     continue;
                 }
                 name=unCapitalize( name.substring(3));
@@ -133,6 +133,28 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 attMap.put( name, methods[j] );
             } else if( name.startsWith( "is" ) ) {
                 // not used in our code. Add later
+                Class params[]=methods[j].getParameterTypes();
+                if( params.length != 0 ) {
+                    if( log.isDebugEnabled())
+                        log.debug("Wrong param count " + name + " " + params.length);
+                    continue;
+                }
+                if( ! Modifier.isPublic( methods[j].getModifiers() ) ) {
+                    if( log.isDebugEnabled())
+                        log.debug("Not public " + methods[j] );
+                    continue;
+                }
+                Class ret=methods[j].getReturnType();
+                if( Boolean.TYPE != ret  ) {
+                    if( log.isDebugEnabled() )
+                        log.debug("Unsupported type " + methods[j] + " " + ret );
+                    continue;
+                }
+                name=unCapitalize( name.substring(2));
+
+                getAttMap.put( name, methods[j] );
+                // just a marker, we don't use the value
+                attMap.put( name, methods[j] );
 
             } else if( name.startsWith( "set" ) ) {
                 Class params[]=methods[j].getParameterTypes();
@@ -222,7 +244,12 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 ai.setDescription("Introspected attribute " + name);
                 if( log.isDebugEnabled()) log.debug("Introspected attribute " +
                         name + " " + gm + " " + sm);
-                mbean.addAttribute(ai);
+                if( gm==null )
+                    ai.setReadable(false);
+                if( sm==null )
+                    ai.setWriteable(false);
+                if( sm!=null || gm!=null )
+                    mbean.addAttribute(ai);
             }
 
             en=invokeAttMap.keys();
