@@ -3,17 +3,17 @@
 
 <!--
         "Modeler" component of the Jakarta Commons Subproject
-        $Id: build.xml,v 1.21 2003/08/19 00:09:57 yoavs Exp $
+        $Id: build.xml,v 1.22 2004/07/05 20:35:40 craigmcc Exp $
 -->
 
 
 <!-- ========== Initialize Properties ===================================== -->
 
 
-  <property file="${user.home}/build.properties"/>   <!-- User local        -->
   <property file="build.properties"/>                <!-- Component local   -->
-  <property file="build.properties.default"/>        <!-- Defaults   -->
   <property file="../build.properties"/>             <!-- Commons local     -->
+  <property file="${user.home}/build.properties"/>   <!-- User local        -->
+  <property file="build.properties.default"/>        <!-- Defaults          -->
 
 
 <!-- ========== External Dependencies ===================================== -->
