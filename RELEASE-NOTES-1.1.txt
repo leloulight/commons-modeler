@@ -1,4 +1,4 @@
-$Id: RELEASE-NOTES-1.1.txt,v 1.4 2003/04/14 02:17:03 costin Exp $
+$Id: RELEASE-NOTES-1.1.txt,v 1.5 2003/04/20 18:20:34 costin Exp $
 
                           Commons Modeler Package
                                 Version 1.1
@@ -43,8 +43,11 @@ small applications.
 
 * (experimental) support for remote mbeans, allowing management of non-local mbeans. 
 
-* (experimental) support for persistence for mbeans loaded from the mbeans file.
+* (experimental) support for persistence for mbeans loaded from the mbeans file. Modification
+of attributes will be saved, however adding new mbeans is not yet implemented
 
+* the distribution package includes commons-modeler-src.jar which can be used in IDEs to 
+quickly see the sources when debugging and to do small builds.
 
 BUG REPORTS ADDRESSED:
 =====================
@@ -56,7 +59,8 @@ All bugs reported against modeler have been fixed.
 In addition, this release fixes problems reported against jakarta-tomcat:
 
 * Support for old connector and other components that are not declared in mbeans-descriptors.xml
-
+* Use of thread class loader when creating objects or the parameter signature in invoke, to deal with
+ the case modeler is installed in a parent loader
 
 NOTES:
 ======
