@@ -4,7 +4,7 @@
   <extend>../project.xml</extend>
   <name>Modeler</name>
   <id>commons-modeler</id>
-  <currentVersion>1.0-dev</currentVersion>
+  <currentVersion>1.1</currentVersion>
   <inceptionYear>2002</inceptionYear>
   <gumpRepositoryId>jakarta</gumpRepositoryId>
   <shortDescription>Commons Modeler</shortDescription>
@@ -18,6 +18,13 @@
       <name>Craig McClanahan</name>
       <id></id>
       <email></email>
+      <organization></organization>
+    </developer>
+
+    <developer>
+      <name>Yoav Shapira</name>
+      <id></id>
+      <email>yoavs@apache.org</email>
       <organization></organization>
     </developer>
   </developers>
