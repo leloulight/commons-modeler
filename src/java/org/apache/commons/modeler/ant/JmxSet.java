@@ -140,23 +140,9 @@ public class JmxSet extends Task {
                  objValue=project.getReference(valueRef);
              }
              if( objValue==null ) {
-                 if( type==null || "java.lang.String".equals( type )) {
-                     // string is default
-                     objValue=value;
-                 } else if( "javax.management.ObjectName".equals( type ) ||
-                         "ObjectName".equals( type )) {
-                     if( log.isTraceEnabled())
-                        log.trace("Convert to ObjectName " + value);
-                     objValue=new ObjectName( value );
-                 } else if( "java.lang.Integer".equals( type ) ||
-                         "int".equals( type )) {
-                     objValue=new Integer( value );
-                 } else if( "java.lang.Boolean".equals( type ) ||
-                         "boolean".equals( type )) {
-                     objValue=new Boolean( value );
-                 }
+                 objValue=registry.convertValue(type, value);
 
-            }
+             }
             if( log.isDebugEnabled())
                 log.debug("Setting " + oname + " " + attribute + " " +
                         objValue);
