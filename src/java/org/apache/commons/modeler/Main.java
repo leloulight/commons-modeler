@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/Main.java,v 1.3 2003/01/21 00:33:45 costin Exp $
- * $Revision: 1.3 $
- * $Date: 2003/01/21 00:33:45 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/Main.java,v 1.4 2003/02/28 04:52:43 costin Exp $
+ * $Revision: 1.4 $
+ * $Date: 2003/02/28 04:52:43 $
  *
  * ====================================================================
  *
@@ -70,6 +70,7 @@ import org.apache.commons.modeler.util.IntrospectionUtils;
 import java.io.FileInputStream;
 import java.io.File;
 import java.net.URL;
+import java.util.List;
 
 
 /**
@@ -119,7 +120,11 @@ public class Main
         File fileF=new File( file );
         URL url=new URL("file", null, fileF.getAbsolutePath());
 
-        reg.loadDescriptors( type, url, null);
+        // Load the mbeans defined in the file and set all
+        // attributes
+        List mbeans=reg.load( type, url, null);
+        reg.invoke(mbeans, "init", false);
+        reg.invoke(mbeans, "start", false);
     }
 
     public static void main( String args[] ) {
