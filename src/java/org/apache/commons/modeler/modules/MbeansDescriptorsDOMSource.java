@@ -330,7 +330,7 @@ public class MbeansDescriptorsDOMSource extends ModelerSource
             }
 
             long t2=System.currentTimeMillis();
-            log.info( "Reading descriptors ( dom ) " + (t2-t1));
+            log.debug( "Reading descriptors ( dom ) " + (t2-t1));
         } catch( Exception ex ) {
             log.error( "Error reading descriptors ", ex);
         }
