@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/Registry.java,v 1.3 2002/08/08 05:34:12 costin Exp $
- * $Revision: 1.3 $
- * $Date: 2002/08/08 05:34:12 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/Registry.java,v 1.4 2002/10/11 22:18:07 craigmcc Exp $
+ * $Revision: 1.4 $
+ * $Date: 2002/10/11 22:18:07 $
  *
  * ====================================================================
  *
@@ -88,7 +88,7 @@ import org.apache.commons.logging.LogFactory;
  * synchronized.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.3 $ $Date: 2002/08/08 05:34:12 $
+ * @version $Revision: 1.4 $ $Date: 2002/10/11 22:18:07 $
  */
 
 public final class Registry {
@@ -333,7 +333,7 @@ public final class Registry {
              "org.apache.commons.modeler.NotificationInfo");
         digester.addCallMethod
             ("mbeans-descriptors/mbean/notification/notification-type",
-             "addNotificationType", 0);
+             "addNotifType", 0);
 
         digester.addObjectCreate
             ("mbeans-descriptors/mbean/operation",
