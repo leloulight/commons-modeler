@@ -13,11 +13,18 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 
 
 /** This will create mbeans based on a config file.
  *  The format is an extended version of MLET.
  *
+ * Classloading. We don't support any explicit classloader tag. 
+ * A ClassLoader is just an mbean ( it can be the standard MLetMBean or
+ * a custom one ). 
+ * 
+ * XXX add a special attribute to reference the loader mbean,
+ * XXX figure out how to deal with private loaders
  */
 public class MbeansSource extends ModelerSource
 {
@@ -28,6 +35,8 @@ public class MbeansSource extends ModelerSource
     Object source;
     List mbeans=new ArrayList();
     static boolean loaderLoaded=false;
+    private Document document;
+    private HashMap object2Node = new HashMap();
 
     public void setRegistry(Registry reg) {
         this.registry=reg;
@@ -69,16 +78,17 @@ public class MbeansSource extends ModelerSource
         execute();
         return mbeans;
     }
+    
 
     public void execute() throws Exception {
         if( registry==null ) registry=Registry.getRegistry();
         try {
             InputStream stream=(InputStream)source;
             long t1=System.currentTimeMillis();
-            Document doc=DomUtil.readXml(stream);
+            document = DomUtil.readXml(stream);
 
             // We don't care what the root node is.
-            Node descriptorsN=doc.getDocumentElement();
+            Node descriptorsN=document.getDocumentElement();
 
             if( descriptorsN == null ) {
                 log.error("No descriptors found");
@@ -96,6 +106,7 @@ public class MbeansSource extends ModelerSource
 
             MBeanServer server=(MBeanServer)Registry.getServer();
 
+            // XXX Not very clean...  Just a workaround
             if( ! loaderLoaded ) {
                 // Register a loader that will be find ant classes.
                 ObjectName defaultLoader= new ObjectName("modeler",
@@ -104,23 +115,22 @@ public class MbeansSource extends ModelerSource
                 server.registerMBean(mlet, defaultLoader);
                 loaderLoaded=true;
             }
-            // We'll process all nodes at the same level.
+        
+            // Process nodes
             for (Node mbeanN = firstMbeanN; mbeanN != null;
                  mbeanN= DomUtil.getNext(mbeanN, null, Node.ELEMENT_NODE))
             {
                 String nodeName=mbeanN.getNodeName();
 
-                if( "mbean".equals(nodeName) || "MLET".equals(nodeName) ||
-                        "service".equals(nodeName)) {
+                // mbean is the "official" name
+                if( "mbean".equals(nodeName) || "MLET".equals(nodeName) )
+                {
                     String code=DomUtil.getAttribute( mbeanN, "code" );
-                    if( code==null ) {
-                        code=DomUtil.getAttribute( mbeanN, "class" );
-                    }
                     String objectName=DomUtil.getAttribute( mbeanN, "objectName" );
                     if( objectName==null ) {
                         objectName=DomUtil.getAttribute( mbeanN, "name" );
                     }
-
+                    
                     if( log.isDebugEnabled())
                         log.debug( "Processing mbean objectName=" + objectName +
                                 " code=" + code);
@@ -133,8 +143,18 @@ public class MbeansSource extends ModelerSource
 
                     try {
                         ObjectName oname=new ObjectName(objectName);
-                        server.createMBean(code, oname);
-                        mbeans.add(oname);
+                        if( ! server.isRegistered( oname )) {
+                            // We wrap everything in a model mbean.
+                            // XXX need to support "StandardMBeanDescriptorsSource"
+                            String modelMBean=BaseModelMBean.class.getName();                            
+                            server.createMBean(modelMBean, oname,
+                                    new Object[] { code, this},
+                                    new String[] { String.class.getName(),
+                                                  ModelerSource.class.getName() } 
+                                    );
+                            mbeans.add(oname);
+                        }
+                        object2Node.put( oname, mbeanN );
                         // XXX Arguments, loader !!!
                     } catch( Exception ex ) {
                         log.error( "Error creating mbean " + objectName, ex);
@@ -146,13 +166,6 @@ public class MbeansSource extends ModelerSource
                     {
                         processAttribute(server, descN, objectName);
                     }
-
-                } else if("classpath".equals(nodeName) ) {
-                    // TODO support classpath ( standard )
-                } else if("jmx-attribute".equals(nodeName) ) {
-                    // <jmx-attribute objectName="..." name="..." value="..."/>
-                    String objectName=DomUtil.getAttribute(mbeanN, "objectName");
-                    processAttribute(server, mbeanN, objectName);
                 } else if("jmx-operation".equals(nodeName) ) {
                     String name=DomUtil.getAttribute(mbeanN, "objectName");
                     if( name==null )
@@ -195,6 +208,23 @@ public class MbeansSource extends ModelerSource
             log.error( "Error reading mbeans ", ex);
         }
     }
+    
+    public void updateField( ObjectName oname, String name, 
+                             Object value ) {
+        // nothing by default 
+        //log.info( "XXX UpdateField " + oname + " " + name + " " + value);
+        Node n=(Node)object2Node.get( oname );
+        if( n == null ) {
+            log.info( "Node not found " + oname );
+            return;
+        }
+        n.getAttributes();
+        
+    }
+    
+    public void store() {
+        
+    }
 
     private void processAttribute(MBeanServer server,
                                   Node descN, String objectName ) {
@@ -213,10 +243,12 @@ public class MbeansSource extends ModelerSource
             // find the type
             if( type==null )
                 type=registry.getType(  oname, attName );
+
             if( type==null ) {
                 log.info("Can't find attribute " + objectName + " " + attName );
+
             } else {
-                Object valueO=getValueObject( value, type);
+                Object valueO=registry.convertValue( type, value);
                 server.setAttribute(oname, new Attribute(attName, valueO));
             }
         } catch( Exception ex) {
@@ -238,8 +270,6 @@ public class MbeansSource extends ModelerSource
                 // The value may be specified as CDATA
                 value=DomUtil.getContent(argN);
             }
-
-
         }
     }
 }
