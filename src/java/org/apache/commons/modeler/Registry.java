@@ -83,9 +83,8 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.13 $ $Date: 2003/01/07 21:07:40 $
  */
-public final class Registry extends BaseRegistry {
+public final class Registry {
 
 
     // ----------------------------------------------------------- Constructors
@@ -259,6 +258,7 @@ public final class Registry extends BaseRegistry {
      *
      * @exception Exception if any parsing or processing error occurs
      * @deprecated use normal class method instead
+     * @since 1.0
      */
     public static void loadRegistry(InputStream stream) throws Exception {
         Registry registry = getRegistry();
@@ -292,11 +292,38 @@ public final class Registry extends BaseRegistry {
         return ds;
     }
 
-    public void loadDescriptors( String location, String type, InputStream stream )
+    public void loadDescriptors( String type, Object source )
         throws Exception
     {
-        DescriptorSource ds=getDescriptorSource(type);
-        ds.loadDescriptors(this, location, type, stream);
+        log.trace("loadDescriptors " + source );
+
+        if( source instanceof URL ) {
+            System.out.println("Try " + source );
+            URL url=(URL)source;
+//            URL url1=new URL( url.toString() + ".ser");
+//            try {
+//                System.out.println("Ser: " + url1);
+//                InputStream stream=url1.openStream();
+//                if( stream != null ) {
+//                    DescriptorSource ds=getDescriptorSource("MbeansDescriptorsSer");
+//                    ds.loadDescriptors(this, url1.toString(), type, stream);
+//                    return;
+//                }
+//            }  catch( FileNotFoundException ex ) {
+//                // nothing
+//                log.debug("Not found: " + url1 );
+//            }  catch( Exception ex ) {
+//                ex.printStackTrace();
+//            }
+            InputStream stream=url.openStream();
+            DescriptorSource ds=getDescriptorSource(type);
+            ds.loadDescriptors(this, url.toString(), type, stream);
+        }
+
+        if( source instanceof InputStream ) {
+            DescriptorSource ds=getDescriptorSource(type);
+            ds.loadDescriptors(this, null, type, (InputStream)source);
+        }
     }
 
     /**
@@ -307,11 +334,12 @@ public final class Registry extends BaseRegistry {
      *  information
      *
      * @exception Exception if any parsing or processing error occurs
+     * @since 1.0
      */
     public void loadDescriptors(InputStream stream, String type)
         throws Exception
     {
-        loadDescriptors(null, type, stream );
+        loadDescriptors( type, stream );
     }
 
     /**
@@ -338,29 +366,34 @@ public final class Registry extends BaseRegistry {
                                   String name)
            throws Exception
     {
-        if( type==null ) {
-            // XXX find type from bean name.
+        String nameStr=null;
+        try {
+            if( type==null ) {
+                // XXX find type from bean name.
+            }
+            ManagedBean managed = registry.findManagedBean(type);
+            if( managed==null ) {
+                // TODO: check package and parent packages
+
+                // TODO: check super-class
+
+                // introspection
+                managed=createManagedBean(domain, bean.getClass(), type);
+                managed.setName( type );
+                addManagedBean(managed);
+            }
+
+            // The real mbean is created and registered
+            ModelMBean mbean = managed.createMBean(bean);
+            StringBuffer sb=new StringBuffer();
+            sb.append( domain ).append(":");
+            sb.append( name );
+            nameStr=sb.toString();
+            getServer().registerMBean( mbean, new ObjectName( nameStr ));
+        } catch( Exception ex) {
+            log.error("Error registering " + nameStr );
+            throw ex;
         }
-        ManagedBean managed = registry.findManagedBean(type);
-        if( managed==null ) {
-            // TODO: check package and parent packages
-
-            // TODO: check super-class
-
-            // introspection
-            managed=createManagedBean(domain, bean.getClass(), type);
-            addManagedBean(managed);
-        }
-
-        // The real mbean is created and registered
-        ModelMBean mbean = managed.createMBean(bean);
-
-        if( name==null ) {
-            // XXX generate a seq or hash ?
-            // should we genereate the seq automatically ?
-        }
-        getServer().registerMBean( mbean, new ObjectName( domain + ": type="
-                + type + " ; " + name ));
     }
 
     public void unregisterComponent( String name ) {
@@ -372,15 +405,6 @@ public final class Registry extends BaseRegistry {
         } catch( Throwable t ) {
             log.error( "Error unregistering mbean ", t );
         }
-    }
-
-
-    public void registerClass(Class beanClass, String domain, String className,
-                              String type, Object source)
-    {
-        // use intropsection. Source is not supported yet.
-        ManagedBean managed=createManagedBean(domain, beanClass, type);
-
     }
 
 
@@ -434,13 +458,51 @@ public final class Registry extends BaseRegistry {
         try {
             DescriptorSource ds=getDescriptorSource("MbeansDescriptorsIntrospection");
             ds.loadDescriptors(this, type, type, realClass);
-            System.out.println("Loading " + realClass.getName());
-            return findManagedBean(realClass.getName());
+            if( log.isDebugEnabled())
+                log.debug("Loading " + type + " " + realClass.getName());
+            return findManagedBean(type);
         } catch( Exception ex ) {
             ex.printStackTrace();
         }
         return null;
     }
 
+    /** Find the 'type' for this class
+     *
+     */
+    public String getType( String domain, Class realClass ) {
+        // first look at explicit mappings ( exceptions in MBeanUtils )
 
+        // We could also look up super classes and locate one we know about
+
+        // We could use the domain as a discriminator
+
+        String name=realClass.getName();
+        name=name.substring( name.lastIndexOf( ".") + 1 );
+
+
+        return name;
+    }
+
+    // Store all objects that have been registered via modeler
+    // it is used to generate unique names automatically - using seq=
+    // scheme
+    Hashtable instances=new Hashtable();
+    /** If a name was not provided, generate a name based on the
+     *  class name and a sequence number.
+     */
+    public String generateSeqName(String domain, Class realClass) {
+        String name=getType( domain, realClass );
+
+        Integer iInt=(Integer)instances.get(name );
+        int seq=0;
+        if( iInt!= null ) {
+            seq=iInt.intValue();
+            seq++;
+            instances.put( name, new Integer( seq ));
+        } else {
+            instances.put( name, new Integer( 0 ));
+        }
+        return "name=" + name + ",seq=" + seq;
+    }
 }
