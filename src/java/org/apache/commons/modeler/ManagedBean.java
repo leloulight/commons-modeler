@@ -76,6 +76,7 @@ public class ManagedBean implements java.io.Serializable
         ai.setName("modelerType");
         ai.setDescription("Type of the modeled resource. Can be set only once");
         ai.setType("java.lang.String");
+        ai.setWriteable(false);
         addAttribute(ai);
     }
     
