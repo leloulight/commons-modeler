@@ -54,17 +54,20 @@
 
 package org.apache.commons.modeler.ant;
 
-import org.apache.tools.ant.*;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.management.*;
-import javax.management.ObjectName;
+import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
+import javax.management.ObjectName;
 import javax.management.loading.MLet;
-import java.util.*;
-import java.net.URL;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Task;
 
 /**
  * Load an MBean. The syntax is similar with the <mlet>, with few

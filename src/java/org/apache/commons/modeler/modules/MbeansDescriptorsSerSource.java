@@ -1,18 +1,15 @@
 package org.apache.commons.modeler.modules;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.apache.commons.modeler.util.DomUtil;
-import org.apache.commons.modeler.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.EOFException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.modeler.ManagedBean;
+import org.apache.commons.modeler.Registry;
 
 
 public class MbeansDescriptorsSerSource extends ModelerSource

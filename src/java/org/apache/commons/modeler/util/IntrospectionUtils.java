@@ -60,10 +60,18 @@
 
 package org.apache.commons.modeler.util;
 
-import java.lang.reflect.*;
-import java.net.*;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.Hashtable;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 // Depends:
 //    JDK1.1

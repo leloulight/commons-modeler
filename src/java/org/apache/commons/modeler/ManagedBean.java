@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ManagedBean.java,v 1.8 2003/04/15 18:19:12 costin Exp $
- * $Revision: 1.8 $
- * $Date: 2003/04/15 18:19:12 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ManagedBean.java,v 1.9 2003/07/20 07:35:13 ggregory Exp $
+ * $Revision: 1.9 $
+ * $Date: 2003/07/20 07:35:13 $
  *
  * ====================================================================
  *
@@ -66,11 +66,13 @@ package org.apache.commons.modeler;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import javax.management.*;
+
+import javax.management.Descriptor;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.RuntimeOperationsException;
 import javax.management.modelmbean.InvalidTargetObjectTypeException;
 import javax.management.modelmbean.ModelMBean;
 import javax.management.modelmbean.ModelMBeanAttributeInfo;
@@ -86,7 +88,7 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.8 $ $Date: 2003/04/15 18:19:12 $
+ * @version $Revision: 1.9 $ $Date: 2003/07/20 07:35:13 $
  */
 
 public class ManagedBean implements java.io.Serializable

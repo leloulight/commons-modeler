@@ -1,21 +1,15 @@
 package org.apache.commons.modeler.mbeans;
 
-import org.apache.commons.modeler.BaseModelMBean;
-import org.apache.commons.modeler.ManagedBean;
-import org.apache.commons.modeler.AttributeInfo;
-import org.apache.commons.modeler.OperationInfo;
-import org.apache.commons.modeler.Registry;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import java.util.List;
 import java.util.HashMap;
-import java.io.InputStream;
-import javax.management.ObjectName;
-import javax.management.MBeanServer;
+
+import javax.management.Attribute;
 import javax.management.AttributeNotFoundException;
 import javax.management.MBeanException;
 import javax.management.ReflectionException;
-import javax.management.Attribute;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.modeler.BaseModelMBean;
 
 /** Use the same metadata, except that we replace the attribute
  * get/set methods.

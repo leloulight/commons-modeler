@@ -61,19 +61,22 @@
 package org.apache.commons.modeler;
 
 
-import java.io.*;
-import java.net.URL;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
+
+import javax.management.AttributeChangeNotification;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MBeanServer;
+import javax.management.MBeanServerNotification;
+import javax.management.Notification;
+import javax.management.NotificationBroadcaster;
+import javax.management.NotificationListener;
+import javax.management.ObjectName;
+import javax.naming.Context;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-// Depends on JNDI - if a DirContext is provided we'll push info into it.
-import javax.naming.*;
-import javax.naming.directory.*;
-
-import javax.management.*;
 
 // EXPERIMENTAL. It may fit better in tomcat jndi impl.
 

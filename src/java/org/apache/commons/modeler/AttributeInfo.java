@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/AttributeInfo.java,v 1.6 2003/02/17 00:52:45 costin Exp $
- * $Revision: 1.6 $
- * $Date: 2003/02/17 00:52:45 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/AttributeInfo.java,v 1.7 2003/07/20 07:35:12 ggregory Exp $
+ * $Revision: 1.7 $
+ * $Date: 2003/07/20 07:35:12 $
  *
  * ====================================================================
  *
@@ -65,10 +65,11 @@
 package org.apache.commons.modeler;
 
 
+import java.io.Serializable;
+import java.lang.reflect.Method;
+
 import javax.management.Descriptor;
 import javax.management.modelmbean.ModelMBeanAttributeInfo;
-import java.lang.reflect.Method;
-import java.io.Serializable;
 
 
 /**
@@ -76,7 +77,7 @@ import java.io.Serializable;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.6 $ $Date: 2003/02/17 00:52:45 $
+ * @version $Revision: 1.7 $ $Date: 2003/07/20 07:35:12 $
  */
 
 public class AttributeInfo extends FeatureInfo implements Serializable {

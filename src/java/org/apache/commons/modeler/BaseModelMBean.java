@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.22 2003/04/17 04:31:36 costin Exp $
- * $Revision: 1.22 $
- * $Date: 2003/04/17 04:31:36 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.23 2003/07/20 07:35:12 ggregory Exp $
+ * $Revision: 1.23 $
+ * $Date: 2003/07/20 07:35:12 $
  *
  * ====================================================================
  *
@@ -65,16 +65,34 @@
 package org.apache.commons.modeler;
 
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.modeler.modules.ModelerSource;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.Hashtable;
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
 
+import javax.management.Attribute;
+import javax.management.AttributeChangeNotification;
+import javax.management.AttributeList;
+import javax.management.AttributeNotFoundException;
+import javax.management.Descriptor;
+import javax.management.DynamicMBean;
+import javax.management.InstanceNotFoundException;
+import javax.management.InvalidAttributeValueException;
+import javax.management.ListenerNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MBeanInfo;
+import javax.management.MBeanNotificationInfo;
+import javax.management.MBeanRegistration;
+import javax.management.MBeanServer;
+import javax.management.Notification;
+import javax.management.NotificationFilter;
+import javax.management.NotificationListener;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
+import javax.management.RuntimeErrorException;
+import javax.management.RuntimeOperationsException;
+import javax.management.ServiceNotFoundException;
 import javax.management.modelmbean.DescriptorSupport;
 import javax.management.modelmbean.InvalidTargetObjectTypeException;
 import javax.management.modelmbean.ModelMBean;
@@ -83,8 +101,10 @@ import javax.management.modelmbean.ModelMBeanInfo;
 import javax.management.modelmbean.ModelMBeanInfoSupport;
 import javax.management.modelmbean.ModelMBeanNotificationInfo;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
-import javax.management.*;
-import javax.management.DynamicMBean;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.modeler.modules.ModelerSource;
 
 // TODO: enable ant-like substitutions ? ( or at least discuss it )
 
@@ -119,7 +139,7 @@ import javax.management.DynamicMBean;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.22 $ $Date: 2003/04/17 04:31:36 $
+ * @version $Revision: 1.23 $ $Date: 2003/07/20 07:35:12 $
  */
 
 public class BaseModelMBean implements ModelMBean, MBeanRegistration {

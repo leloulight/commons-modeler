@@ -1,22 +1,6 @@
 package org.apache.commons.modeler.modules;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.apache.commons.modeler.util.DomUtil;
-import org.apache.commons.modeler.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.management.*;
-import javax.management.loading.MLet;
-import javax.xml.transform.TransformerException;
-import java.io.InputStream;
-import java.io.FileOutputStream;
-import java.io.FileNotFoundException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.HashMap;
 
 
 /**

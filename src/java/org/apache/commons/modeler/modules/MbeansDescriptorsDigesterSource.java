@@ -60,15 +60,15 @@
 
 package org.apache.commons.modeler.modules;
 
-import org.apache.commons.digester.Digester;
-import org.apache.commons.modeler.Registry;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.InputStream;
 import java.net.URL;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.digester.Digester;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.modeler.Registry;
 
 public class MbeansDescriptorsDigesterSource extends ModelerSource
 {

@@ -61,13 +61,15 @@
 package org.apache.commons.modeler.ant;
 
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.net.URL;
 
-import org.apache.commons.modeler.ManagedBean;
-import org.apache.commons.modeler.Registry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.modeler.ManagedBean;
+import org.apache.commons.modeler.Registry;
 import org.apache.tools.ant.BuildException;
 
 /**

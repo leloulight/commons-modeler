@@ -54,11 +54,13 @@
 
 package org.apache.commons.modeler.ant;
 
-import org.apache.tools.ant.*;
-import javax.management.*;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import java.util.Vector;
+
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+import javax.management.ObjectName;
+
+import org.apache.tools.ant.Task;
 
 /**
  * Set mbean properties.

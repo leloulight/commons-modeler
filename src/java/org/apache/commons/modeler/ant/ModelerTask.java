@@ -54,16 +54,11 @@
 
 package org.apache.commons.modeler.ant;
 
-import org.apache.tools.ant.*;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
+import java.util.ArrayList;
 
-import javax.management.*;
-import javax.management.ObjectName;
-import javax.management.MBeanServer;
-import javax.management.loading.MLet;
-import java.util.*;
-import java.net.URL;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.tools.ant.BuildException;
 
 /**
  * Like MLETTask, but it wraps the bean in a BaseModelMBean.

@@ -1,25 +1,21 @@
 package org.apache.commons.modeler.modules;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.apache.commons.modeler.util.DomUtil;
-import org.apache.commons.modeler.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Hashtable;
-import java.util.Enumeration;
 import java.util.ArrayList;
 import java.util.List;
-import javax.management.ObjectName;
+
 import javax.management.DynamicMBean;
-import javax.management.MBeanInfo;
 import javax.management.MBeanAttributeInfo;
+import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.modeler.AttributeInfo;
+import org.apache.commons.modeler.ManagedBean;
+import org.apache.commons.modeler.OperationInfo;
+import org.apache.commons.modeler.ParameterInfo;
+import org.apache.commons.modeler.Registry;
 
 
 /** Extract metadata from a dynamic mbean.

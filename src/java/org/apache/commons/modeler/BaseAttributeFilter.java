@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseAttributeFilter.java,v 1.2 2002/06/15 18:17:02 craigmcc Exp $
- * $Revision: 1.2 $
- * $Date: 2002/06/15 18:17:02 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseAttributeFilter.java,v 1.3 2003/07/20 07:35:12 ggregory Exp $
+ * $Revision: 1.3 $
+ * $Date: 2003/07/20 07:35:12 $
  *
  * ====================================================================
  *
@@ -66,6 +66,7 @@ package org.apache.commons.modeler;
 
 
 import java.util.HashSet;
+
 import javax.management.AttributeChangeNotification;
 import javax.management.Notification;
 import javax.management.NotificationFilter;
@@ -78,7 +79,7 @@ import javax.management.NotificationFilter;
  * supplied by the application.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.2 $ $Date: 2002/06/15 18:17:02 $
+ * @version $Revision: 1.3 $ $Date: 2003/07/20 07:35:12 $
  */
 
 public class BaseAttributeFilter implements NotificationFilter {

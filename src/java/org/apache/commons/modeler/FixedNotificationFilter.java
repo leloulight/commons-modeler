@@ -62,7 +62,7 @@ package org.apache.commons.modeler;
 
 
 import java.util.HashSet;
-import javax.management.AttributeChangeNotification;
+
 import javax.management.Notification;
 import javax.management.NotificationFilter;
 

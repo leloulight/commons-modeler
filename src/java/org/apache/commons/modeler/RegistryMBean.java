@@ -62,8 +62,6 @@ package org.apache.commons.modeler;
 
 
 import java.util.List;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 
 /**
  * Interface for modeler MBeans.

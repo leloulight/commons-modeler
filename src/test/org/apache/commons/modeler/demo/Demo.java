@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/test/org/apache/commons/modeler/demo/Demo.java,v 1.1 2002/04/30 20:58:52 craigmcc Exp $
- * $Revision: 1.1 $
- * $Date: 2002/04/30 20:58:52 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/test/org/apache/commons/modeler/demo/Demo.java,v 1.2 2003/07/20 07:35:45 ggregory Exp $
+ * $Revision: 1.2 $
+ * $Date: 2003/07/20 07:35:45 $
  *
  * ====================================================================
  *
@@ -68,6 +68,7 @@ package org.apache.commons.modeler.demo;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Iterator;
+
 import javax.management.Attribute;
 import javax.management.Descriptor;
 import javax.management.MBeanAttributeInfo;
@@ -83,6 +84,7 @@ import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 import javax.management.modelmbean.ModelMBean;
 import javax.management.modelmbean.ModelMBeanInfo;
+
 import org.apache.commons.modeler.ManagedBean;
 import org.apache.commons.modeler.Registry;
 
@@ -93,7 +95,7 @@ import org.apache.commons.modeler.Registry;
  * manipulates the objects through the MBean interfaces.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.1 $ $Date: 2002/04/30 20:58:52 $
+ * @version $Revision: 1.2 $ $Date: 2003/07/20 07:35:45 $
  */
 
 public class Demo implements NotificationListener {

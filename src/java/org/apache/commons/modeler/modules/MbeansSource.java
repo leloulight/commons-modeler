@@ -1,25 +1,28 @@
 package org.apache.commons.modeler.modules;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.apache.commons.modeler.util.DomUtil;
-import org.apache.commons.modeler.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.management.*;
-import javax.management.loading.MLet;
-import javax.xml.transform.TransformerException;
-import java.io.InputStream;
-import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
+
+import javax.management.Attribute;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.management.loading.MLet;
+import javax.xml.transform.TransformerException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.modeler.AttributeInfo;
+import org.apache.commons.modeler.BaseModelMBean;
+import org.apache.commons.modeler.ManagedBean;
+import org.apache.commons.modeler.Registry;
+import org.apache.commons.modeler.util.DomUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 
 /** This will create mbeans based on a config file.

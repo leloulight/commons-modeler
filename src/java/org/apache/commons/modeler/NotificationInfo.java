@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/NotificationInfo.java,v 1.4 2003/02/20 05:56:00 costin Exp $
- * $Revision: 1.4 $
- * $Date: 2003/02/20 05:56:00 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/NotificationInfo.java,v 1.5 2003/07/20 07:35:13 ggregory Exp $
+ * $Revision: 1.5 $
+ * $Date: 2003/07/20 07:35:13 $
  *
  * ====================================================================
  *
@@ -65,9 +65,10 @@
 package org.apache.commons.modeler;
 
 
+import java.io.Serializable;
+
 import javax.management.Descriptor;
 import javax.management.modelmbean.ModelMBeanNotificationInfo;
-import java.io.Serializable;
 
 
 /**
@@ -75,7 +76,7 @@ import java.io.Serializable;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.4 $ $Date: 2003/02/20 05:56:00 $
+ * @version $Revision: 1.5 $ $Date: 2003/07/20 07:35:13 $
  */
 
 public class NotificationInfo extends FeatureInfo implements Serializable {

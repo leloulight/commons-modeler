@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseNotificationBroadcaster.java,v 1.4 2003/04/14 02:08:16 costin Exp $
- * $Revision: 1.4 $
- * $Date: 2003/04/14 02:08:16 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseNotificationBroadcaster.java,v 1.5 2003/07/20 07:35:13 ggregory Exp $
+ * $Revision: 1.5 $
+ * $Date: 2003/07/20 07:35:13 $
  *
  * ====================================================================
  *
@@ -67,6 +67,7 @@ package org.apache.commons.modeler;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;

@@ -54,18 +54,14 @@
 
 package org.apache.commons.modeler.ant;
 
-import org.apache.tools.ant.*;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.modeler.Registry;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.management.*;
-import javax.management.ObjectName;
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.management.loading.MLet;
-import java.util.*;
-import java.net.URL;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.modeler.Registry;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Task;
 
 /**
  * Group a set of mbeans in a service, and perform actions on
