@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.8 2002/11/13 06:27:22 costin Exp $
- * $Revision: 1.8 $
- * $Date: 2002/11/13 06:27:22 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.9 2002/12/26 18:19:01 costin Exp $
+ * $Revision: 1.9 $
+ * $Date: 2002/12/26 18:19:01 $
  *
  * ====================================================================
  *
@@ -65,7 +65,9 @@
 package org.apache.commons.modeler;
 
 
-import java.lang.reflect.Constructor;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -75,12 +77,10 @@ import javax.management.AttributeChangeNotification;
 import javax.management.AttributeList;
 import javax.management.AttributeNotFoundException;
 import javax.management.Descriptor;
-import javax.management.DescriptorAccess;
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanException;
 import javax.management.MBeanInfo;
 import javax.management.MBeanNotificationInfo;
-import javax.management.MBeanParameterInfo;
 import javax.management.Notification;
 import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
@@ -93,10 +93,8 @@ import javax.management.modelmbean.DescriptorSupport;
 import javax.management.modelmbean.InvalidTargetObjectTypeException;
 import javax.management.modelmbean.ModelMBean;
 import javax.management.modelmbean.ModelMBeanAttributeInfo;
-import javax.management.modelmbean.ModelMBeanConstructorInfo;
 import javax.management.modelmbean.ModelMBeanInfo;
 import javax.management.modelmbean.ModelMBeanInfoSupport;
-import javax.management.modelmbean.ModelMBeanNotificationBroadcaster;
 import javax.management.modelmbean.ModelMBeanNotificationInfo;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
 
@@ -104,7 +102,14 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
 
 /**
  * <p>Basic implementation of the <code>ModelMBean</code> interface, which
- * supports the minimal requirements of the interface contract as follows.</p>
+ * supports the minimal requirements of the interface contract.</p>
+ *
+ * <p>This can be used directly to wrap an existing java bean, or inside
+ * an mlet or anywhere an MBean would be used. The String parameter
+ * passed to the constructor or "modeledType" attribute will be used
+ * to construct an instance of the real object that we wrap.
+ *
+ * Limitations:
  * <ul>
  * <li>Only managed resources of type <code>objectReference</code> are
  *     supportd.</li>
@@ -125,14 +130,13 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.8 $ $Date: 2002/11/13 06:27:22 $
+ * @version $Revision: 1.9 $ $Date: 2002/12/26 18:19:01 $
  */
 
 public class BaseModelMBean implements ModelMBean {
-
+    private static Log log = LogFactory.getLog(BaseModelMBean.class);
 
     // ----------------------------------------------------------- Constructors
-
 
     /**
      * Construct a <code>ModelMBean</code> with default
@@ -147,7 +151,7 @@ public class BaseModelMBean implements ModelMBean {
 
         super();
         setModelMBeanInfo(createDefaultModelMBeanInfo());
-
+        if( log.isDebugEnabled()) log.debug("default constructor");
     }
 
 
@@ -164,12 +168,22 @@ public class BaseModelMBean implements ModelMBean {
      */
     public BaseModelMBean(ModelMBeanInfo info)
         throws MBeanException, RuntimeOperationsException {
-
+        // XXX should be deprecated - just call setInfo
         super();
         setModelMBeanInfo(info);
-
+        if( log.isDebugEnabled()) log.debug("ModelMBeanInfo constructor");
     }
 
+    /** Construct a ModelMBean of a specified type.
+     *  The type can be a class name or the key used in one of the descriptors.
+     *
+     * If no descriptor is available, we'll first try to locate one in
+     * the same package with the class, then use introspection.
+     *
+     * @param type Class name or the type key used in the descriptor.
+     * @throws MBeanException
+     * @throws RuntimeOperationsException
+     */
     public BaseModelMBean( String type )
         throws MBeanException, RuntimeOperationsException
     {
@@ -237,7 +251,7 @@ public class BaseModelMBean implements ModelMBean {
                 (new IllegalArgumentException("Attribute name is null"),
                  "Attribute name is null");
 
-        // Extract the method from cache 
+        // Extract the method from cache
         Method m=(Method)getAttMap.get( name );
 
         if( m==null ) {
@@ -249,7 +263,7 @@ public class BaseModelMBean implements ModelMBean {
             if (attrDesc == null)
                 throw new AttributeNotFoundException("Cannot find attribute " + name + " descriptor");
             String getMethod = (String) attrDesc.getFieldValue("getMethod");
-            
+
             if (getMethod == null)
                 throw new AttributeNotFoundException("Cannot find attribute " + name + " get method name");
 
@@ -271,11 +285,11 @@ public class BaseModelMBean implements ModelMBean {
                 }
             }
             if( exception != null )
-                throw new ReflectionException(exception, 
+                throw new ReflectionException(exception,
                                               "Cannot find getter method " + getMethod);
             getAttMap.put( name, m );
         }
-        
+
         Object result = null;
         try {
             if( m.getDeclaringClass() == this.getClass() ) {
@@ -372,8 +386,9 @@ public class BaseModelMBean implements ModelMBean {
                 (new IllegalArgumentException("Method name is null"),
                  "Method name is null");
 
+        if( log.isDebugEnabled()) log.debug("Invoke " + name);
         Method method=(Method)invokeAttMap.get(name);
-        if( method==null ) { 
+        if( method==null ) {
             if (params == null)
                 params = new Object[0];
             if (signature == null)
@@ -390,7 +405,7 @@ public class BaseModelMBean implements ModelMBean {
                 throw new MBeanException
                     (new ServiceNotFoundException("Cannot find operation " + name),
                      "Cannot find operation " + name);
-            
+
             // Prepare the signature required by Java reflection APIs
             // FIXME - should we use the signature from opInfo?
             Class types[] = new Class[signature.length];
@@ -424,7 +439,7 @@ public class BaseModelMBean implements ModelMBean {
             }
             invokeAttMap.put( name, method );
         }
-        
+
         // Invoke the selected method on the appropriate object
         Object result = null;
         try {
@@ -505,18 +520,27 @@ public class BaseModelMBean implements ModelMBean {
         throws AttributeNotFoundException, MBeanException,
         ReflectionException
     {
+        if( log.isDebugEnabled() )
+            log.debug("Setting attribute " + this + " " + attribute );
+
         // Validate the input parameters
         if (attribute == null)
             throw new RuntimeOperationsException
                 (new IllegalArgumentException("Attribute is null"),
                  "Attribute is null");
-        
+
         String name = attribute.getName();
         Object value = attribute.getValue();
         if (name == null)
             throw new RuntimeOperationsException
                 (new IllegalArgumentException("Attribute name is null"),
                  "Attribute name is null");
+        // Special type
+        if( "modeledType".equals( name )) {
+            log.info("Change modeled type " + value);
+            setModeledType((String)value);
+            return;
+        }
 
         try {
             // XXX Is it before or after ?
@@ -568,11 +592,11 @@ public class BaseModelMBean implements ModelMBean {
                 }
             }
             if( exception != null )
-                throw new ReflectionException(exception, 
+                throw new ReflectionException(exception,
                                               "Cannot find setter method " + setMethod);
             setAttMap.put( name, m );
         }
-        
+
         Object result = null;
         try {
             if( m.getDeclaringClass() == this.getClass() ) {
@@ -752,6 +776,9 @@ public class BaseModelMBean implements ModelMBean {
             throw new IllegalArgumentException("Listener is null");
         if (attributeBroadcaster == null)
             attributeBroadcaster = new BaseNotificationBroadcaster();
+
+        if( log.isDebugEnabled() )
+            log.debug("addAttributeNotificationListener " + listener);
 
         BaseAttributeFilter filter = new BaseAttributeFilter(name);
         attributeBroadcaster.addNotificationListener
@@ -948,11 +975,26 @@ public class BaseModelMBean implements ModelMBean {
 
         if (listener == null)
             throw new IllegalArgumentException("Listener is null");
+
+        if( log.isDebugEnabled() ) log.debug("addNotificationListener " + listener);
+
         if (generalBroadcaster == null)
             generalBroadcaster = new BaseNotificationBroadcaster();
         generalBroadcaster.addNotificationListener
             (listener, filter, handback);
 
+        // We'll send the attribute change notifications to all listeners ( who care )
+        // The normal filtering can be used.
+        // The problem is that there is no other way to add attribute change listeners
+        // to a model mbean ( AFAIK ). I suppose the spec should be fixed.
+        if (attributeBroadcaster == null)
+            attributeBroadcaster = new BaseNotificationBroadcaster();
+
+        if( log.isDebugEnabled() )
+            log.debug("addAttributeNotificationListener " + listener);
+
+        attributeBroadcaster.addNotificationListener
+                (listener, filter, handback);
     }
 
 
@@ -1036,8 +1078,8 @@ public class BaseModelMBean implements ModelMBean {
      * @exception ListenerNotFoundException if this listener is not
      *  registered in the MBean
      */
-    public void removeNotificationListener(NotificationListener listener, 
-                                           Object handback) 
+    public void removeNotificationListener(NotificationListener listener,
+                                           Object handback)
         throws ListenerNotFoundException {
 
         removeNotificationListener(listener);
@@ -1058,9 +1100,9 @@ public class BaseModelMBean implements ModelMBean {
      * @exception ListenerNotFoundException if this listener is not
      *  registered in the MBean
      */
-    public void removeNotificationListener(NotificationListener listener, 
-                                           NotificationFilter filter, 
-                                           Object handback) 
+    public void removeNotificationListener(NotificationListener listener,
+                                           NotificationFilter filter,
+                                           Object handback)
         throws ListenerNotFoundException {
 
         removeNotificationListener(listener);
@@ -1133,11 +1175,15 @@ public class BaseModelMBean implements ModelMBean {
      */
     public void setModeledType( String type ) {
         try {
+            if( log.isDebugEnabled())
+                log.debug("setModeledType " + type);
+
             Registry reg=Registry.getRegistry();
             ManagedBean descriptor=reg.findManagedBean(type);
 
             if( descriptor != null ) {
-                System.out.println("Using descriptor " + type);
+                if( log.isDebugEnabled())
+                    log.debug("Using descriptor " + type);
                 this.setModelMBeanInfo( descriptor.createMBeanInfo());
                 return;
             }
@@ -1145,7 +1191,8 @@ public class BaseModelMBean implements ModelMBean {
             // Maybe it's a real class name. Use introspection
             Class c=Class.forName( type);
             resource = c.newInstance();
-            System.out.println("Introspecting " + type);
+            if( log.isDebugEnabled())
+                log.debug("Introspecting " + type);
             descriptor=reg.createManagedBean(null, c, type);
 
             this.setModelMBeanInfo(descriptor.createMBeanInfo());
@@ -1180,8 +1227,5 @@ public class BaseModelMBean implements ModelMBean {
     protected boolean isModelMBeanInfoValid(ModelMBeanInfo info) {
         return (true);
     }
-
-    private static org.apache.commons.logging.Log log=
-         org.apache.commons.logging.LogFactory.getLog( BaseModelMBean.class );
 
 }
