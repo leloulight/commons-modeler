@@ -1,4 +1,4 @@
-$Id: RELEASE-NOTES-1.1.txt,v 1.5 2003/04/20 18:20:34 costin Exp $
+$Id: RELEASE-NOTES-1.1.txt,v 1.6 2003/07/29 00:21:27 yoavs Exp $
 
                           Commons Modeler Package
                                 Version 1.1
@@ -15,38 +15,37 @@ Modeler package, and highlights changes since the previous version.
 NEW FEATURES:
 ============
 
-* support for components that are not explicitely declared. Introspection and common
+* Support for components that are not explicitely declared. Introspection and common
 patterns are used to expose all attributes and simple methods with known type.
 
-* new parser using DOM. That reduces the dependencies, is a bit faster and allows more
-flexibility in processing the input
+* New parser using DOM. That reduces the dependencies, is a bit faster and allows more
+flexibility in processing the input,
  
-* support serialization of the model, and loading the .ser format. Serialization is 
+* Support serialization of the model, and loading the .ser format. Serialization is 
 implemented using an ant task, and all objects in the model are serializable. Reading the
-.ser form is much faster than processing the XML
+.ser form is much faster than processing the XML.
 
-* a set of ant tasks that use modeler to load metadata and operate on mbeans. The tasks
+* A set of ant tasks that use modeler to load metadata and operate on mbeans. The tasks
 can be used with any JMX component, not only with modeler. An example use is tomcat5.
 
-* support for loading extended mlet files, with a syntax consistent with the ant tasks
-and jboss ( and other ). 
+* Support for loading extended mlet files, with a syntax consistent with the ant tasks
+and JBoss ( and other ). 
 
-* helper to perform lifecycle operations on sets of mbeans
+* Helper to perform lifecycle operations on sets of mbeans.
 
-* a small startup program ( org.apache.commons.modeler.Main ) capable of loading an mlet
+* A small startup program ( org.apache.commons.modeler.Main ) capable of loading an mlet
 file and performing init/start on all components. This can help in testing and jumpstarting
 small applications.
 
-* cleaner APIs, with deprecation of static methods.
+* Cleaner APIs, with deprecation of static methods.
 
-* new methods to access the Registry, with support for container application separation
+* New methods to access the Registry, with support for container application separation.
 
-* (experimental) support for remote mbeans, allowing management of non-local mbeans. 
+* (Experimental) support for remote mbeans, allowing management of non-local mbeans. 
 
-* (experimental) support for persistence for mbeans loaded from the mbeans file. Modification
-of attributes will be saved, however adding new mbeans is not yet implemented
+* (Experimental) support for persistence for mbeans loaded from the mbeans file. Modification of attributes will be saved, however adding new mbeans is not yet implemented.
 
-* the distribution package includes commons-modeler-src.jar which can be used in IDEs to 
+* The distribution package includes commons-modeler-src.jar which can be used in IDEs to 
 quickly see the sources when debugging and to do small builds.
 
 BUG REPORTS ADDRESSED:
@@ -65,7 +64,5 @@ In addition, this release fixes problems reported against jakarta-tomcat:
 NOTES:
 ======
 
-* the unit tests will fail with MX4J-1.1.1+ - there are 2 oposite tests for
+* The unit tests will fail with MX4J-1.1.1+ - there are 2 oposite tests for
 severity, it can never work. A patch was submited to mx4j.
- 
-
