@@ -1,9 +1,9 @@
-<project name="Modeler" default="jar" basedir=".">
+<project name="Modeler" default="compile" basedir=".">
 
 
 <!--
         "Modeler" component of the Jakarta Commons Subproject
-        $Id: build.xml,v 1.15 2003/04/14 01:08:29 costin Exp $
+        $Id: build.xml,v 1.16 2003/04/19 19:34:03 costin Exp $
 -->
 
 
@@ -230,15 +230,49 @@
   <target name="dist" depends="dist-lite,javadoc"
     description="Create binary distribution">
     <copy      file="LICENSE.txt"
-              tofile="${dist.home}/LICENSE"/>
+              tofile="${dist.home}/LICENSE.txt"/>
     <copy todir="${dist.home}" >
        <fileset dir="." includes="RELEASE-NOTES**"/>
     </copy>
 
-    <copy      file="src/java/org/apache/commons/modeler/mbeans-descriptors.dtd"
+    <!-- some helpers to quickly build -->
+    <copy todir="${dist.home}" >
+       <fileset dir=".">
+           <include name="build.xml"/>
+           <include name="build.properties.sample"/>
+       </fileset>
+    </copy>
+
+    <!-- the src is similar with the JDK sources - and very usefull for users of
+         IDEs, where the jar can be "mounted" and used when debugging -->
+    <jar file="${dist.home}/commons-modeler-src.jar">
+         <fileset dir="src/java" includes="**" />        
+         <fileset dir="src/conf" includes="MANIFEST.MF" />
+     </jar>
+ 
+     <copy      file="src/java/org/apache/commons/modeler/mbeans-descriptors.dtd"
               todir="${dist.home}"/>
   </target>
 
+  <!-- Experimental for now. If people download the dist, they should be able to 
+       do a quick build and to make small fixes -->
+  <target name="dist-build-prepare" description="Allow dist users to unpack the sources" >
+     <mkdir dir="src/java" />
+     <mkdir dir="src/conf" />
+     <unjar src="commons-modeler-src.jar" dest="src/java" />
+     <copy file="src/java/MANIFEST.MF" todir="src/conf" />
+  </target>
+  
+  <target name="check-deps" >
+    
+  </target>
+
+  <target name="dist-build" description="Buid target for the dist"  depends="dist-build-prepare,check-deps,compile">
+     <antcall target="jar" >
+        <param name="commons-modeler.jar" location="commons-modeler.jar" />
+        <param name="build.home" location="target" />
+     </antcall>
+  </target>
 
 <!-- ========== Unit Test Targets ========================================= -->
 
