@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.16 2003/03/15 00:34:10 costin Exp $
- * $Revision: 1.16 $
- * $Date: 2003/03/15 00:34:10 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.17 2003/04/07 07:12:02 costin Exp $
+ * $Revision: 1.17 $
+ * $Date: 2003/04/07 07:12:02 $
  *
  * ====================================================================
  *
@@ -67,11 +67,14 @@ package org.apache.commons.modeler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.modeler.modules.MbeansSource;
+import org.apache.commons.modeler.modules.ModelerSource;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Hashtable;
+import java.util.HashMap;
 
 import javax.management.modelmbean.DescriptorSupport;
 import javax.management.modelmbean.InvalidTargetObjectTypeException;
@@ -91,8 +94,8 @@ import javax.management.*;
  *
  * <p>This can be used directly to wrap an existing java bean, or inside
  * an mlet or anywhere an MBean would be used. The String parameter
- * passed to the constructor or "modeledType" attribute will be used
- * to construct an instance of the real object that we wrap.
+ * passed to the constructor will be used to construct an instance of the
+ * real object that we wrap.
  *
  * Limitations:
  * <ul>
@@ -111,11 +114,12 @@ import javax.management.*;
  *     <li>Operations that return no value should declare a return type of
  *         <code>void</code>.</li>
  *     </ul>
+ * <li>Attribute caching is not supported</li>
  * </ul>
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.16 $ $Date: 2003/03/15 00:34:10 $
+ * @version $Revision: 1.17 $ $Date: 2003/04/07 07:12:02 $
  */
 
 public class BaseModelMBean implements ModelMBean, MBeanRegistration {
@@ -165,6 +169,8 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
      * If no descriptor is available, we'll first try to locate one in
      * the same package with the class, then use introspection.
      *
+     * The mbean resource will be created.
+     *
      * @param type Class name or the type key used in the descriptor.
      * @throws MBeanException
      * @throws RuntimeOperationsException
@@ -173,10 +179,23 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
         throws MBeanException, RuntimeOperationsException
     {
         try {
+            // This constructor is used from <mlet>, it should create
+            // the resource
             setModeledType(type);
         } catch( Throwable ex ) {
             log.error( "Error creating mbean ", ex);
         }
+    }
+
+    public BaseModelMBean( String type, ModelerSource source )
+        throws MBeanException, RuntimeOperationsException
+    {
+        try {
+            setModeledType(type);
+        } catch( Throwable ex ) {
+            log.error( "Error creating mbean ", ex);
+        }
+        this.source=source;
     }
 
     // ----------------------------------------------------- Instance Variables
@@ -187,12 +206,16 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
      */
     protected BaseNotificationBroadcaster attributeBroadcaster = null;
 
+    /** Registry we are associated with
+     */
+    protected Registry registry=null;
 
     /**
      * Notification broadcaster for general notifications.
      */
     protected BaseNotificationBroadcaster generalBroadcaster = null;
 
+    protected ObjectName oname=null;
 
     /**
      * The <code>ModelMBeanInfo</code> object that controls our activity.
@@ -204,19 +227,28 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
      * The managed resource this MBean is associated with (if any).
      */
     protected Object resource = null;
+    protected String resourceType = null;
 
+    /** Source object used to read this mbean. Can be used to
+     * persist the mbean
+     */
+    protected ModelerSource source=null;
+
+    /** Attribute values. XXX That can be stored in the value Field
+     */
+    protected HashMap attributes=new HashMap();
 
     // --------------------------------------------------- DynamicMBean Methods
     static final Object[] NO_ARGS_PARAM=new Object[0];
     static final Class[] NO_ARGS_PARAM_SIG=new Class[0];
     // key: attribute val: getter method
-    Hashtable getAttMap=new Hashtable();
+    private Hashtable getAttMap=new Hashtable();
 
     // key: attribute val: setter method
-    Hashtable setAttMap=new Hashtable();
+    private Hashtable setAttMap=new Hashtable();
 
     // key: operation val: invoke method
-    Hashtable invokeAttMap=new Hashtable();
+    private Hashtable invokeAttMap=new Hashtable();
 
     /**
      * Obtain and return the value of a specific attribute of this MBean.
@@ -523,16 +555,19 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
 
         String name = attribute.getName();
         Object value = attribute.getValue();
+
         if (name == null)
             throw new RuntimeOperationsException
                 (new IllegalArgumentException("Attribute name is null"),
                  "Attribute name is null");
-        // Special type
-        if( "modeledType".equals( name )) {
-            log.info("Change modeled type " + value);
-            setModeledType((String)value);
-            return;
-        }
+
+        ModelMBeanAttributeInfo attrInfo=info.getAttribute(name);
+        if (attrInfo == null)
+            throw new AttributeNotFoundException("Cannot find attribute " + name);
+
+        Descriptor attrDesc=attrInfo.getDescriptor();
+        if (attrDesc == null)
+            throw new AttributeNotFoundException("Cannot find attribute " + name + " descriptor");
 
         try {
             // XXX Is it before or after ?
@@ -550,14 +585,6 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
 
         if( m==null ) {
             // Look up the actual operation to be used
-            ModelMBeanAttributeInfo attrInfo = info.getAttribute(name);
-            if (attrInfo == null)
-                throw new AttributeNotFoundException("Cannot find attribute " + name);
-
-            Descriptor attrDesc = attrInfo.getDescriptor();
-            if (attrDesc == null)
-                throw new AttributeNotFoundException("Cannot find attribute " + name + " descriptor");
-
             String setMethod = (String) attrDesc.getFieldValue("setMethod");
             if (setMethod == null)
                 throw new AttributeNotFoundException("Cannot find attribute " + name + " set method name");
@@ -617,8 +644,18 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
             throw new MBeanException
                 (e, "Exception invoking method " + name);
         }
+
+        attributes.put( name, value );
+        if( source != null ) {
+            // this mbean is asscoiated with a source - maybe we want to persist
+            source.updateField(oname, name, value);
+        }
     }
 
+    public String toString() {
+        if( resource==null ) return "BaseModelMbean[" + resourceType + "]";
+        return resource.toString();
+    }
 
     /**
      * Set the values of several attributes of this MBean.
@@ -687,6 +724,11 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
      * Set the instance handle of the object against which we will execute
      * all methods in this ModelMBean management interface.
      *
+     * This method will detect and call "setModelMbean" method. A resource
+     * can implement this method to get a reference to the model mbean.
+     * The reference can be used to send notification and access the
+     * registry.
+     *
      * @param resource The resource object to be managed
      * @param type The type of reference for the managed resource
      *  ("ObjectReference", "Handle", "IOR", "EJBHandle", or
@@ -703,8 +745,8 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
      */
     public void setManagedResource(Object resource, String type)
         throws InstanceNotFoundException, InvalidTargetObjectTypeException,
-        MBeanException, RuntimeOperationsException {
-
+        MBeanException, RuntimeOperationsException
+    {
         if (resource == null)
             throw new RuntimeOperationsException
                 (new IllegalArgumentException("Managed resource is null"),
@@ -714,7 +756,20 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
             throw new InvalidTargetObjectTypeException(type);
 
         this.resource = resource;
+        this.resourceType = resource.getClass().getName();
 
+        // Make the resource aware of the model mbean.
+        try {
+            Method m=resource.getClass().getMethod("setModelMBean",
+                    new Class[] {ModelMBean.class});
+            if( m!= null ) {
+                m.invoke(resource, new Object[] {this});
+            }
+        } catch( NoSuchMethodException t ) {
+            // ignore
+        } catch( Throwable t ) {
+            log.error( "Can't set model mbean ", t );
+        }
     }
 
 
@@ -723,6 +778,9 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
      * <code>ModelMBean</code>.  After the information and associated
      * descriptors have been customized, the <code>ModelMBean</code> should
      * be registered with the associated <code>MBeanServer</code>.
+     *
+     * Currently the model can be set after registration. This behavior is
+     * deprecated and won't be supported in future versions.
      *
      * @param info The ModelMBeanInfo object to be used by this ModelMBean
      *
@@ -1169,15 +1227,34 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
      * @param type the type of classname of the modeled object
      */
     public void setModeledType( String type ) {
+        initModelInfo(type);
+        createResource();
+    }
+    /** Set the type of the mbean. This is used as a key to locate
+     * the description in the Registry.
+     *
+     * @param type the type of classname of the modeled object
+     */
+    protected void initModelInfo( String type ) {
         try {
             if( log.isDebugEnabled())
                 log.debug("setModeledType " + type);
 
-            Registry reg=Registry.getRegistry();
+            log.debug( "Set model Info " + type);
+            if(type==null) {
+                return;
+            }
+            resourceType=type;
             //Thread.currentThread().setContextClassLoader(BaseModelMBean.class.getClassLoader());
-            Class c=Class.forName( type);
-            resource = c.newInstance();
-            ManagedBean descriptor=reg.findManagedBean(c, type);
+            Class c=null;
+            try {
+                c=Class.forName( type);
+            } catch( Throwable t ) {
+                log.error( "Error creating class " + t);
+            }
+
+            // The class c doesn't need to exist
+            ManagedBean descriptor=getRegistry().findManagedBean(c, type);
 
             this.setModelMBeanInfo(descriptor.createMBeanInfo());
         } catch( Throwable ex) {
@@ -1186,11 +1263,50 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
         }
     }
 
-    public String getClassName() {
-        if( resource==null ) {
-            return null;
+    /** Set the type of the mbean. This is used as a key to locate
+     * the description in the Registry.
+     *
+     * @param type the type of classname of the modeled object
+     */
+    protected void createResource() {
+        try {
+            //Thread.currentThread().setContextClassLoader(BaseModelMBean.class.getClassLoader());
+            Class c=null;
+            try {
+                c=Class.forName( resourceType );
+                resource = c.newInstance();
+            } catch( Throwable t ) {
+                log.error( "Error creating class " + t);
+            }
+        } catch( Throwable ex) {
+            log.error( "TCL: " + Thread.currentThread().getContextClassLoader(),
+                    ex);
         }
-        return resource.getClass().getName();
+    }
+
+
+    public String getModelerType() {
+        return resourceType;
+    }
+
+    public String getClassName() {
+        return getModelerType();
+    }
+
+    public ObjectName getObjectName() {
+        return oname;
+    }
+
+    public void setRegistry(Registry registry) {
+        this.registry = registry;
+    }
+
+    public Registry getRegistry() {
+        // XXX Need a better solution - to avoid the static
+        if( registry == null )
+            registry=Registry.getRegistry();
+
+        return registry;
     }
 
     // ------------------------------------------------------ Protected Methods
@@ -1230,10 +1346,11 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
     {
         if( log.isDebugEnabled())
             log.debug("preRegister " + resource + " " + name );
+        oname=name;
         if( resource instanceof MBeanRegistration ) {
-            return ((MBeanRegistration)resource).preRegister(server, name );
+            oname= ((MBeanRegistration)resource).preRegister(server, name );
         }
-        return name;
+        return oname;
     }
 
     public void postRegister(Boolean registrationDone) {
