@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/test/org/apache/commons/modeler/RegistryTestCase.java,v 1.4 2003/01/27 19:27:43 craigmcc Exp $
- * $Revision: 1.4 $
- * $Date: 2003/01/27 19:27:43 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/test/org/apache/commons/modeler/RegistryTestCase.java,v 1.5 2003/01/27 19:31:49 craigmcc Exp $
+ * $Revision: 1.5 $
+ * $Date: 2003/01/27 19:31:49 $
  *
  * ====================================================================
  *
@@ -72,6 +72,7 @@ import javax.management.MBeanConstructorInfo;
 import javax.management.modelmbean.ModelMBeanAttributeInfo;
 import javax.management.modelmbean.ModelMBeanConstructorInfo;
 import javax.management.modelmbean.ModelMBeanInfo;
+import javax.management.modelmbean.ModelMBeanOperationInfo;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -81,7 +82,7 @@ import junit.framework.TestSuite;
  * <p>Test Case for the Registry class.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.4 $ $Date: 2003/01/27 19:27:43 $
+ * @version $Revision: 1.5 $ $Date: 2003/01/27 19:31:49 $
  */
 
 public class RegistryTestCase extends TestCase {
@@ -332,6 +333,34 @@ public class RegistryTestCase extends TestCase {
         checkDescriptor(desc, "descriptortype", "MBean");
         checkDescriptor(desc, "field1", "HttpConnector/field1");
         checkDescriptor(desc, "field2", "HttpConnector/field2");
+
+    }
+
+
+    /**
+     * Test ModelMBeanOperationInfo information.
+     */
+    public void testModelMBeanOperationInfo() throws Exception {
+
+        // Retrieve a ManagedBean
+        ManagedBean http = registry.findManagedBean("HttpConnector");
+        assertNotNull("Found HttpConnector managed bean");
+
+        // Create the associated ModelMBeanInfo
+        ModelMBeanInfo info = http.createMBeanInfo();
+        assertNotNull("Found HttpConnector ModelMBeanInfo", info);
+
+        // Retrieve the specified ModelMBeanOperationInfo
+        ModelMBeanOperationInfo mmoinfo = info.getOperation("initialize");
+        assertNotNull("Found HttpConnector initialize info", mmoinfo);
+
+        // Get the Descriptor
+        Descriptor desc = mmoinfo.getDescriptor();
+        assertNotNull("Found HttpConnector initialize descriptor", desc);
+
+        // Check the configured fields
+        checkDescriptor(desc, "field1", "HttpConnector.initialize/field1");
+        checkDescriptor(desc, "field2", "HttpConnector.initialize/field2");
 
     }
 

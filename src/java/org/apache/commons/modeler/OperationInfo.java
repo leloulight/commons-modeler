@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/OperationInfo.java,v 1.3 2003/01/07 06:39:36 costin Exp $
- * $Revision: 1.3 $
- * $Date: 2003/01/07 06:39:36 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/OperationInfo.java,v 1.4 2003/01/27 19:31:49 craigmcc Exp $
+ * $Revision: 1.4 $
+ * $Date: 2003/01/27 19:31:49 $
  *
  * ====================================================================
  *
@@ -79,7 +79,7 @@ import java.io.Serializable;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.3 $ $Date: 2003/01/07 06:39:36 $
+ * @version $Revision: 1.4 $ $Date: 2003/01/27 19:31:49 $
  */
 
 public class OperationInfo extends FeatureInfo implements Serializable {
@@ -265,6 +265,7 @@ public class OperationInfo extends FeatureInfo implements Serializable {
         Descriptor descriptor = info.getDescriptor();
         descriptor.removeField("class");
         descriptor.setField("role", getRole());
+        addFields(descriptor);
         info.setDescriptor(descriptor);
         return (info);
 
