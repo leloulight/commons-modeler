@@ -75,7 +75,6 @@ import java.util.jar.Manifest;
 import java.util.jar.Attributes;
 import javax.management.*;
 import javax.management.AttributeNotFoundException;
-import javax.management.loading.ClassLoaderRepository;
 
 import org.apache.commons.modeler.Registry;
 import org.apache.commons.modeler.BaseModelMBean;
