@@ -115,7 +115,6 @@ public class FixedNotificationFilter implements NotificationFilter {
      * <p>Test whether notification enabled for this event.
      * Return true if:</p>
      * <ul>
-     * <li>This is an attribute change notification</li>
      * <li>Either the set of accepted names is empty (implying that all
      *     attribute names are of interest) or the set of accepted names
      *     includes the name of the attribute in this notification</li>
@@ -125,17 +124,11 @@ public class FixedNotificationFilter implements NotificationFilter {
 
         if (notification == null)
             return (false);
-        if (!(notification instanceof AttributeChangeNotification))
-            return (false);
-        AttributeChangeNotification acn =
-            (AttributeChangeNotification) notification;
-        if (!AttributeChangeNotification.ATTRIBUTE_CHANGE.equals(acn.getType()))
-            return (false);
         synchronized (names) {
             if (names.size() < 1)
                 return (true);
             else
-                return (names.contains(acn.getAttributeName()));
+                return (names.contains(notification.getType()));
         }
 
     }
