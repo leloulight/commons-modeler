@@ -211,17 +211,14 @@ public class MbeansSource extends ModelerSource
                         " " + value);
             ObjectName oname=new ObjectName(objectName);
             // find the type
-            MBeanInfo info=server.getMBeanInfo(oname);
-            MBeanAttributeInfo attInfo[]=info.getAttributes();
-            for( int i=0; i<attInfo.length; i++ ) {
-                if( attName.equals(attInfo[i].getName())) {
-                    type=attInfo[i].getType();
-                    Object valueO=getValueObject( value, type);
-                    server.setAttribute(oname, new Attribute(attName, valueO));
-                    return;
-                }
+            if( type==null )
+                type=registry.getType(  oname, attName );
+            if( type==null ) {
+                log.info("Can't find attribute " + objectName + " " + attName );
+            } else {
+                Object valueO=getValueObject( value, type);
+                server.setAttribute(oname, new Attribute(attName, valueO));
             }
-            log.info("Can't find attribute " + objectName + " " + attName );
         } catch( Exception ex) {
             log.error("Error processing attribute " + objectName + " " +
                     attName + " " + value, ex);

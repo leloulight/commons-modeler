@@ -350,7 +350,7 @@ public final class Registry {
     }
 
     public void invoke( List mbeans, String operation, boolean failFirst )
-            throws Throwable
+            throws Exception
     {
         if( mbeans==null ) return;
         Iterator itr=mbeans.iterator();
@@ -368,9 +368,9 @@ public final class Registry {
                 getMBeanServer().invoke(oN, operation,
                         new Object[] {}, new String[] {});
 
-            } catch( Throwable t ) {
+            } catch( Exception t ) {
                 if( failFirst ) throw t;
-                log.info("Error initializing " + current);
+                log.info("Error initializing " + current + " " + t.toString());
             }
         }
     }
@@ -449,6 +449,46 @@ public final class Registry {
         } catch( Throwable t ) {
             log.error( "Error unregistering mbean ", t );
         }
+    }
+
+    // -------------------- Helpers  --------------------
+    public String getType( ObjectName oname, String attName )
+    {
+        String type=null;
+        MBeanInfo info=null;
+        try {
+            info=server.getMBeanInfo(oname);
+        } catch (Exception e) {
+            log.info( "Can't find metadata " + oname );
+            return null;
+        }
+        MBeanAttributeInfo attInfo[]=info.getAttributes();
+        for( int i=0; i<attInfo.length; i++ ) {
+            if( attName.equals(attInfo[i].getName())) {
+                type=attInfo[i].getType();
+                return type;
+            }
+        }
+        return null;
+    }
+
+    public MBeanOperationInfo getMethodInfo( ObjectName oname, String opName )
+    {
+        String type=null;
+        MBeanInfo info=null;
+        try {
+            info=server.getMBeanInfo(oname);
+        } catch (Exception e) {
+            log.info( "Can't find metadata " + oname );
+            return null;
+        }
+        MBeanOperationInfo attInfo[]=info.getOperations();
+        for( int i=0; i<attInfo.length; i++ ) {
+            if( opName.equals(attInfo[i].getName())) {
+                return attInfo[i];
+            }
+        }
+        return null;
     }
 
     // -------------------- Experimental: discovery  --------------------
