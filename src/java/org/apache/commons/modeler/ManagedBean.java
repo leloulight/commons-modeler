@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ManagedBean.java,v 1.6 2003/01/27 19:00:22 craigmcc Exp $
- * $Revision: 1.6 $
- * $Date: 2003/01/27 19:00:22 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ManagedBean.java,v 1.7 2003/04/07 06:45:02 costin Exp $
+ * $Revision: 1.7 $
+ * $Date: 2003/04/07 06:45:02 $
  *
  * ====================================================================
  *
@@ -86,7 +86,7 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.6 $ $Date: 2003/01/27 19:00:22 $
+ * @version $Revision: 1.7 $ $Date: 2003/04/07 06:45:02 $
  */
 
 public class ManagedBean implements java.io.Serializable
@@ -113,6 +113,17 @@ public class ManagedBean implements java.io.Serializable
     protected OperationInfo operations[] = new OperationInfo[0];
     protected String type = null;
 
+    /** Constructor. Will add default attributes. 
+     *  
+     */ 
+    public ManagedBean() {
+        AttributeInfo ai=new AttributeInfo();
+        ai.setName("modelerType");
+        ai.setDescription("Type of the modeled resource. Can be set only once");
+        ai.setType("java.lang.String");
+        addAttribute(ai);
+    }
+    
     // ------------------------------------------------------------- Properties
 
 
@@ -435,6 +446,7 @@ public class ManagedBean implements java.io.Serializable
             new ModelMBeanAttributeInfo[attrs.length];
         for (int i = 0; i < attrs.length; i++)
             attributes[i] = attrs[i].createAttributeInfo();
+        
         ConstructorInfo consts[] = getConstructors();
         ModelMBeanConstructorInfo constructors[] =
             new ModelMBeanConstructorInfo[consts.length];
