@@ -79,18 +79,21 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
         specialMethods.put( "postDeregister", "");
     }
 
+    private static String strArray[]=new String[0];
+
     // createMBean == registerClass + registerMBean
 
     private boolean supportedType( Class ret ) {
         return ret == String.class ||
-            ret == Integer.class ||
-            ret == Integer.TYPE ||
-            ret == Long.class ||
-            ret == Long.TYPE ||
-            ret == java.io.File.class ||
-            ret == Boolean.class ||
-            ret == Boolean.TYPE ||
-            ret == ObjectName.class
+                ret == Integer.class ||
+                ret == Integer.TYPE ||
+                ret == Long.class ||
+                ret == Long.TYPE ||
+                ret == java.io.File.class ||
+                ret == Boolean.class ||
+                ret == Boolean.TYPE ||
+                ret == strArray.getClass() || // XXX ???
+                ret == ObjectName.class
             ;
     }
 

@@ -83,7 +83,7 @@ public final class RegistryTask  {
 
     String resource;
     String file;
-    String type="MbeansDescriptorsDOM";
+    String type="MbeansDescriptorsDOMSource";
 
     /** Set the resource type that will be loaded
      *
