@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ManagedBean.java,v 1.2 2002/08/08 05:36:54 costin Exp $
- * $Revision: 1.2 $
- * $Date: 2002/08/08 05:36:54 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ManagedBean.java,v 1.3 2002/12/26 18:22:19 costin Exp $
+ * $Revision: 1.3 $
+ * $Date: 2002/12/26 18:22:19 $
  *
  * ====================================================================
  *
@@ -66,11 +66,7 @@ package org.apache.commons.modeler;
 
 
 import java.util.ArrayList;
-import javax.management.Descriptor;
-import javax.management.MBeanException;
-import javax.management.MBeanParameterInfo;
-import javax.management.InstanceNotFoundException;
-import javax.management.RuntimeOperationsException;
+import javax.management.*;
 import javax.management.modelmbean.InvalidTargetObjectTypeException;
 import javax.management.modelmbean.ModelMBean;
 import javax.management.modelmbean.ModelMBeanAttributeInfo;
@@ -86,12 +82,11 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.2 $ $Date: 2002/08/08 05:36:54 $
+ * @version $Revision: 1.3 $ $Date: 2002/12/26 18:22:19 $
  */
 
-public class ManagedBean {
-
-
+public class ManagedBean implements java.io.Serializable
+{
     // ----------------------------------------------------- Instance Variables
 
 

@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ParameterInfo.java,v 1.1 2002/04/30 20:58:52 craigmcc Exp $
- * $Revision: 1.1 $
- * $Date: 2002/04/30 20:58:52 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ParameterInfo.java,v 1.2 2002/12/26 18:22:19 costin Exp $
+ * $Revision: 1.2 $
+ * $Date: 2002/12/26 18:22:19 $
  *
  * ====================================================================
  *
@@ -65,6 +65,9 @@
 package org.apache.commons.modeler;
 
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import javax.management.MBeanParameterInfo;
 
 
@@ -73,10 +76,12 @@ import javax.management.MBeanParameterInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.1 $ $Date: 2002/04/30 20:58:52 $
+ * @version $Revision: 1.2 $ $Date: 2002/12/26 18:22:19 $
  */
 
 public class ParameterInfo extends FeatureInfo {
+    private static Log log = LogFactory.getLog(ParameterInfo.class);
+
 
 
     // ----------------------------------------------------------- Constructors
@@ -172,6 +177,9 @@ public class ParameterInfo extends FeatureInfo {
         if (info != null)
             return (info);
 
+        if( log.isTraceEnabled())
+            log.trace("createParameterInfo " + getName() + " " + getType() + " " +
+                    getDescription());
         // Create and return a new information object
         info = new MBeanParameterInfo
             (getName(), getType(), getDescription());

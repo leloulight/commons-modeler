@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/OperationInfo.java,v 1.1 2002/04/30 20:58:52 craigmcc Exp $
- * $Revision: 1.1 $
- * $Date: 2002/04/30 20:58:52 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/OperationInfo.java,v 1.2 2002/12/26 18:22:19 costin Exp $
+ * $Revision: 1.2 $
+ * $Date: 2002/12/26 18:22:19 $
  *
  * ====================================================================
  *
@@ -65,6 +65,9 @@
 package org.apache.commons.modeler;
 
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import javax.management.Descriptor;
 import javax.management.MBeanParameterInfo;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
@@ -75,10 +78,12 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.1 $ $Date: 2002/04/30 20:58:52 $
+ * @version $Revision: 1.2 $ $Date: 2002/12/26 18:22:19 $
  */
 
 public class OperationInfo extends FeatureInfo {
+    private static Log log = LogFactory.getLog(OperationInfo.class);
+
 
 
     // ----------------------------------------------------------- Constructors
@@ -261,6 +266,11 @@ public class OperationInfo extends FeatureInfo {
             impact = ModelMBeanOperationInfo.ACTION_INFO;
         else if ("INFO".equals(getImpact()))
             impact = ModelMBeanOperationInfo.INFO;
+
+        if( log.isTraceEnabled())
+            log.trace("createOperationInfo " + getName() + " " + getReturnType() + " " +
+                        getDescription());
+
         info = new ModelMBeanOperationInfo
             (getName(), getDescription(), parameters,
              getReturnType(), impact);
