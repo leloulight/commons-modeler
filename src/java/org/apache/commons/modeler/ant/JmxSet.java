@@ -73,7 +73,7 @@ public class JmxSet extends Task {
     String value;
     String valueRef;
     Object objValue;
-    String name;
+    String objectName;
     String type;
 
 
@@ -88,6 +88,10 @@ public class JmxSet extends Task {
         this.value = value;
     }
 
+    public void addText( String value ) {
+        this.value=value;
+    }
+
     public void setValueRef(String valueRef) {
         this.valueRef = valueRef;
     }
@@ -100,8 +104,8 @@ public class JmxSet extends Task {
         this.objValue = objValue;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setObjectName(String name) {
+        this.objectName = name;
     }
 
 
@@ -113,13 +117,14 @@ public class JmxSet extends Task {
                 if( MBeanServerFactory.findMBeanServer(null).size() > 0 ) {
                     server=(MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
                 } else {
-                    System.out.println("Creating mbean server");
+                    if( log.isDebugEnabled())
+                        log.debug("Creating mbean server");
                     server=MBeanServerFactory.createMBeanServer();
                 }
                 project.addReference("jmx.server", server);
             }
 
-            ObjectName oname=new ObjectName(name);
+            ObjectName oname=new ObjectName(objectName);
 
             // XXX convert value, use meta data to find type
             if( objValue==null && valueRef != null ) {
