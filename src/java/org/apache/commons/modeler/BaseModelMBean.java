@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.2 2002/06/15 18:17:02 craigmcc Exp $
- * $Revision: 1.2 $
- * $Date: 2002/06/15 18:17:02 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.3 2002/08/08 05:36:54 costin Exp $
+ * $Revision: 1.3 $
+ * $Date: 2002/08/08 05:36:54 $
  *
  * ====================================================================
  *
@@ -69,6 +69,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
+import java.util.Hashtable;
 import javax.management.Attribute;
 import javax.management.AttributeChangeNotification;
 import javax.management.AttributeList;
@@ -122,7 +123,7 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  * </ul>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.2 $ $Date: 2002/06/15 18:17:02 $
+ * @version $Revision: 1.3 $ $Date: 2002/08/08 05:36:54 $
  */
 
 public class BaseModelMBean implements ModelMBean {
@@ -196,6 +197,16 @@ public class BaseModelMBean implements ModelMBean {
 
 
     // --------------------------------------------------- DynamicMBean Methods
+    static final Object[] NO_ARGS_PARAM=new Object[0];
+    static final Class[] NO_ARGS_PARAM_SIG=new Class[0];
+    // key: attribute val: getter method
+    Hashtable getAttMap=new Hashtable();
+
+    // key: attribute val: setter method
+    Hashtable setAttMap=new Hashtable();
+
+    // key: operation val: invoke method
+    Hashtable invokeAttMap=new Hashtable();
 
 
     /**
@@ -213,32 +224,79 @@ public class BaseModelMBean implements ModelMBean {
     public Object getAttribute(String name)
         throws AttributeNotFoundException, MBeanException,
         ReflectionException {
-
         // Validate the input parameters
         if (name == null)
             throw new RuntimeOperationsException
                 (new IllegalArgumentException("Attribute name is null"),
                  "Attribute name is null");
 
-        // Look up the actual operation to be used
-        ModelMBeanAttributeInfo attrInfo = info.getAttribute(name);
-        if (attrInfo == null)
-            throw new AttributeNotFoundException
-                ("Cannot find attribute " + name);
-        Descriptor attrDesc = attrInfo.getDescriptor();
-        if (attrDesc == null)
-            throw new AttributeNotFoundException
-                ("Cannot find attribute " + name + " descriptor");
-        String getMethod = (String) attrDesc.getFieldValue("getMethod");
-        if (getMethod == null)
-            throw new AttributeNotFoundException
-                ("Cannot find attribute " + name + " get method name");
+        // Extract the method from cache 
+        Method m=(Method)getAttMap.get( name );
 
-        // Invoke the specified get method and return the results
-        return (invoke(getMethod,
-                       new Object[] { },
-                       new String[] { }));
+        if( m==null ) {
+            // Look up the actual operation to be used
+            ModelMBeanAttributeInfo attrInfo = info.getAttribute(name);
+            if (attrInfo == null)
+                throw new AttributeNotFoundException(" Cannot find attribute " + name);
+            Descriptor attrDesc = attrInfo.getDescriptor();
+            if (attrDesc == null)
+                throw new AttributeNotFoundException("Cannot find attribute " + name + " descriptor");
+            String getMethod = (String) attrDesc.getFieldValue("getMethod");
+            
+            if (getMethod == null)
+                throw new AttributeNotFoundException("Cannot find attribute " + name + " get method name");
 
+            Object object = null;
+            NoSuchMethodException exception = null;
+            try {
+                object = this;
+                m = object.getClass().getMethod(getMethod, NO_ARGS_PARAM_SIG);
+            } catch (NoSuchMethodException e) {
+                exception = e;;
+            }
+            if( m== null && resource != null ) {
+                try {
+                    object = resource;
+                    m = object.getClass().getMethod(getMethod, NO_ARGS_PARAM_SIG);
+                    exception=null;
+                } catch (NoSuchMethodException e) {
+                    exception = e;
+                }
+            }
+            if( exception != null )
+                throw new ReflectionException(exception, 
+                                              "Cannot find getter method " + getMethod);
+            getAttMap.put( name, m );
+        }
+        
+        Object result = null;
+        try {
+            if( m.getDeclaringClass() == this.getClass() ) {
+                result = m.invoke(this, NO_ARGS_PARAM );
+            } else {
+                result = m.invoke(resource, NO_ARGS_PARAM );
+            }
+        } catch (InvocationTargetException e) {
+            Throwable t = e.getTargetException();
+            if (t == null)
+                t = e;
+            if (t instanceof RuntimeException)
+                throw new RuntimeOperationsException
+                    ((RuntimeException) t, "Exception invoking method " + name);
+            else if (t instanceof Error)
+                throw new RuntimeErrorException
+                    ((Error) t, "Error invoking method " + name);
+            else
+                throw new MBeanException
+                    (e, "Exception invoking method " + name);
+        } catch (Exception e) {
+            throw new MBeanException
+                (e, "Exception invoking method " + name);
+        }
+
+        // Return the results of this method invocation
+        // FIXME - should we validate the return type?
+        return (result);
     }
 
 
@@ -274,9 +332,8 @@ public class BaseModelMBean implements ModelMBean {
      * Return the <code>MBeanInfo</code> object for this MBean.
      */
     public MBeanInfo getMBeanInfo() {
-
+        // XXX Why do we have to clone ?
         return ((MBeanInfo) info.clone());
-
     }
 
 
@@ -307,84 +364,70 @@ public class BaseModelMBean implements ModelMBean {
             throw new RuntimeOperationsException
                 (new IllegalArgumentException("Method name is null"),
                  "Method name is null");
-        if (params == null)
-            params = new Object[0];
-        if (signature == null)
-            signature = new String[0];
-        if (params.length != signature.length)
-            throw new RuntimeOperationsException
-                (new IllegalArgumentException("Inconsistent arguments and signature"),
-                 "Inconsistent arguments and signature");
 
-        // Acquire the ModelMBeanOperationInfo information for
-        // the requested operation
-        ModelMBeanOperationInfo opInfo = info.getOperation(name);
-        if (opInfo == null)
-            throw new MBeanException
-                (new ServiceNotFoundException("Cannot find operation " + name),
-                 "Cannot find operation " + name);
+        Method method=(Method)invokeAttMap.get(name);
+        if( method==null ) { 
+            if (params == null)
+                params = new Object[0];
+            if (signature == null)
+                signature = new String[0];
+            if (params.length != signature.length)
+                throw new RuntimeOperationsException
+                    (new IllegalArgumentException("Inconsistent arguments and signature"),
+                     "Inconsistent arguments and signature");
 
-        // Prepare the signature required by Java reflection APIs
-        // FIXME - should we use the signature from opInfo?
-        Class types[] = new Class[signature.length];
-        for (int i = 0; i < signature.length; i++) {
-            if (signature[i].equals(Boolean.TYPE.getName()))
-                types[i] = Boolean.TYPE;
-            else if (signature[i].equals(Byte.TYPE.getName()))
-                types[i] = Byte.TYPE;
-            else if (signature[i].equals(Character.TYPE.getName()))
-                types[i] = Character.TYPE;
-            else if (signature[i].equals(Double.TYPE.getName()))
-                types[i] = Double.TYPE;
-            else if (signature[i].equals(Float.TYPE.getName()))
-                types[i] = Float.TYPE;
-            else if (signature[i].equals(Integer.TYPE.getName()))
-                types[i] = Integer.TYPE;
-            else if (signature[i].equals(Long.TYPE.getName()))
-                types[i] = Long.TYPE;
-            else if (signature[i].equals(Short.TYPE.getName()))
-                types[i] = Short.TYPE;
-            else {
-                try {
-                    types[i] = Class.forName(signature[i]);
-                } catch (ClassNotFoundException e) {
-                    throw new ReflectionException
-                        (e, "Cannot find Class for " + signature[i]);
-                }
+            // Acquire the ModelMBeanOperationInfo information for
+            // the requested operation
+            ModelMBeanOperationInfo opInfo = info.getOperation(name);
+            if (opInfo == null)
+                throw new MBeanException
+                    (new ServiceNotFoundException("Cannot find operation " + name),
+                     "Cannot find operation " + name);
+            
+            // Prepare the signature required by Java reflection APIs
+            // FIXME - should we use the signature from opInfo?
+            Class types[] = new Class[signature.length];
+            for (int i = 0; i < signature.length; i++) {
+                types[i]=getAttributeClass( signature[i] );
             }
-        }
 
-        // Locate the method to be invoked, either in this MBean itself
-        // or in the corresponding managed resource
-        // FIXME - Accessible methods in superinterfaces?
-        Method method = null;
-        Object object = null;
-        Exception exception = null;
-        try {
-            object = this;
-            method = object.getClass().getMethod(name, types);
-        } catch (NoSuchMethodException e) {
-            exception = e;;
-        }
-        try {
-            if ((method == null) && (resource != null)) {
-                object = resource;
+            // Locate the method to be invoked, either in this MBean itself
+            // or in the corresponding managed resource
+            // FIXME - Accessible methods in superinterfaces?
+            Object object = null;
+            Exception exception = null;
+            try {
+                object = this;
                 method = object.getClass().getMethod(name, types);
+            } catch (NoSuchMethodException e) {
+                exception = e;;
             }
-        } catch (NoSuchMethodException e) {
-            exception = e;
+            try {
+                if ((method == null) && (resource != null)) {
+                    object = resource;
+                    method = object.getClass().getMethod(name, types);
+                }
+            } catch (NoSuchMethodException e) {
+                exception = e;
+            }
+            if (method == null) {
+                throw new ReflectionException(exception,
+                                              "Cannot find method " + name +
+                                              " with this signature");
+            }
+            invokeAttMap.put( name, method );
         }
-        if (method == null) {
-            throw new ReflectionException(exception,
-                                          "Cannot find method " + name +
-                                          " with this signature");
-        }
-
+        
         // Invoke the selected method on the appropriate object
         Object result = null;
         try {
-            result = method.invoke(object, params);
+            if( method.getDeclaringClass() == this.getClass() ) {
+                result = method.invoke(this, params );
+            } else {
+                result = method.invoke(resource, params);
+            }
         } catch (InvocationTargetException e) {
+            log.error("Exception invoking method " + name , e );
             Throwable t = e.getTargetException();
             if (t == null)
                 t = e;
@@ -398,6 +441,7 @@ public class BaseModelMBean implements ModelMBean {
                 throw new MBeanException
                     (e, "Exception invoking method " + name);
         } catch (Exception e) {
+            log.error("Exception invoking method " + name , e );
             throw new MBeanException
                 (e, "Exception invoking method " + name);
         }
@@ -408,6 +452,34 @@ public class BaseModelMBean implements ModelMBean {
 
     }
 
+    private Class getAttributeClass(String signature)
+        throws ReflectionException
+    {
+        if (signature.equals(Boolean.TYPE.getName()))
+            return Boolean.TYPE;
+        else if (signature.equals(Byte.TYPE.getName()))
+            return Byte.TYPE;
+        else if (signature.equals(Character.TYPE.getName()))
+            return Character.TYPE;
+        else if (signature.equals(Double.TYPE.getName()))
+            return Double.TYPE;
+        else if (signature.equals(Float.TYPE.getName()))
+            return Float.TYPE;
+        else if (signature.equals(Integer.TYPE.getName()))
+            return Integer.TYPE;
+        else if (signature.equals(Long.TYPE.getName()))
+            return Long.TYPE;
+        else if (signature.equals(Short.TYPE.getName()))
+            return Short.TYPE;
+        else {
+            try {
+                return Class.forName(signature);
+            } catch (ClassNotFoundException e) {
+                throw new ReflectionException
+                    (e, "Cannot find Class for " + signature);
+            }
+        }
+    }
 
     /**
      * Set the value of a specific attribute of this MBean.
@@ -424,13 +496,15 @@ public class BaseModelMBean implements ModelMBean {
      */
     public void setAttribute(Attribute attribute)
         throws AttributeNotFoundException, MBeanException,
-        ReflectionException {
-
+        ReflectionException
+    {
+        // XXX Send attribute changed notification !!!
         // Validate the input parameters
         if (attribute == null)
             throw new RuntimeOperationsException
                 (new IllegalArgumentException("Attribute is null"),
                  "Attribute is null");
+        
         String name = attribute.getName();
         Object value = attribute.getValue();
         if (name == null)
@@ -438,25 +512,72 @@ public class BaseModelMBean implements ModelMBean {
                 (new IllegalArgumentException("Attribute name is null"),
                  "Attribute name is null");
 
-        // Look up the actual operation to be used
-        ModelMBeanAttributeInfo attrInfo = info.getAttribute(name);
-        if (attrInfo == null)
-            throw new AttributeNotFoundException
-                ("Cannot find attribute " + name);
-        Descriptor attrDesc = attrInfo.getDescriptor();
-        if (attrDesc == null)
-            throw new AttributeNotFoundException
-                ("Cannot find attribute " + name + " descriptor");
-        String setMethod = (String) attrDesc.getFieldValue("setMethod");
-        if (setMethod == null)
-            throw new AttributeNotFoundException
-                ("Cannot find attribute " + name + " set method name");
+        // Extract the method from cache 
+        Method m=(Method)setAttMap.get( name );
 
-        // Invoke the specified set method and ignore any results
-        invoke(setMethod,
-               new Object[] { value },
-               new String[] { attrInfo.getType() });
+        if( m==null ) {
+            // Look up the actual operation to be used
+            ModelMBeanAttributeInfo attrInfo = info.getAttribute(name);
+            if (attrInfo == null)
+                throw new AttributeNotFoundException("Cannot find attribute " + name);
+            Descriptor attrDesc = attrInfo.getDescriptor();
+            if (attrDesc == null)
+                throw new AttributeNotFoundException("Cannot find attribute " + name + " descriptor");
+            String setMethod = (String) attrDesc.getFieldValue("setMethod");
+            if (setMethod == null)
+                throw new AttributeNotFoundException("Cannot find attribute " + name + " set method name");
 
+            String argType=attrInfo.getType();
+            Class signature[] = new Class[] { getAttributeClass( argType ) };
+
+            Object object = null;
+            NoSuchMethodException exception = null;
+            try {
+                object = this;
+                m = object.getClass().getMethod(setMethod, signature);
+            } catch (NoSuchMethodException e) {
+                exception = e;;
+            }
+            if( m== null && resource != null ) {
+                try {
+                    object = resource;
+                    m = object.getClass().getMethod(setMethod, signature);
+                    exception=null;
+                } catch (NoSuchMethodException e) {
+                    exception = e;
+                }
+            }
+            if( exception != null )
+                throw new ReflectionException(exception, 
+                                              "Cannot find setter method " + setMethod);
+            setAttMap.put( name, m );
+        }
+        
+        Object result = null;
+        try {
+            if( m.getDeclaringClass() == this.getClass() ) {
+                result = m.invoke(this, new Object[] { value });
+            } else {
+                result = m.invoke(resource, new Object[] { value });
+            }
+        } catch (InvocationTargetException e) {
+            Throwable t = e.getTargetException();
+            if (t == null)
+                t = e;
+            if (t instanceof RuntimeException)
+                throw new RuntimeOperationsException
+                    ((RuntimeException) t, "Exception invoking method " + name);
+            else if (t instanceof Error)
+                throw new RuntimeErrorException
+                    ((Error) t, "Error invoking method " + name);
+            else
+                throw new MBeanException
+                    (e, "Exception invoking method " + name);
+        } catch (Exception e) {
+            log.error("Exception invoking method " + name , e );
+            throw new MBeanException
+                (e, "Exception invoking method " + name);
+        }
     }
 
 
@@ -1006,10 +1127,10 @@ public class BaseModelMBean implements ModelMBean {
      * @param info The <code>ModelMBeanInfo object to check
      */
     protected boolean isModelMBeanInfoValid(ModelMBeanInfo info) {
-
         return (true);
-
     }
 
+    private static org.apache.commons.logging.Log log=
+         org.apache.commons.logging.LogFactory.getLog( BaseModelMBean.class );
 
 }

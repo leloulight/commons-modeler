@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ManagedBean.java,v 1.1 2002/04/30 20:58:51 craigmcc Exp $
- * $Revision: 1.1 $
- * $Date: 2002/04/30 20:58:51 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ManagedBean.java,v 1.2 2002/08/08 05:36:54 costin Exp $
+ * $Revision: 1.2 $
+ * $Date: 2002/08/08 05:36:54 $
  *
  * ====================================================================
  *
@@ -86,7 +86,7 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.1 $ $Date: 2002/04/30 20:58:51 $
+ * @version $Revision: 1.2 $ $Date: 2002/08/08 05:36:54 $
  */
 
 public class ManagedBean {
@@ -308,7 +308,6 @@ public class ManagedBean {
      * @param operation The new operation descriptor
      */
     public void addOperation(OperationInfo operation) {
-
         synchronized (operations) {
             OperationInfo results[] =
                 new OperationInfo[operations.length + 1];
@@ -441,6 +440,7 @@ public class ManagedBean {
         for (int i = 0; i < opers.length; i++)
             operations[i] = opers[i].createOperationInfo();
 
+        /*
         // Add operations for attribute getters and setters as needed
         ArrayList list = new ArrayList();
         for (int i = 0; i < operations.length; i++)
@@ -465,7 +465,8 @@ public class ManagedBean {
         if (list.size() > operations.length)
             operations =
                 (ModelMBeanOperationInfo[]) list.toArray(operations);
-
+        */
+        
         // Construct and return a new ModelMBeanInfo object
         info = new ModelMBeanInfoSupport
             (getClassName(), getDescription(),
