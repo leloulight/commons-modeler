@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/NotificationInfo.java,v 1.1 2002/04/30 20:58:51 craigmcc Exp $
- * $Revision: 1.1 $
- * $Date: 2002/04/30 20:58:51 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/NotificationInfo.java,v 1.2 2003/01/07 06:39:36 costin Exp $
+ * $Revision: 1.2 $
+ * $Date: 2003/01/07 06:39:36 $
  *
  * ====================================================================
  *
@@ -66,6 +66,7 @@ package org.apache.commons.modeler;
 
 
 import javax.management.modelmbean.ModelMBeanNotificationInfo;
+import java.io.Serializable;
 
 
 /**
@@ -73,10 +74,10 @@ import javax.management.modelmbean.ModelMBeanNotificationInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.1 $ $Date: 2002/04/30 20:58:51 $
+ * @version $Revision: 1.2 $ $Date: 2003/01/07 06:39:36 $
  */
 
-public class NotificationInfo extends FeatureInfo {
+public class NotificationInfo extends FeatureInfo implements Serializable {
 
 
     // ----------------------------------------------------- Instance Variables
@@ -86,8 +87,8 @@ public class NotificationInfo extends FeatureInfo {
      * The <code>ModelMBeanNotificationInfo</code> object that corresponds
      * to this <code>NotificationInfo</code> instance.
      */
-    ModelMBeanNotificationInfo info = null;
-
+    transient ModelMBeanNotificationInfo info = null;
+    protected String notifTypes[] = new String[0];
 
     // ------------------------------------------------------------- Properties
 
@@ -117,8 +118,6 @@ public class NotificationInfo extends FeatureInfo {
     /**
      * The set of notification types for this MBean.
      */
-    protected String notifTypes[] = new String[0];
-
     public String[] getNotifTypes() {
         return (this.notifTypes);
     }

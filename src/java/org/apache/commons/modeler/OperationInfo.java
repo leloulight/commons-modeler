@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/OperationInfo.java,v 1.2 2002/12/26 18:22:19 costin Exp $
- * $Revision: 1.2 $
- * $Date: 2002/12/26 18:22:19 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/OperationInfo.java,v 1.3 2003/01/07 06:39:36 costin Exp $
+ * $Revision: 1.3 $
+ * $Date: 2003/01/07 06:39:36 $
  *
  * ====================================================================
  *
@@ -71,6 +71,7 @@ import org.apache.commons.logging.LogFactory;
 import javax.management.Descriptor;
 import javax.management.MBeanParameterInfo;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
+import java.io.Serializable;
 
 
 /**
@@ -78,13 +79,10 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.2 $ $Date: 2002/12/26 18:22:19 $
+ * @version $Revision: 1.3 $ $Date: 2003/01/07 06:39:36 $
  */
 
-public class OperationInfo extends FeatureInfo {
-    private static Log log = LogFactory.getLog(OperationInfo.class);
-
-
+public class OperationInfo extends FeatureInfo implements Serializable {
 
     // ----------------------------------------------------------- Constructors
 
@@ -136,7 +134,11 @@ public class OperationInfo extends FeatureInfo {
      * The <code>ModelMBeanOperationInfo</code> object that corresponds
      * to this <code>OperationInfo</code> instance.
      */
-    ModelMBeanOperationInfo info = null;
+    transient ModelMBeanOperationInfo info = null;
+    protected String impact = "UNKNOWN";
+    protected String role = "operation";
+    protected String returnType = "void";    // FIXME - Validate
+    protected ParameterInfo parameters[] = new ParameterInfo[0];
 
 
     // ------------------------------------------------------------- Properties
@@ -168,8 +170,6 @@ public class OperationInfo extends FeatureInfo {
      * The "impact" of this operation, which should be a (case-insensitive)
      * string value "ACTION", "ACTION_INFO", "INFO", or "UNKNOWN".
      */
-    protected String impact = "UNKNOWN";
-
     public String getImpact() {
         return (this.impact);
     }
@@ -186,8 +186,6 @@ public class OperationInfo extends FeatureInfo {
      * The role of this operation ("getter", "setter", "operation", or
      * "constructor").
      */
-    protected String role = "operation";
-
     public String getRole() {
         return (this.role);
     }
@@ -201,8 +199,6 @@ public class OperationInfo extends FeatureInfo {
      * The fully qualified Java class name of the return type for this
      * operation.
      */
-    protected String returnType = "void";    // FIXME - Validate
-
     public String getReturnType() {
         return (this.returnType);
     }
@@ -211,16 +207,12 @@ public class OperationInfo extends FeatureInfo {
         this.returnType = returnType;
     }
 
-
     /**
      * The set of parameters for this operation.
      */
-    protected ParameterInfo parameters[] = new ParameterInfo[0];
-
     public ParameterInfo[] getSignature() {
         return (this.parameters);
     }
-
 
     // --------------------------------------------------------- Public Methods
 
@@ -266,10 +258,6 @@ public class OperationInfo extends FeatureInfo {
             impact = ModelMBeanOperationInfo.ACTION_INFO;
         else if ("INFO".equals(getImpact()))
             impact = ModelMBeanOperationInfo.INFO;
-
-        if( log.isTraceEnabled())
-            log.trace("createOperationInfo " + getName() + " " + getReturnType() + " " +
-                        getDescription());
 
         info = new ModelMBeanOperationInfo
             (getName(), getDescription(), parameters,

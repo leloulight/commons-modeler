@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ManagedBean.java,v 1.3 2002/12/26 18:22:19 costin Exp $
- * $Revision: 1.3 $
- * $Date: 2002/12/26 18:22:19 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ManagedBean.java,v 1.4 2003/01/07 06:39:36 costin Exp $
+ * $Revision: 1.4 $
+ * $Date: 2003/01/07 06:39:36 $
  *
  * ====================================================================
  *
@@ -82,7 +82,7 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.3 $ $Date: 2002/12/26 18:22:19 $
+ * @version $Revision: 1.4 $ $Date: 2003/01/07 06:39:36 $
  */
 
 public class ManagedBean implements java.io.Serializable
@@ -94,8 +94,19 @@ public class ManagedBean implements java.io.Serializable
      * The <code>ModelMBeanInfo</code> object that corresponds
      * to this <code>ManagedBean</code> instance.
      */
-    ModelMBeanInfo info = null;
+    transient ModelMBeanInfo info = null;
+    protected AttributeInfo attributes[] = new AttributeInfo[0];
+    protected String className =
+            "org.apache.commons.modeler.BaseModelMBean";
+    protected ConstructorInfo constructors[] = new ConstructorInfo[0];
+    protected String description = null;
+    protected String domain = null;
+    protected String group = null;
+    protected String name = null;
 
+    protected NotificationInfo notifications[] = new NotificationInfo[0];
+    protected OperationInfo operations[] = new OperationInfo[0];
+    protected String type = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -103,8 +114,6 @@ public class ManagedBean implements java.io.Serializable
     /**
      * The collection of attributes for this MBean.
      */
-    protected AttributeInfo attributes[] = new AttributeInfo[0];
-
     public AttributeInfo[] getAttributes() {
         return (this.attributes);
     }
@@ -116,9 +125,6 @@ public class ManagedBean implements java.io.Serializable
      * class (<code>javax.management.modelmbean.RequiredModeLMBean</code>)
      * will be utilized.
      */
-    protected String className =
-        //        "javax.management.modelmbean.RequiredModelMBean";
-        "org.apache.commons.modeler.BaseModelMBean";
     public String getClassName() {
         return (this.className);
     }
@@ -132,8 +138,6 @@ public class ManagedBean implements java.io.Serializable
     /**
      * The collection of constructors for this MBean.
      */
-    protected ConstructorInfo constructors[] = new ConstructorInfo[0];
-
     public ConstructorInfo[] getConstructors() {
         return (this.constructors);
     }
@@ -142,8 +146,6 @@ public class ManagedBean implements java.io.Serializable
     /**
      * The human-readable description of this MBean.
      */
-    protected String description = null;
-
     public String getDescription() {
         return (this.description);
     }
@@ -158,8 +160,6 @@ public class ManagedBean implements java.io.Serializable
      * The (optional) <code>ObjectName</code> domain in which this MBean
      * should be registered in the MBeanServer.
      */
-    protected String domain = null;
-
     public String getDomain() {
         return (this.domain);
     }
@@ -172,8 +172,6 @@ public class ManagedBean implements java.io.Serializable
     /**
      * The (optional) group to which this MBean belongs.
      */
-    protected String group = null;
-
     public String getGroup() {
         return (this.group);
     }
@@ -187,8 +185,6 @@ public class ManagedBean implements java.io.Serializable
      * The name of this managed bean, which must be unique among all
      * MBeans managed by a particular MBeans server.
      */
-    protected String name = null;
-
     public String getName() {
         return (this.name);
     }
@@ -202,8 +198,6 @@ public class ManagedBean implements java.io.Serializable
     /**
      * The collection of notifications for this MBean.
      */
-    protected NotificationInfo notifications[] = new NotificationInfo[0];
-
     public NotificationInfo[] getNotifications() {
         return (this.notifications);
     }
@@ -212,8 +206,6 @@ public class ManagedBean implements java.io.Serializable
     /**
      * The collection of operations for this MBean.
      */
-    protected OperationInfo operations[] = new OperationInfo[0];
-
     public OperationInfo[] getOperations() {
         return (this.operations);
     }
@@ -224,8 +216,6 @@ public class ManagedBean implements java.io.Serializable
      * implementation class described by the managed bean described
      * by this descriptor.
      */
-    protected String type = null;
-
     public String getType() {
         return (this.type);
     }

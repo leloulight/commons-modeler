@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/FeatureInfo.java,v 1.1 2002/04/30 20:58:51 craigmcc Exp $
- * $Revision: 1.1 $
- * $Date: 2002/04/30 20:58:51 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/FeatureInfo.java,v 1.2 2003/01/07 06:39:36 costin Exp $
+ * $Revision: 1.2 $
+ * $Date: 2003/01/07 06:39:36 $
  *
  * ====================================================================
  *
@@ -64,6 +64,8 @@
 
 package org.apache.commons.modeler;
 
+import java.io.Serializable;
+
 
 /**
  * <p>Convenience base class for <code>AttributeInfo</code>,
@@ -72,11 +74,13 @@ package org.apache.commons.modeler;
  * <code>ModelMBean</code> beans exposed for management.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.1 $ $Date: 2002/04/30 20:58:51 $
+ * @version $Revision: 1.2 $ $Date: 2003/01/07 06:39:36 $
  */
 
-public class FeatureInfo {
+public class FeatureInfo implements Serializable {
 
+    protected String description = null;
+    protected String name = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -84,8 +88,6 @@ public class FeatureInfo {
     /**
      * The human-readable description of this feature.
      */
-    protected String description = null;
-
     public String getDescription() {
         return (this.description);
     }
@@ -99,8 +101,6 @@ public class FeatureInfo {
      * The name of this feature, which must be unique among features in the
      * same collection.
      */
-    protected String name = null;
-
     public String getName() {
         return (this.name);
     }

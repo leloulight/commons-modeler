@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ConstructorInfo.java,v 1.1 2002/04/30 20:58:51 craigmcc Exp $
- * $Revision: 1.1 $
- * $Date: 2002/04/30 20:58:51 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ConstructorInfo.java,v 1.2 2003/01/07 06:39:36 costin Exp $
+ * $Revision: 1.2 $
+ * $Date: 2003/01/07 06:39:36 $
  *
  * ====================================================================
  *
@@ -68,6 +68,7 @@ package org.apache.commons.modeler;
 import javax.management.Descriptor;
 import javax.management.MBeanParameterInfo;
 import javax.management.modelmbean.ModelMBeanConstructorInfo;
+import java.io.Serializable;
 
 
 /**
@@ -75,10 +76,10 @@ import javax.management.modelmbean.ModelMBeanConstructorInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.1 $ $Date: 2002/04/30 20:58:51 $
+ * @version $Revision: 1.2 $ $Date: 2003/01/07 06:39:36 $
  */
 
-public class ConstructorInfo extends FeatureInfo {
+public class ConstructorInfo extends FeatureInfo implements Serializable {
 
 
     // ----------------------------------------------------- Instance Variables
@@ -88,7 +89,9 @@ public class ConstructorInfo extends FeatureInfo {
      * The <code>ModelMBeanConstructorInfo</code> object that corresponds
      * to this <code>ConstructorInfo</code> instance.
      */
-    ModelMBeanConstructorInfo info = null;
+    transient ModelMBeanConstructorInfo info = null;
+    protected String displayName = null;
+    protected ParameterInfo parameters[] = new ParameterInfo[0];
 
 
     // ------------------------------------------------------------- Properties
@@ -119,8 +122,6 @@ public class ConstructorInfo extends FeatureInfo {
     /**
      * The display name of this attribute.
      */
-    protected String displayName = null;
-
     public String getDisplayName() {
         return (this.displayName);
     }
@@ -133,8 +134,6 @@ public class ConstructorInfo extends FeatureInfo {
     /**
      * The set of parameters for this constructor.
      */
-    protected ParameterInfo parameters[] = new ParameterInfo[0];
-
     public ParameterInfo[] getSignature() {
         return (this.parameters);
     }

@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ParameterInfo.java,v 1.2 2002/12/26 18:22:19 costin Exp $
- * $Revision: 1.2 $
- * $Date: 2002/12/26 18:22:19 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ParameterInfo.java,v 1.3 2003/01/07 06:39:36 costin Exp $
+ * $Revision: 1.3 $
+ * $Date: 2003/01/07 06:39:36 $
  *
  * ====================================================================
  *
@@ -69,6 +69,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.management.MBeanParameterInfo;
+import java.io.Serializable;
 
 
 /**
@@ -76,14 +77,10 @@ import javax.management.MBeanParameterInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.2 $ $Date: 2002/12/26 18:22:19 $
+ * @version $Revision: 1.3 $ $Date: 2003/01/07 06:39:36 $
  */
 
-public class ParameterInfo extends FeatureInfo {
-    private static Log log = LogFactory.getLog(ParameterInfo.class);
-
-
-
+public class ParameterInfo extends FeatureInfo implements Serializable {
     // ----------------------------------------------------------- Constructors
 
 
@@ -121,8 +118,8 @@ public class ParameterInfo extends FeatureInfo {
      * The <code>MBeanParameterInfo</code> object that corresponds
      * to this <code>ParameterInfo</code> instance.
      */
-    MBeanParameterInfo info = null;
-
+    transient MBeanParameterInfo info = null;
+    protected String type = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -152,8 +149,6 @@ public class ParameterInfo extends FeatureInfo {
     /**
      * The fully qualified Java class name of this parameter.
      */
-    protected String type = null;
-
     public String getType() {
         return (this.type);
     }
@@ -177,9 +172,6 @@ public class ParameterInfo extends FeatureInfo {
         if (info != null)
             return (info);
 
-        if( log.isTraceEnabled())
-            log.trace("createParameterInfo " + getName() + " " + getType() + " " +
-                    getDescription());
         // Create and return a new information object
         info = new MBeanParameterInfo
             (getName(), getType(), getDescription());
@@ -204,6 +196,4 @@ public class ParameterInfo extends FeatureInfo {
         return (sb.toString());
 
     }
-
-
 }

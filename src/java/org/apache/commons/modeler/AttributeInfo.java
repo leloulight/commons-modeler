@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/AttributeInfo.java,v 1.2 2002/11/13 06:25:32 costin Exp $
- * $Revision: 1.2 $
- * $Date: 2002/11/13 06:25:32 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/AttributeInfo.java,v 1.3 2003/01/07 06:39:36 costin Exp $
+ * $Revision: 1.3 $
+ * $Date: 2003/01/07 06:39:36 $
  *
  * ====================================================================
  *
@@ -68,6 +68,7 @@ package org.apache.commons.modeler;
 import javax.management.Descriptor;
 import javax.management.modelmbean.ModelMBeanAttributeInfo;
 import java.lang.reflect.Method;
+import java.io.Serializable;
 
 
 /**
@@ -75,10 +76,10 @@ import java.lang.reflect.Method;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.2 $ $Date: 2002/11/13 06:25:32 $
+ * @version $Revision: 1.3 $ $Date: 2003/01/07 06:39:36 $
  */
 
-public class AttributeInfo extends FeatureInfo {
+public class AttributeInfo extends FeatureInfo implements Serializable {
 
 
     // ----------------------------------------------------- Instance Variables
@@ -88,9 +89,21 @@ public class AttributeInfo extends FeatureInfo {
      * The <code>ModelMBeanAttributeInfo</code> object that corresponds
      * to this <code>AttributeInfo</code> instance.
      */
-    ModelMBeanAttributeInfo info = null;
+    protected transient ModelMBeanAttributeInfo info = null;
+    protected String displayName = null;
+    protected String getMethod = null;
+    protected String setMethod = null;
 
+    protected transient Method getMethodObj = null;
+    protected transient Method setMethodObj = null;
 
+    protected boolean readable = true;
+    protected boolean writeable = true;
+
+    protected boolean is = false;
+    protected String type = null;
+
+    protected String persist;
     // ------------------------------------------------------------- Properties
 
 
@@ -104,7 +117,6 @@ public class AttributeInfo extends FeatureInfo {
         this.info = null;
     }
 
-
     /**
      * Override the <code>name</code> property setter.
      *
@@ -115,12 +127,9 @@ public class AttributeInfo extends FeatureInfo {
         this.info = null;
     }
 
-
     /**
      * The display name of this attribute.
      */
-    protected String displayName = null;
-
     public String getDisplayName() {
         return (this.displayName);
     }
@@ -129,14 +138,9 @@ public class AttributeInfo extends FeatureInfo {
         this.displayName = displayName;
     }
 
-
     /**
      * The name of the property getter method, if non-standard.
      */
-    protected String getMethod = null;
-    protected Method getMethodObj = null;
-    protected Method setMethodObj = null;
-
     public String getGetMethod() {
         return (this.getMethod);
     }
@@ -165,8 +169,6 @@ public class AttributeInfo extends FeatureInfo {
     /**
      * Is this a boolean attribute with an "is" getter?
      */
-    protected boolean is = false;
-
     public boolean isIs() {
         return (this.is);
     }
@@ -180,8 +182,6 @@ public class AttributeInfo extends FeatureInfo {
     /**
      * Is this attribute readable by management applications?
      */
-    protected boolean readable = true;
-
     public boolean isReadable() {
         return (this.readable);
     }
@@ -195,8 +195,6 @@ public class AttributeInfo extends FeatureInfo {
     /**
      * The name of the property setter method, if non-standard.
      */
-    protected String setMethod = null;
-
     public String getSetMethod() {
         return (this.setMethod);
     }
@@ -210,8 +208,6 @@ public class AttributeInfo extends FeatureInfo {
     /**
      * The fully qualified Java class name of this attribute.
      */
-    protected String type = null;
-
     public String getType() {
         return (this.type);
     }
@@ -225,8 +221,6 @@ public class AttributeInfo extends FeatureInfo {
     /**
      * Is this attribute writeable by management applications?
      */
-    protected boolean writeable = true;
-
     public boolean isWriteable() {
         return (this.writeable);
     }
