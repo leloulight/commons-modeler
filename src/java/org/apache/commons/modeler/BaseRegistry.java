@@ -166,14 +166,20 @@ public class BaseRegistry {
 
     /** Load component descriptors from a stream.
      *
-     * @param is
-     * @param type The type of the descriptor. Right now only 'modeler' is
-     *      supported. In future we may add 'jboss' or other dtds.
+     * @param location Location - used to display error messages
+     * @param is Stream to read the data from
+     * @param type The type of the descriptor. Supported: MbeansDescriptorsDOM,
+     * MbeansDescriptorsDigester.
      */
-    public void loadDescriptors( InputStream is, String type ) 
+    public void loadDescriptors( String location, InputStream is, String type )
         throws Exception
     {
 
+    }
+
+    public void loadDescriptors( InputStream is, String type )
+        throws Exception
+    {
     }
 
     /** Locate descriptors in the class loader, using a discovery mechansim
