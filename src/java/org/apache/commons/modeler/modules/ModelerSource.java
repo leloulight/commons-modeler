@@ -10,6 +10,15 @@ import javax.management.ObjectName;
  */
 public class ModelerSource {
 
+    /** Load data, returns a list of items. 
+     * 
+     * @param registry
+     * @param location
+     * @param type
+     * @param source Introspected object or some other source
+     * @return
+     * @throws Exception
+     */ 
     public List loadDescriptors( Registry registry, String location,
                                  String type, Object source)
             throws Exception
@@ -18,18 +27,20 @@ public class ModelerSource {
         return null;
     }
     
-    // XXX We should know the type from the mbean metadata
-    protected Object getValueObject( String valueS, String type )
-            throws MalformedObjectNameException
-    {
-        if( type==null )
-            return valueS;
-        if( "int".equals( type ) || "java.lang.Integer".equals(type) ) {
-            return new Integer( valueS);
-        }
-        if( "ObjectName".equals( type ) || "javax.management.ObjectName".equals(type) ) {
-            return new ObjectName( valueS);
-        }
-        return valueS;
+    /** Callback from the BaseMBean to notify that an attribute has changed.
+     * Can be used to implement persistence.
+     * 
+     * @param oname
+     * @param name
+     * @param value
+     */ 
+    public void updateField( ObjectName oname, String name, 
+                             Object value ) {
+        // nothing by default 
     }
+
+    public void store() {
+        // nothing
+    }
+    
 }
