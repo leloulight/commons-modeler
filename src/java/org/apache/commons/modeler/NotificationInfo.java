@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/NotificationInfo.java,v 1.3 2003/01/27 19:57:07 craigmcc Exp $
- * $Revision: 1.3 $
- * $Date: 2003/01/27 19:57:07 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/NotificationInfo.java,v 1.4 2003/02/20 05:56:00 costin Exp $
+ * $Revision: 1.4 $
+ * $Date: 2003/02/20 05:56:00 $
  *
  * ====================================================================
  *
@@ -75,11 +75,11 @@ import java.io.Serializable;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.3 $ $Date: 2003/01/27 19:57:07 $
+ * @version $Revision: 1.4 $ $Date: 2003/02/20 05:56:00 $
  */
 
 public class NotificationInfo extends FeatureInfo implements Serializable {
-
+    static final long serialVersionUID = -6319885418912650856L;
 
     // ----------------------------------------------------- Instance Variables
 

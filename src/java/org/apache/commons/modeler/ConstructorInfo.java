@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ConstructorInfo.java,v 1.4 2003/01/27 19:22:45 craigmcc Exp $
- * $Revision: 1.4 $
- * $Date: 2003/01/27 19:22:45 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ConstructorInfo.java,v 1.5 2003/02/20 05:56:00 costin Exp $
+ * $Revision: 1.5 $
+ * $Date: 2003/02/20 05:56:00 $
  *
  * ====================================================================
  *
@@ -76,11 +76,11 @@ import java.io.Serializable;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.4 $ $Date: 2003/01/27 19:22:45 $
+ * @version $Revision: 1.5 $ $Date: 2003/02/20 05:56:00 $
  */
 
 public class ConstructorInfo extends FeatureInfo implements Serializable {
-
+    static final long serialVersionUID = -5735336213417238238L;
 
     // ----------------------------------------------------- Instance Variables
 

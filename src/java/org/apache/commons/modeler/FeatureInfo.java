@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/FeatureInfo.java,v 1.3 2003/01/23 19:42:04 craigmcc Exp $
- * $Revision: 1.3 $
- * $Date: 2003/01/23 19:42:04 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/FeatureInfo.java,v 1.4 2003/02/20 05:56:00 costin Exp $
+ * $Revision: 1.4 $
+ * $Date: 2003/02/20 05:56:00 $
  *
  * ====================================================================
  *
@@ -79,11 +79,11 @@ import javax.management.Descriptor;
  * <code>ModelMBean</code> beans exposed for management.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.3 $ $Date: 2003/01/23 19:42:04 $
+ * @version $Revision: 1.4 $ $Date: 2003/02/20 05:56:00 $
  */
 
 public class FeatureInfo implements Serializable {
-
+    static final long serialVersionUID = -911529176124712296L;
     protected String description = null;
     protected List fields = new ArrayList();
     protected String name = null;
