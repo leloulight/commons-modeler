@@ -391,11 +391,13 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                     OperationInfo op=new OperationInfo();
                     op.setName(name);
                     op.setReturnType(m.getReturnType().getName());
+                    op.setDescription("Introspected operation " + name);
                     Class parms[]=m.getParameterTypes();
                     for(int i=0; i<parms.length; i++ ) {
                         ParameterInfo pi=new ParameterInfo();
                         pi.setType(parms[i].getName());
                         pi.setName( "param" + i);
+                        pi.setDescription("Introspected parameter param" + i);
                         op.addParameter(pi);
                     }
                     mbean.addOperation(op);
@@ -419,6 +421,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                     ParameterInfo pi = new ParameterInfo();
                     pi.setType(classes[j].getName());
                     pi.setName("param" + j);
+                    pi.setDescription("Introspected parameter param" + j);
                     info.addParameter(pi);
                 }
                 mbean.addConstructor(info);
