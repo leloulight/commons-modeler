@@ -2,7 +2,6 @@ package org.apache.commons.modeler.modules;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.NamedNodeMap;
 import org.apache.commons.modeler.util.DomUtil;
 import org.apache.commons.modeler.*;
 import org.apache.commons.logging.Log;
@@ -50,7 +49,7 @@ public class MbeansSource extends ModelerSource
 
     public void setRegistry(Registry reg) {
         this.registry=reg;
-    }
+    }          
 
     public void setLocation( String loc ) {
         this.location=loc;
@@ -231,29 +230,30 @@ public class MbeansSource extends ModelerSource
             log.info( "Node not found " + oname );
             return;
         }
-        // n is an <mbean> node
-        Node firstAttN=DomUtil.getChild(n, "attribute");
-        boolean found=false;
-        for (Node descN = firstAttN; descN != null;
-             descN = DomUtil.getNext( descN ))
-        {
-            String thisAttName=DomUtil.getAttribute(descN, "name");
-            if( name.equals( thisAttName )) {
-                // XXX value = null, remove existing, conversions
-                found=true;
-                DomUtil.setAttribute(descN, "value", value.toString());
-                break;
-            }
+        Node attNode=DomUtil.findChildWithAtt(n, "attribute", "name", name);
+        if( attNode == null ) {
+            // found no existing attribute with this name
+            attNode=n.getOwnerDocument().createElement("attribute");
+            DomUtil.setAttribute(attNode, "name", name);
+            n.appendChild(attNode);
+        } 
+        String oldValue=DomUtil.getAttribute(attNode, "value");
+        if( oldValue != null ) {
+            // we'll convert all values to text content
+            DomUtil.removeAttribute( attNode, "value");
         }
-        if( ! found ) {
-            Node attN=n.getOwnerDocument().createElement("attribute");
-            DomUtil.setAttribute(attN, "name", name);
-            DomUtil.setAttribute(attN, "value", value.toString());
-            n.appendChild(attN);
-        }
+        DomUtil.setText(attNode, value.toString());
 
-
-        // XXX no often than, etc.
+        //store();
+    }
+    
+    /** Store the mbeans. 
+     * XXX add a background thread to store it periodically 
+     */ 
+    public void store() {
+        // XXX customize no often than ( based on standard descriptor ), etc.
+        // It doesn't work very well if we call this on each set att - 
+        // the triger will work for the first att, but all others will be delayed
         long time=System.currentTimeMillis();
         if( location!=null &&
                 time - lastUpdate > updateInterval ) {
@@ -267,10 +267,6 @@ public class MbeansSource extends ModelerSource
                 log.error( "Error writing" ,e );
             }
         }
-    }
-    
-    public void store() {
-        
     }
 
     private void processAttribute(MBeanServer server,
