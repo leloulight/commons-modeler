@@ -1,0 +1,113 @@
+<html>
+<head>
+<title>Package Documentation for org.apache.commons.modeler.ant Package</title>
+</head>
+<body>
+Ant Tasks for Commons Modeler Integration.
+
+<div align="center">
+[<a href="#mbean">mbean / MLET</a>]
+[<a href="#jmx-attribute">jmx-attribute</a>]
+[<a href="#jmx-operation">jmx-operation</a>]
+[<a href="#mbeans-descriptors">mbeans-descriptors</a>]
+</div>
+
+<p>The <em>commons-modeler</em> package includes a set of custom tasks
+for the <a href="http://jakarta.apache.org/ant/">Ant</a> build tool, which
+lets you use Ant to automate the loading of MBean descriptor information,
+dynamic creation of JMX MBeans, and calling operations and attribute setters
+on those MBeans.  If your application can assemble itself based JMX Mbean
+operations, this means that you can now use Ant scripts to manage the lifecycle
+of your application's components, without having to write Java code for this
+purpose.</p>
+
+<p>To use these tasks, you must copy <code>commons-modeler.jar</code> into
+the <code>lib</code> subdirectory of your Ant installation, or make sure that
+it is on the CLASSPATH being used to execute Ant.</p>
+
+<hr>
+
+
+<h2><a name="mbean">mbean / MLET</a></h2>
+
+
+<hr>
+
+
+<h2><a name="jmx-attribute">jmx-attribute</a></h2>
+
+<h3>Description</h3>
+
+<p>Locates the JMX MBean identified by the <code>objectName</code> attribute,
+and calls its <code>setAttribute()</code> operation, passing in the attribute
+name specified by <code>attribute</code> and the value specified by
+<code>value</code>, after converting the value to the type specified by
+<code>type</code>.</p>
+
+<h3>Parameters</h3>
+<table border="1" cellpadding="2" cellspacing="0">
+  <tr>
+    <th>Attribute</th>
+    <th>Description</th>
+    <th>Required</th>
+  </tr>
+  <tr>
+    <td valign="top">attribute</td>
+    <td valign="top">
+      <p>Name of the attribute for which the
+      <code>setAttribute()</code> method will be called.</p>
+    </td>
+    <td valign="top" align="center">Yes</td>
+  </tr>
+  <tr>
+    <td valign="top">objectName</td>
+    <td valign="top">
+      The JMX ObjectName that identifies the MBean whose
+      <code>setAttribute()</code> method will be called.
+    </td>
+    <td valign="top" align="center">Yes</td>
+  </tr>
+  <tr>
+    <td valign="top">type</td>
+    <td valign="top">
+      <p>The data type of the attribute value to be set.  If not specified,
+      will be assumed to be a <code>String</code>.  Otherwise, must be one of
+      <code>ObjectName</code>, <code>boolean</code>, or <code>int</code>.</p>
+    </td>
+    <td valign="top" align="center">No</td>
+  </tr>
+  <tr>
+    <td valign="top">value</td>
+    <td valign="top">
+      <p>String representation of the value to which this attribute will be
+      set.  Either <code>value</code> or <code>valueRef</code> must be
+      specified.</p>
+    </td>
+    <td valign="top" align="center">No</td>
+  </tr>
+  <tr>
+    <td valign="top">valueRef</td>
+    <td valign="top">
+      <p>Indirect pointer to a project reference containing the value to which
+      this attribute will be set.  Either <code>value</code> or
+      <code>valueRef</code> must be specified.</p>
+    </td>
+    <td valign="top" align="center">No</td>
+  </tr>
+</table>
+
+<hr>
+
+
+<h2><a name="jmx-operation">jmx-operation</a></h2>
+
+<hr>
+
+
+<h2><a name="mbeans-descriptors">mbeans-descriptors</a></h2>
+
+<hr>
+
+
+</body>
+</html>
