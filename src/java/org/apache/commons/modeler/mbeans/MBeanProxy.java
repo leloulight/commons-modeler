@@ -36,8 +36,8 @@ class MBeanProxy extends BaseModelMBean {
      * data is received
      */
     protected void update( String name, String val ) {
-        if( log.isDebugEnabled() )
-            log.debug( "Updating " + oname + " " + name + " " + val);
+        if( log.isTraceEnabled() )
+            log.trace( "Updating " + oname + " " + name + " " + val);
         // XXX Conversions !!!
         atts.put( name, val);
     }
