@@ -2,6 +2,11 @@ package org.apache.commons.modeler.modules;
 
 import org.apache.commons.modeler.Registry;
 import java.util.List;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.URL;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
@@ -9,6 +14,8 @@ import javax.management.ObjectName;
  *
  */
 public class ModelerSource {
+    protected Object source;
+    protected String location;
 
     /** Load data, returns a list of items. 
      * 
@@ -42,5 +49,22 @@ public class ModelerSource {
     public void store() {
         // nothing
     }
-    
+
+    protected InputStream getInputStream() throws IOException {
+        if( source instanceof URL ) {
+            URL url=(URL)source;
+            location=url.toString();
+            return url.openStream();
+        } else if( source instanceof File ) {
+            location=((File)source).getAbsolutePath();
+            return new FileInputStream((File)source);            
+        } else if( source instanceof String) {
+            location=(String)source;
+            return new FileInputStream((String)source);            
+        } else if( source instanceof InputStream ) {
+            return (InputStream)source;
+        } 
+        return null;
+    }
+
 }

@@ -13,6 +13,9 @@ import javax.xml.transform.TransformerException;
 import java.io.InputStream;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +32,11 @@ import java.util.HashMap;
  * XXX add a special attribute to reference the loader mbean,
  * XXX figure out how to deal with private loaders
  */
-public class MbeansSource extends ModelerSource
+public class MbeansSource extends ModelerSource implements MbeansSourceMBean
 {
     private static Log log = LogFactory.getLog(MbeansSource.class);
     Registry registry;
-    String location;
     String type;
-    Object source;
 
     // true if we are during the original loading
     boolean loading=true;
@@ -67,6 +68,14 @@ public class MbeansSource extends ModelerSource
         this.source=source;
     }
 
+    public Object getSource() {
+        return source;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+    
     /** Return the list of mbeans created by this source.
      *  It can be used to implement runtime services.
      *
@@ -88,11 +97,33 @@ public class MbeansSource extends ModelerSource
         return mbeans;
     }
     
+    public void start() throws Exception {
+        registry.invoke(mbeans, "start", false);        
+    }
+
+    public void stop() throws Exception {
+        registry.invoke(mbeans, "stop", false);        
+    }
+    
+    public void init() throws Exception {
+        if( mbeans==null) execute();
+        if( registry==null ) registry=Registry.getRegistry();
+        
+        registry.invoke(mbeans, "init", false);
+    }
+    
+    public void destroy() throws Exception {
+        registry.invoke(mbeans, "destroy", false);                
+    }
+    
+    public void load() throws Exception {
+        execute(); // backward compat
+    }
 
     public void execute() throws Exception {
         if( registry==null ) registry=Registry.getRegistry();
         try {
-            InputStream stream=(InputStream)source;
+            InputStream stream=getInputStream();
             long t1=System.currentTimeMillis();
             document = DomUtil.readXml(stream);
 
@@ -250,7 +281,7 @@ public class MbeansSource extends ModelerSource
     /** Store the mbeans. 
      * XXX add a background thread to store it periodically 
      */ 
-    public void store() {
+    public void save() {
         // XXX customize no often than ( based on standard descriptor ), etc.
         // It doesn't work very well if we call this on each set att - 
         // the triger will work for the first att, but all others will be delayed
