@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/AttributeInfo.java,v 1.5 2003/02/03 21:42:32 costin Exp $
- * $Revision: 1.5 $
- * $Date: 2003/02/03 21:42:32 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/AttributeInfo.java,v 1.6 2003/02/17 00:52:45 costin Exp $
+ * $Revision: 1.6 $
+ * $Date: 2003/02/17 00:52:45 $
  *
  * ====================================================================
  *
@@ -76,11 +76,11 @@ import java.io.Serializable;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.5 $ $Date: 2003/02/03 21:42:32 $
+ * @version $Revision: 1.6 $ $Date: 2003/02/17 00:52:45 $
  */
 
 public class AttributeInfo extends FeatureInfo implements Serializable {
-
+    static final long serialVersionUID = -2511626862303972143L;
 
     // ----------------------------------------------------- Instance Variables
 
@@ -104,6 +104,7 @@ public class AttributeInfo extends FeatureInfo implements Serializable {
     protected String type = null;
 
     protected String persist;
+    protected String defaultStringValue;
     // ------------------------------------------------------------- Properties
 
 
@@ -228,6 +229,31 @@ public class AttributeInfo extends FeatureInfo implements Serializable {
     public void setWriteable(boolean writeable) {
         this.writeable = writeable;
         this.info = null;
+    }
+
+    /** Persistence policy.
+     * All persistent attributes should have this attribute set.
+     * Valid values:
+     *   ???
+     */
+    public String getPersist() {
+        return persist;
+    }
+
+    public void setPersist(String persist) {
+        this.persist = persist;
+    }
+
+    /** Default value. If set, it can provide info to the user and
+     * it can be used by persistence mechanism to generate a more compact
+     * representation ( a value may not be saved if it's default )
+     */
+    public String getDefault() {
+        return defaultStringValue;
+    }
+
+    public void setDefault(String defaultStringValue) {
+        this.defaultStringValue = defaultStringValue;
     }
 
 
