@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/Main.java,v 1.5 2003/04/07 06:43:19 costin Exp $
- * $Revision: 1.5 $
- * $Date: 2003/04/07 06:43:19 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/Main.java,v 1.6 2003/04/13 17:34:39 costin Exp $
+ * $Revision: 1.6 $
+ * $Date: 2003/04/13 17:34:39 $
  *
  * ====================================================================
  *
@@ -81,8 +81,6 @@ import java.util.List;
  *  Arguments:
  *   -file FILE
  *       Will load mbeans from the file
- *   -type TYPE
- *       Type of the mbeans file
  *
  * @author Costin Manolache
  */
@@ -91,7 +89,6 @@ public class Main
 {
     String file;
     String home;
-    String type="MbeansSource";
 
     public void setFile( String f ) {
         this.file=f;
@@ -100,10 +97,6 @@ public class Main
     // shortcut
     public void setF( String f ) {
         this.file=f;
-    }
-
-    public void setType( String type ) {
-        this.type=type;
     }
 
     public void execute( )
@@ -122,7 +115,7 @@ public class Main
 
         // Load the mbeans defined in the file and set all
         // attributes
-        List mbeans=reg.load( type, url, null);
+        List mbeans=reg.loadMBeans( url, null);
         reg.invoke(mbeans, "init", false);
         reg.invoke(mbeans, "start", false);
     }
