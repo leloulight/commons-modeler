@@ -228,6 +228,8 @@ public final class Registry {
             managed=findManagedBean(type);
             // TODO: check super-class
         }
+
+
         if( log.isDebugEnabled() )
             log.debug( "Managed= "+ managed);
 
@@ -383,6 +385,45 @@ public final class Registry {
             throws Exception
     {
         loadDescriptors("MbeansDescriptorsDOMSource", source, null );
+    }
+
+    /** Lookup the component descriptor in the package and
+     * in the parent packages.
+     *
+     * @param packageName
+     */
+    public void loadDescriptors( String packageName, ClassLoader classLoader  ) {
+        String res=packageName.replace( '.', '/');
+
+        if( log.isTraceEnabled() )
+            log.trace("Finding descriptor " + res );
+
+        if( searchedPaths.get( packageName ) != null ) {
+            return;
+        }
+        String descriptors=res + "/mbeans-descriptors.ser";
+
+        URL dURL=classLoader.getResource( descriptors );
+
+        if( dURL == null ) {
+            descriptors=res + "/mbeans-descriptors.xml";
+            dURL=classLoader.getResource( descriptors );
+        }
+        if( dURL == null ) return;
+
+        log.debug( "Found " + dURL);
+        searchedPaths.put( packageName,  dURL );
+        try {
+            if( descriptors.endsWith(".xml" ))
+                loadDescriptors("MbeansDescriptorsDOMSource", dURL, null);
+            else
+                loadDescriptors("MbeansDescriptorsSerSource", dURL, null);
+            return;
+        } catch(Exception ex ) {
+            log.error("Error loading " + dURL);
+        }
+
+        return;
     }
 
     /**
@@ -655,14 +696,14 @@ public final class Registry {
     // -------------------- Experimental: discovery  --------------------
     /** Experimental support for manifest-based discovery.
      */
-    public static String MODELER_MANIFEST="/META-INF/modeler-mbeans.xml";
+    public static String MODELER_MANIFEST="/META-INF/mbeans-descriptors.xml";
 
     /** Discover all META-INF/modeler.xml files in classpath and register
      * the components
      *
      * @since EXPERIMENTAL
      */
-    public void loadDescriptors(ClassLoader cl, String type) {
+    public void loadMetaInfDescriptors(ClassLoader cl) {
         try {
             Enumeration en=cl.getResources(MODELER_MANIFEST);
             while( en.hasMoreElements() ) {
@@ -736,43 +777,16 @@ public final class Registry {
      */
     private boolean findDescriptor( Class beanClass ) {
         String className=beanClass.getName();
-        String res=className.replace( '.', '/');
-        if( log.isDebugEnabled() )
-            log.debug("Finding descriptor " + res );
-        while( res.indexOf( "/") > 0 ) {
-            int lastComp=res.lastIndexOf( "/");
+        String pkg=className;
+        while( pkg.indexOf( ".") > 0 ) {
+            int lastComp=pkg.lastIndexOf( ".");
             if( lastComp <= 0 ) return false;
-
-            String packageName=res.substring(0, lastComp);
-            res=packageName;
-            if( searchedPaths.get( packageName ) != null ) {
+            pkg=pkg.substring(0, lastComp);
+            if( searchedPaths.get( pkg ) != null ) {
                 return false;
             }
-            String descriptors=packageName + "/mbeans-descriptors.ser";
-            if( log.isDebugEnabled() )
-                log.debug( "Finding " + descriptors );
-            URL dURL=beanClass.getClassLoader().getResource( descriptors );
-            if( dURL == null ) {
-                descriptors=packageName + "/mbeans-descriptors.xml";
-                dURL=beanClass.getClassLoader().getResource( descriptors );
-                if( dURL == null ) {
-                    className=packageName;
-                    continue;
-                }
-            }
-            log.debug( "Found " + dURL);
-            searchedPaths.put( descriptors,  dURL );
-            try {
-                if( descriptors.endsWith(".xml" ))
-                    loadDescriptors("MbeansDescriptorsDOMSource", dURL, null);
-                else
-                    loadDescriptors("MbeansDescriptorsSerSource", dURL, null);
-                return true;
-            } catch(Exception ex ) {
-                log.error("Error loading " + dURL);
-            }
+            loadDescriptors(pkg, beanClass.getClassLoader());
         }
-
         return false;
     }
 
