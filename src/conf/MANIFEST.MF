@@ -1,8 +1,7 @@
-Extension-Name: @name@
+Manifest-version: 1.0
+Extension-Name: org.apache.commons.modeler
 Specification-Vendor: Apache Software Foundation
-Specification-Version: 1.0
+Specification-Version: 1.1
+Implementation-Vendor-Id: org.apache
 Implementation-Vendor: Apache Software Foundation
-Implementation-Version: @version@
-Class-Path: mx4j-jmx.jar jmxri.jar commons-logging.jar commons-logging-api.jar crimson.jar xercesImpl.jar xmlParserAPI.jar mx4j-tools.jar jmxtools.jar
-Main-Class: org.apache.commons.modeler.Main
-
+Implementation-Version: 1.1.0
