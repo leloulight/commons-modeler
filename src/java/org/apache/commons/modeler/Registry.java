@@ -85,7 +85,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.6 $ $Date: 2002/11/02 06:52:12 $
+ * @version $Revision: 1.7 $ $Date: 2002/11/05 19:15:52 $
  */
 public final class Registry extends BaseRegistry {
 
@@ -111,7 +111,7 @@ public final class Registry extends BaseRegistry {
      * The set of ManagedBean instances for the beans this registry
      * knows about, keyed by name.
      */
-    private HashMap beans = new HashMap();
+    private HashMap descriptors = new HashMap();
 
 
     /**
@@ -129,9 +129,9 @@ public final class Registry extends BaseRegistry {
      * @param bean The managed bean to be added
      */
     public void addManagedBean(ManagedBean bean) {
-
-        beans.put(bean.getName(), bean);
-
+        // called from digester
+        descriptors.put(bean.getName(), bean);
+        
     }
 
 
@@ -143,7 +143,7 @@ public final class Registry extends BaseRegistry {
      */
     public ManagedBean findManagedBean(String name) {
 
-        return ((ManagedBean) beans.get(name));
+        return ((ManagedBean) descriptors.get(name));
 
     }
 
@@ -154,7 +154,7 @@ public final class Registry extends BaseRegistry {
      */
     public String[] findManagedBeans() {
 
-        return ((String[]) beans.keySet().toArray(new String[0]));
+        return ((String[]) descriptors.keySet().toArray(new String[0]));
 
     }
 
@@ -169,7 +169,7 @@ public final class Registry extends BaseRegistry {
     public String[] findManagedBeans(String group) {
 
         ArrayList results = new ArrayList();
-        Iterator items = beans.values().iterator();
+        Iterator items = descriptors.values().iterator();
         while (items.hasNext()) {
             ManagedBean item = (ManagedBean) items.next();
             if ((group == null) && (item.getGroup() == null)) {
@@ -191,7 +191,7 @@ public final class Registry extends BaseRegistry {
      */
     public void removeManagedBean(ManagedBean bean) {
 
-        beans.remove(bean.getName());
+        descriptors.remove(bean.getName());
 
     }
 
@@ -401,32 +401,50 @@ public final class Registry extends BaseRegistry {
     }
 
 
+    /** Main registration method
+     *
+     */
     public void registerComponent(Object bean, String domain, String type,
                                   String name)
            throws Exception
     {
+        if( type==null ) {
+            // XXX find type from bean name.
+        }
         ManagedBean managed = registry.findManagedBean(type);
+        if( managed==null ) {
+            // XXX use introspection ( or check super classes ?? )
+            // I think introspection + super classes ( i.e. use descriptions, etc)
+        }
 
+        // XXX The real mbean is created and registered
         ModelMBean mbean = managed.createMBean(bean);
 
+        if( name==null ) {
+            // XXX generate a seq or hash ?
+            // should we genereate the seq automatically ?
+        }
         getServer().registerMBean( mbean, new ObjectName( domain + ": type="
                 + type + " ; " + name ));
     }
 
-    public void registerClass(Class beanClass, String domain, String className,
-                                  String type, Object source)
-    {
-    }
-
-    public void unregisterMBean( String name ) {
+    public void unregisterComponent( String name ) {
         try {
             ObjectName oname=new ObjectName( name );
 
+            // XXX remove from our tables.
             getServer().unregisterMBean( oname );
         } catch( Throwable t ) {
             log.error( "Error unregistering mbean ", t );
         }
-      }
+    }
+
+
+    public void registerClass(Class beanClass, String domain, String className,
+                                  String type, Object source)
+    {
+        ManagedBean managed=createManagedBean(domain, beanClass, type);
+    }
 
 
     public String registerMBean( String domain, String name ) {
@@ -550,7 +568,7 @@ public final class Registry extends BaseRegistry {
      * @todo Deal with constructors
      *       
      */
-    private ManagedBean createManagedBean(String domain, Object real, String type) {
+    private ManagedBean createManagedBean(String domain, Class realClass, String type) {
         ManagedBean mbean= new ManagedBean();
         
         Method methods[]=null;
@@ -563,7 +581,6 @@ public final class Registry extends BaseRegistry {
         // key: operation val: invoke method
         Hashtable invokeAttMap=new Hashtable();        
         
-        Class realClass=real.getClass();
         methods = realClass.getMethods();
 
         initMethods(realClass, methods, attMap, getAttMap, setAttMap, invokeAttMap );
