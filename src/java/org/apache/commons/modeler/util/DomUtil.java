@@ -83,12 +83,13 @@ public class DomUtil {
 
     // -------------------- DOM utils --------------------
 
-    /** Get the content of a node
+    /** Get the trimed text content of a node or null if there is no text
      */
     public static String getContent(Node n ) {
         if( n==null ) return null;
-        Node n1=n.getFirstChild();
-        // XXX Check if it's a text node
+        Node n1=DomUtil.getChild(n, Node.TEXT_NODE);
+
+        if( n1==null ) return null;
 
         String s1=n1.getNodeValue();
         return s1.trim();
@@ -128,15 +129,57 @@ public class DomUtil {
     }
 
     public static void setAttribute(Node node, String attName, String val) {
-        Element element=(Element)node;
-        if( element.getAttribute(attName) != null ) {
-            element.removeAttribute(attName);
-        }
-//        Node attNode=element.getOwnerDocument().createAttribute(attName);
-//        attNode.setNodeValue(val);
-        element.setAttribute(attName, val);
-//        element.appendChild(attNode);
+        NamedNodeMap attributes=node.getAttributes();
+        Node attNode=node.getOwnerDocument().createAttribute(attName);
+        attNode.setNodeValue( val );
+        attributes.setNamedItem(attNode);
     }
+    
+    public static void removeAttribute( Node node, String attName ) {
+        NamedNodeMap attributes=node.getAttributes();
+        attributes.removeNamedItem(attName);                
+    }
+    
+    
+    /** Set or replace the text value 
+     */ 
+    public static void setText(Node node, String val) {
+        Node chld=DomUtil.getChild(node, Node.TEXT_NODE);
+        if( chld == null ) {
+            Node textN=node.getOwnerDocument().createTextNode(val);
+            node.appendChild(textN);
+            return;
+        }
+        // change the value
+        chld.setNodeValue(val);           
+    }
+
+    /** Find the first direct child with a given attribute.
+     * @param parent
+     * @param elemName name of the element, or null for any 
+     * @param attName attribute we're looking for
+     * @param attVal attribute value or null if we just want any
+     */ 
+    public static Node findChildWithAtt(Node parent, String elemName,
+                                        String attName, String attVal) {
+        
+        Node child=DomUtil.getChild(parent, Node.ELEMENT_NODE);
+        if( attVal== null ) {
+            while( child!= null &&
+                    ( elemName==null || elemName.equals( child.getNodeName())) && 
+                    DomUtil.getAttribute(child, attName) != null ) {
+                child=getNext(child, elemName, Node.ELEMENT_NODE );
+            }
+        } else {
+            while( child!= null && 
+                    ( elemName==null || elemName.equals( child.getNodeName())) && 
+                    ! attVal.equals( DomUtil.getAttribute(child, attName)) ) {
+                child=getNext(child, elemName, Node.ELEMENT_NODE );
+            }
+        }
+        return child;        
+    }    
+    
 
     /** Get the first child's content ( ie it's included TEXT node ).
      */
@@ -153,6 +196,17 @@ public class DomUtil {
         return null;
     }
 
+    /** Get the first direct child with a given type
+     */
+    public static Node getChild( Node parent, int type ) {
+        Node n=parent.getFirstChild();
+        while( n!=null && type != n.getNodeType() ) {
+            n=n.getNextSibling();
+        }
+        if( n==null ) return null;
+        return n;
+    }
+
     /** Get the next sibling with the same name and type
      */
     public static Node getNext( Node current ) {
@@ -161,12 +215,16 @@ public class DomUtil {
         return getNext( current, name, type);
     }
 
+    /** Return the next sibling with a given name and type
+     */ 
     public static Node getNext( Node current, String name, int type) {
         Node first=current.getNextSibling();
         if( first==null ) return null;
+
         for (Node node = first; node != null;
              node = node.getNextSibling()) {
-            if( node.getNodeType() != type ) continue;
+            
+            if( type >= 0 && node.getNodeType() != type ) continue;
             //System.out.println("getNode: " + name + " " + node.getNodeName());
             if( name==null )
                 return node;
