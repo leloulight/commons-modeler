@@ -9,7 +9,7 @@ offers convenient support for configuring and instantiating Model MBeans
 used within a server-based application that wants to expose management
 features via JMX.  See the
 <a href="http://java.sun.com/products/JavaManagement/download.html">
-JMX Specification (Version 1.0)</a> for more information about Model MBeans
+JMX Specification (Version 1.1)</a> for more information about Model MBeans
 and other JMX concepts.</p>
 
 <p>Model MBeans are very powerful - and the JMX specification includes a
@@ -37,13 +37,15 @@ source distribution), and much more complex usage code in Tomcat 4.1 (in the
 
 <h3>1.  Acquire a JMX Implementation</h3>
 
-<p><em>Modeler</em> has been tested with two different JMX implementations:
+<p><em>Modeler</em> has been tested with different JMX implementations:
 <ul>
 <li>JMX Reference Implementation (version 1.0.1 or later) -
     <a href="http://java.sun.com/products/JavaManagement/download.html">
     http://java.sun.com/products/JavaManagement/download.html</a></li>
 <li>MX4J (version 1.0-beta-3 or later) -
     <a href="http://mx4j.sourceforge.net/">http://mx4j.sourceforge.net</a></li>
+<li>JBoss MX
+    <a href="http://www.jboss.org/">http://www.jboss.org</a></li>
 </ul>
 
 <p>After unpacking the release, you will need to ensure that the appropriate
@@ -186,9 +188,9 @@ containing the MBean implementation classes themselves, and loaded as follows:
 <pre>
     InputStream stream = this.getClass().getResourceAsStream
       ("/com/mycompany/mypackage/mbeans-descriptors.xml");
-    Registry.loadRegistry(stream);
-    stream.close();
     Registry registry = Registry.getRegistry();
+    registry.loadDescriptors(stream);
+    stream.close();
 </pre>
 
 <p>Besides using the configuration file, it is possible to configure the
@@ -197,31 +199,34 @@ registry metadata by hand, using the <code>addManagedBean()</code> and
 the standard support for loading a configuration file to be convenient
 and sufficient.</p>
 
+<p>Modeler will also look for a mbeans-descriptors.xml in the same package
+with the class beeing registered and in its parent. If no metadata is found,
+modeler will use a number of simple patterns, similar with the ones used by 
+ant, to determine a reasonable metadata</p>
+
+<p>In a future version we should also support xdoclet-based generation of the
+descriptors</p>
+
 
 <h3>4.  Instantiate Model MBeans As Needed</h3>
 
 <p>When your server application needs to instantiate a new MBean and register
 it with the corresponding <code>MBeanServer</code>, it can execute code like
 this:</p>
+
 <pre>
   Group group = ... managed component instance ...;
-  MBeanServer mserver = registry.getServer();
-  ManagedBean managed = registry.findManagedBean("Group");
-  String domain = managed.getDomain();
-  if (domain == null) {
-    domain = mserver.getDefaultDomain();
-  }
-  ModelMBean mbean = managed.createMBean(group);
-  ObjectName oname = ... object name for this mbean ...;
-  mserver.registerMBean(mbean, oname);
+
+  MBeanServer mserver = registry.getMBeanServer();
+
+  ObjectName oname="myDomain:type=Group,name=myGroup";
+
+  registry.registerComponent( group, oname, "Group" );
 </pre>
 
 <p>After the Model MBean has been created and registered, it is accessible to
-JMX clients through the standard JMX client APIs.  A comprehensive example
-that illustrates these techniques is the administrative web application that
-manages a Tomcat 4.1 server, including the ability to save an updated copy of
-the <code>conf/server.xml</code> file that represents the current configuration
-of all Tomcat components.</p>
+JMX clients through the standard JMX client APIs.
+</p>
 
 </body>
 </html>
