@@ -1,4 +1,4 @@
-$Id: RELEASE-NOTES-1.1.txt,v 1.1 2003/03/13 18:11:59 costin Exp $
+$Id: RELEASE-NOTES-1.1.txt,v 1.2 2003/04/09 19:00:06 costin Exp $
 
                           Commons Modeler Package
                                 Version 1.1
@@ -39,11 +39,18 @@ small applications.
 
 * cleaner APIs, with deprecation of static methods.
 
+* (experimental) support for remote mbeans, allowing management of non-local mbeans. 
+
+* (experimental) support for persistence for mbeans loaded from the mbeans file.
+
 
 BUG REPORTS ADDRESSED:
 =====================
 
 All bugs reported against modeler have been fixed.
 
-* XXX Attribute change notifications not beeing sent
-* 
+* 17349 Attribute change notifications not beeing sent
+
+In addition, this release fixes problems reported against jakarta-tomcat:
+
+* XXX Support for old connector and other components that are not declared in mbeans-descriptors.xml
