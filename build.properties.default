@@ -1,0 +1,59 @@
+# ----- Proxy setup -----
+#proxy.host=proxy.domain
+#proxy.port=8080
+#proxy.use=on
+
+# ----- CVS root for the jakarta repositories ------
+cvsroot=":pserver:anoncvs@cvs.apache.org:/home/cvspublic"
+
+# ----- Default Base Path for Dependent Packages -----
+base.path=/usr/share/java
+#base.path=../repository
+
+# --------------------------------------------------
+#                REQUIRED LIBRARIES
+# --------------------------------------------------
+
+
+# ----- Commons Beanutils, version 1.4 or later -----
+commons-beanutils.home=${base.path}/commons-beanutils-1.6.1
+commons-beanutils.lib=${commons-beanutils.home}
+commons-beanutils.jar=${commons-beanutils.lib}/commons-beanutils.jar
+commons-beanutils.loc=http://www.apache.org/dist/jakarta/commons/beanutils/binaries/commons-beanutils-1.6.1.tar.gz
+
+
+# ----- Commons Collections, version 2.0 or later -----
+commons-collections.home=${base.path}/commons-collections-2.1
+commons-collections.lib=${commons-collections.home}
+commons-collections.jar=${commons-collections.lib}/commons-collections.jar
+commons-collections.loc=http://www.apache.org/dist/jakarta/commons/collections/binaries/collections-2.1.tar.gz
+
+
+# ----- Commons Digester, version 1.4 or later -----
+commons-digester.home=${base.path}/commons-digester-1.4.1
+commons-digester.lib=${commons-digester.home}
+commons-digester.jar=${commons-digester.lib}/commons-digester.jar
+commons-digester.loc=http://www.apache.org/dist/jakarta/commons/digester/binaries/commons-digester-1.4.1.tar.gz
+
+
+# ----- Commons Logging, version 1.0.1 or later -----
+commons-logging.home=${base.path}/commons-logging-1.0.3
+commons-logging.lib=${commons-logging.home}
+commons-logging-api.jar=${commons-logging.lib}/commons-logging-api.jar
+commons-logging.jar=${commons-logging.lib}/commons-logging.jar
+commons-logging.loc=http://www.apache.org/dist/jakarta/commons/logging/binaries/commons-logging-1.0.3.tar.gz
+
+
+# ----- Java Management Extensions (JMX), JMX RI 1.0.1 or later or MX4J 1.1 or later -----
+jmx.home=${base.path}/mx4j-1.1.1
+jmx.lib=${jmx.home}/lib
+jmx.jar=${jmx.lib}/mx4j-jmx.jar
+jmx-tools.jar=${jmx.lib}/mx4j-tools.jar
+jmx.loc=http://telia.dl.sourceforge.net/sourceforge/mx4j/mx4j-1.1.1.tar.gz
+
+
+# ----- JUnit Unit Test Suite, version 3.7 or later -----
+junit.home=${base.path}/junit3.7
+junit.lib=${junit.home}
+junit.jar=${junit.lib}/junit.jar
+junit.loc=http://telia.dl.sourceforge.net/sourceforge/junit/junit3.7.zip
