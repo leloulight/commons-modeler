@@ -210,7 +210,39 @@ public final class Registry {
         return mb;
     }
 
+    public ManagedBean findManagedBean(Class bean, String type)
+        throws Exception
+    {
+        if( type==null )
+            type=bean.getName();
+        ManagedBean managed = registry.findManagedBean(type);
 
+        // Search for a descriptor in the same package
+        if( managed==null ) {
+            // check package and parent packages
+            if( log.isDebugEnabled() )
+                log.debug( "Looking for descriptor ");
+
+            findDescriptor( bean );
+
+            managed=findManagedBean(type);
+            // TODO: check super-class
+        }
+        if( log.isDebugEnabled() )
+            log.debug( "Managed= "+ managed);
+
+        // Still not found - use introspection
+        if( managed==null ) {
+            // introspection
+            loadDescriptors("MbeansDescriptorsIntrospectionSource",
+                    bean, type);
+
+            managed=findManagedBean(type);
+            managed.setName( type );
+            addManagedBean(managed);
+        }
+        return managed;
+    }
     /**
      * Return the set of bean names for all managed beans known to
      * this registry.
@@ -513,6 +545,8 @@ public final class Registry {
     public void registerComponent(Object bean, ObjectName oname, String type)
            throws Exception
     {
+        if( log.isDebugEnabled() )
+            log.debug( "Managed= "+ oname);
 
         if( bean ==null ) {
             log.error("Null component " + oname );
@@ -524,26 +558,7 @@ public final class Registry {
                 type=bean.getClass().getName();
             }
 
-            ManagedBean managed = registry.findManagedBean(type);
-
-            if( managed==null ) {
-                // check package and parent packages
-                findDescriptor( bean );
-
-                managed=findManagedBean(type);
-                // TODO: check super-class
-            }
-
-            // Still not found - use introspection
-            if( managed==null ) {
-                // introspection
-                loadDescriptors("MbeansDescriptorsIntrospectionSource",
-                        bean.getClass(), type);
-
-                managed=findManagedBean(type);
-                managed.setName( type );
-                addManagedBean(managed);
-            }
+            ManagedBean managed = registry.findManagedBean(bean.getClass(), type);
 
             // The real mbean is created and registered
             ModelMBean mbean = managed.createMBean(bean);
@@ -719,30 +734,33 @@ public final class Registry {
      * @param bean
      * @return
      */
-    private boolean findDescriptor( Object bean ) {
-        String className=bean.getClass().getName();
+    private boolean findDescriptor( Class beanClass ) {
+        String className=beanClass.getName();
         String res=className.replace( '.', '/');
-        while( className.indexOf( "/") > 0 ) {
+        if( log.isDebugEnabled() )
+            log.debug("Finding descriptor " + res );
+        while( res.indexOf( "/") > 0 ) {
             int lastComp=res.lastIndexOf( "/");
             if( lastComp <= 0 ) return false;
 
             String packageName=res.substring(0, lastComp);
+            res=packageName;
             if( searchedPaths.get( packageName ) != null ) {
                 return false;
             }
             String descriptors=packageName + "/mbeans-descriptors.ser";
             if( log.isDebugEnabled() )
                 log.debug( "Finding " + descriptors );
-            URL dURL=bean.getClass().getClassLoader().getResource( descriptors );
+            URL dURL=beanClass.getClassLoader().getResource( descriptors );
             if( dURL == null ) {
                 descriptors=packageName + "/mbeans-descriptors.xml";
-                dURL=bean.getClass().getClassLoader().getResource( descriptors );
+                dURL=beanClass.getClassLoader().getResource( descriptors );
                 if( dURL == null ) {
                     className=packageName;
                     continue;
                 }
             }
-            log.info( "Found " + dURL);
+            log.debug( "Found " + dURL);
             searchedPaths.put( descriptors,  dURL );
             try {
                 if( descriptors.endsWith(".xml" ))

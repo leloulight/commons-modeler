@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.15 2003/02/28 23:39:20 costin Exp $
- * $Revision: 1.15 $
- * $Date: 2003/02/28 23:39:20 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.16 2003/03/15 00:34:10 costin Exp $
+ * $Revision: 1.16 $
+ * $Date: 2003/03/15 00:34:10 $
  *
  * ====================================================================
  *
@@ -115,7 +115,7 @@ import javax.management.*;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.15 $ $Date: 2003/02/28 23:39:20 $
+ * @version $Revision: 1.16 $ $Date: 2003/03/15 00:34:10 $
  */
 
 public class BaseModelMBean implements ModelMBean, MBeanRegistration {
@@ -1177,20 +1177,7 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
             //Thread.currentThread().setContextClassLoader(BaseModelMBean.class.getClassLoader());
             Class c=Class.forName( type);
             resource = c.newInstance();
-            ManagedBean descriptor=reg.findManagedBean(type);
-
-            if( descriptor != null ) {
-                if( log.isDebugEnabled())
-                    log.debug("Using descriptor " + type + " " + descriptor);
-                this.setModelMBeanInfo( descriptor.createMBeanInfo());
-                return;
-            }
-
-            // Maybe it's a real class name. Use introspection
-            if( log.isDebugEnabled())
-                log.debug("Introspecting " + type);
-            reg.loadDescriptors("MbeansDescriptorsIntrospectionSource", c, type);
-            descriptor=reg.findManagedBean(type);
+            ManagedBean descriptor=reg.findManagedBean(c, type);
 
             this.setModelMBeanInfo(descriptor.createMBeanInfo());
         } catch( Throwable ex) {
