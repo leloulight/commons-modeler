@@ -1,14 +1,5 @@
 package org.apache.commons.modeler.modules;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
-
-import javax.management.ObjectName;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.modeler.AttributeInfo;
@@ -16,6 +7,16 @@ import org.apache.commons.modeler.ManagedBean;
 import org.apache.commons.modeler.OperationInfo;
 import org.apache.commons.modeler.ParameterInfo;
 import org.apache.commons.modeler.Registry;
+
+import javax.management.ObjectName;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
 
 
 public class MbeansDescriptorsIntrospectionSource extends ModelerSource
@@ -88,21 +89,86 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
     private static ObjectName objNameArray[]=new ObjectName[0];
     // createMBean == registerClass + registerMBean
 
-    private boolean supportedType( Class ret ) {
-        return ret == String.class ||
-                ret == Integer.class ||
-                ret == Integer.TYPE ||
-                ret == Long.class ||
-                ret == Long.TYPE ||
-                ret == java.io.File.class ||
-                ret == Boolean.class ||
-                ret == Boolean.TYPE ||
-                ret == strArray.getClass() || 
-                ret == ObjectName.class  ||
-                ret == objNameArray.getClass()
-            ;
+    private static Class[] supportedTypes  = new Class[] {
+        Boolean.class,
+        Boolean.TYPE,
+        Byte.class,
+        Byte.TYPE,
+        Character.class,
+        Character.TYPE,
+        Short.class,
+        Short.TYPE,
+        Integer.class,
+        Integer.TYPE,
+        Long.class,
+        Long.TYPE,
+        Float.class, 
+        Float.TYPE,
+        Double.class,
+        Double.TYPE,
+        String.class,
+        strArray.getClass(),
+        BigDecimal.class,
+        BigInteger.class,
+        ObjectName.class,
+        objNameArray.getClass(),
+        java.io.File.class,
+    };
+    
+    /**
+     * Check if this class is one of the supported types.
+     * @param ret
+     * @return true if the class is a supported type.
+     */ 
+    private boolean supportedType(Class ret) {
+        for (int i = 0; i < supportedTypes.length; i++) {
+            if (ret == supportedTypes[i]) {
+                return true;
+            }
+        }
+        if (isBeanCompatible(ret)) {
+            return true;
+        }
+        return false;
     }
 
+    /**
+     * Check if this class conforms to JavaBeans specifications.
+     * @param javaType
+     * @return
+     */
+    protected boolean isBeanCompatible(Class javaType) {
+        // Must be a non-primitive and non array
+        if (javaType.isArray() || javaType.isPrimitive()) {
+            return false;
+        }
+
+        // Anything in the java or javax package that
+        // does not have a defined mapping is excluded.
+        if (javaType.getName().startsWith("java.") || 
+            javaType.getName().startsWith("javax.")) {
+            return false;
+        }
+
+        try {
+            javaType.getConstructor(new Class[]{});
+        } catch (java.lang.NoSuchMethodException e) {
+            return false;
+        }
+
+        // Make sure superclass is compatible
+        Class superClass = javaType.getSuperclass();
+        if (superClass != null && 
+            superClass != java.lang.Object.class && 
+            superClass != java.lang.Exception.class && 
+            superClass != java.lang.Throwable.class) {
+            if (!isBeanCompatible(superClass)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     /** Process the methods and extract 'attributes', methods, etc
       *
       */
