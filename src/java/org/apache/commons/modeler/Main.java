@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/Main.java,v 1.4 2003/02/28 04:52:43 costin Exp $
- * $Revision: 1.4 $
- * $Date: 2003/02/28 04:52:43 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/Main.java,v 1.5 2003/04/07 06:43:19 costin Exp $
+ * $Revision: 1.5 $
+ * $Date: 2003/04/07 06:43:19 $
  *
  * ====================================================================
  *
@@ -66,8 +66,8 @@ package org.apache.commons.modeler;
 
 
 import org.apache.commons.modeler.util.IntrospectionUtils;
+import org.apache.commons.modeler.Registry;
 
-import java.io.FileInputStream;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
@@ -91,7 +91,7 @@ public class Main
 {
     String file;
     String home;
-    String type="Mbeans";
+    String type="MbeansSource";
 
     public void setFile( String f ) {
         this.file=f;
