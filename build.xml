@@ -3,30 +3,31 @@
 
 <!--
         "Modeler" component of the Jakarta Commons Subproject
-        $Id: build.xml,v 1.5 2002/11/13 06:24:14 costin Exp $
+        $Id: build.xml,v 1.6 2002/12/20 21:37:58 costin Exp $
 -->
 
 
 <!-- ========== Initialize Properties ===================================== -->
 
 
+  <property file="${user.home}/build.properties"/>   <!-- User local        -->
   <property file="build.properties"/>                <!-- Component local   -->
   <property file="../build.properties"/>             <!-- Commons local     -->
-  <property file="${user.home}/build.properties"/>   <!-- User local        -->
 
 
 <!-- ========== External Dependencies ===================================== -->
 
 
   <!-- The directories corresponding to your necessary dependencies -->
-  <property name="jaxp.home"               value="/usr/local/jaxp-1.1"/>
-  <property name="junit.home"              value="/usr/local/junit3.7"/>
-  <property name="commons.home"            value="../../jakarta-commons"/>
-  <property name="sandbox.home"            value="../../jakarta-commons-sandbox"/>
+  <property name="base.path"               value="/usr/local" />
+  <property name="jaxp.home"               value="${base.path}/jaxp-1.1"/>
+  <property name="junit.home"              value="${base.path}/junit3.7"/>
+  <property name="commons.home"            location="../../jakarta-commons"/>
+  <property name="sandbox.home"            location="../../jakarta-commons-sandbox"/>
   <property name="beanutils.home"          value="${commons.home}/beanutils"/>
   <property name="collections.home"        value="${commons.home}/collections"/>
   <property name="digester.home"           value="${commons.home}/digester"/>
-  <property name="jmx.home"                value="/usr/local/jmx-ri_1.0.1/jmx"/>
+  <property name="jmx.home"                value="${base.path}/jmx-ri_1.0.1/jmx"/>
   <property name="logging.home"            value="${commons.home}/logging"/>
 
 <!-- ========== Derived Values ============================================ -->
@@ -41,7 +42,7 @@
   <property name="commons-beanutils.jar"   value="${beanutils.home}/dist/commons-beanutils.jar"/>
   <property name="commons-collections.jar" value="${collections.home}/dist/commons-collections.jar"/>
   <property name="commons-digester.jar"    value="${digester.home}/dist/commons-digester.jar"/>
-  <property name="commons-logging.jar"     value="${logging.home}/dist/commons-logging.jar"/>
+  <property name="commons-logging.jar"     value="${logging.home}/target/commons-logging.jar"/>
 
 
 <!-- ========== Component Declarations ==================================== -->
@@ -254,61 +255,6 @@
       <arg value="org.apache.commons.modeler.RegistryTestCase"/>
       <classpath refid="test.classpath"/>
     </java>
-  </target>
-
-  <target name="ant.test" depends="init">
-    <property name="tomcat.home" location="../../jakarta-tomcat-5/build" />
-
-    <path id="jmx.test.classpath">
-      <pathelement location="target/classes" />
-      <fileset dir="${tomcat.home}/common/lib" includes="*.jar"/>
-      <fileset dir="${tomcat.home}/server/lib" includes="*.jar"/>
-      <fileset dir="${tomcat.home}/bin" includes="*.jar"/>
-      <pathelement location="${commons-logging.jar}" />
-      <pathelement location="${jmx.jar}" />
-      <pathelement location="${ide.classes}" />
-    </path>
-
-    <taskdef resource="META-INF/ant.properties"
-             classpathref="jmx.test.classpath" />
-
-    <MLET code="mx4j.adaptor.http.HttpAdaptor"
-          name="Http:name=HttpAdaptor" />
-
-    <MLET code="mx4j.adaptor.http.XSLTProcessor"
-          name="Http:name=XSLTProcessor"/>
-
-    <jmxSet name="Http:name=HttpAdaptor"
-            attribute="Port"
-            type="int"
-            value="9999" />
-
-    <jmxSet name="Http:name=HttpAdaptor"
-            attribute="ProcessorName"
-            type="ObjectName"
-            value="Http:name=XSLTProcessor" />
-
-    <jmx name="Http:name=HttpAdaptor"
-         method="start" />
-
-    <!-- start catalina -->
-
-    <MLET code="org.apache.commons.modeler.BaseModelMBean"
-          name="catalina: type=server" >
-       <arg value="org.apache.catalina.startup.Catalina" />
-    </MLET>
-
-    <jmxSet name="catalina: type=server"
-            attribute="catalinaHome"
-            value="${tomcat.home}"/>
-
-    <jmx name="catalina: type=server"
-         method="start" />
-
-    <echo>Tomcat started</echo>
-
-    <sleep hours="1"/>
-        
   </target>
 
 <!-- ========== Demonstration Targets ===================================== -->
