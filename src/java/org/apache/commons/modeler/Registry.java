@@ -63,7 +63,6 @@ package org.apache.commons.modeler;
 
 import java.io.*;
 import java.net.*;
-import java.lang.reflect.*;
 import java.util.*;
 
 import javax.management.*;
@@ -71,6 +70,7 @@ import javax.management.modelmbean.ModelMBean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.modeler.modules.ModelerSource;
 
 /**
  * <p>Registry for MBean descriptor information.  This class implements
@@ -85,6 +85,28 @@ import org.apache.commons.logging.LogFactory;
  * @author Costin Manolache
  */
 public final class Registry {
+    /**
+     * The Log instance to which we will write our log messages.
+     */
+    private static Log log = LogFactory.getLog(Registry.class);
+    /**
+     * The registry instance created by our factory method the first time
+     * it is called.
+     */
+    private static Registry registry = null;
+
+
+    /**
+     * The <code>MBeanServer</code> instance that we will use to register
+     * management beans.
+     */
+    private MBeanServer server = null;
+
+    /**
+     * The set of ManagedBean instances for the beans this registry
+     * knows about, keyed by name.
+     */
+    private HashMap descriptors = new HashMap();
 
 
     // ----------------------------------------------------------- Constructors
@@ -100,35 +122,32 @@ public final class Registry {
 
     }
 
-
-    // ----------------------------------------------------- Instance Variables
-
-
     /**
-     * The set of ManagedBean instances for the beans this registry
-     * knows about, keyed by name.
+     * Factory method to create (if necessary) and return our
+     * <code>Registry</code> instance.
      */
-    private HashMap descriptors = new HashMap();
+    public synchronized static Registry getRegistry() {
 
+        if (registry == null) {
+            log.debug("Creating new Registry instance");
+            registry = new Registry();
+        }
+        return (registry);
+
+    }
+
+    // -------------------- Metadata   --------------------
 
     /**
-     * The Log instance to which we will write our log messages.
-     */
-    private static Log log = LogFactory.getLog(Registry.class);
-
-
-    // --------------------------------------------------------- Public Methods
-
-
-    /**
-     * Add a new bean to the set of beans known to this registry.
+     * Add a new bean metadata to the set of beans known to this registry.
      *
      * @param bean The managed bean to be added
+     * @since 1.0
      */
     public void addManagedBean(ManagedBean bean) {
         // called from digester
+        // XXX Use group + name
         descriptors.put(bean.getName(), bean);
-
     }
 
 
@@ -137,22 +156,23 @@ public final class Registry {
      * bean name, if any; otherwise return <code>null</code>.
      *
      * @param name Name of the managed bean to be returned
+     * @since 1.0
+     * XXX Group ?? Use Group + Type
      */
     public ManagedBean findManagedBean(String name) {
-
         return ((ManagedBean) descriptors.get(name));
-
     }
 
 
     /**
      * Return the set of bean names for all managed beans known to
      * this registry.
+     *
+     * @since 1.0
+     * XXX Use the group
      */
     public String[] findManagedBeans() {
-
         return ((String[]) descriptors.keySet().toArray(new String[0]));
-
     }
 
 
@@ -162,6 +182,7 @@ public final class Registry {
      *
      * @param group Name of the group of interest, or <code>null</code>
      *  to select beans that do <em>not</em> belong to a group
+     * @since 1.0
      */
     public String[] findManagedBeans(String group) {
 
@@ -185,56 +206,56 @@ public final class Registry {
      * Remove an existing bean from the set of beans known to this registry.
      *
      * @param bean The managed bean to be removed
+     * @since 1.0
+     * TODO: change this to use group/name
      */
     public void removeManagedBean(ManagedBean bean) {
-
         descriptors.remove(bean.getName());
-
     }
 
-
-    // ------------------------------------------------------- Static Variables
-
-
-    /**
-     * The registry instance created by our factory method the first time
-     * it is called.
-     */
-    private static Registry registry = null;
-
-
-    /**
-     * The <code>MBeanServer</code> instance that we will use to register
-     * management beans.
-     */
-    private static MBeanServer server = null;
-
-
-
-    // --------------------------------------------------------- Static Methods
-
-    /**
-     * Factory method to create (if necessary) and return our
-     * <code>Registry</code> instance.
-     */
-    public synchronized static Registry getRegistry() {
-
-        if (registry == null) {
-            log.debug("Creating new Registry instance");
-            registry = new Registry();
-        }
-        return (registry);
-
-    }
-
-    // XXX This should be decoupled - Registry should only deal with
-    // type info, and it may be nice to not depend directly on JMX.
+    // -------------------- Access the mbean server  --------------------
 
     /**
      * Factory method to create (if necessary) and return our
      * <code>MBeanServer</code> instance.
+     *
+     * @since 1.0
+     * @deprecated Use the instance method
      */
-    public synchronized static MBeanServer getServer() {
+    public static MBeanServer getServer() {
+        return Registry.getRegistry().getMBeanServer();
+    }
+
+    /**
+     * Set the <code>MBeanServer</code> to be utilized for our
+     * registered management beans.
+     *
+     * @param mbeanServer The new <code>MBeanServer</code> instance
+     * @since 1.0
+     * @deprecated Use the instance method
+     */
+    public static void setServer(MBeanServer mbeanServer) {
+        Registry.getRegistry().setServer(mbeanServer);
+    }
+
+    /**
+     * Set the <code>MBeanServer</code> to be utilized for our
+     * registered management beans.
+     *
+     * @param server The new <code>MBeanServer</code> instance
+     * @since 2.0
+     */
+    public void setMBeanServer( MBeanServer server ) {
+        this.server=server;
+    }
+
+    /**
+     * Factory method to create (if necessary) and return our
+     * <code>MBeanServer</code> instance.
+     *
+     * @since 2.0
+     */
+    public synchronized MBeanServer getMBeanServer() {
         long t1=System.currentTimeMillis();
 
         if (server == null) {
@@ -249,6 +270,8 @@ public final class Registry {
         return (server);
     }
 
+    // -------------------- Loading data from different sources  --------------
+
     /**
      * Load the registry from the XML input found in the specified input
      * stream.
@@ -262,104 +285,48 @@ public final class Registry {
      */
     public static void loadRegistry(InputStream stream) throws Exception {
         Registry registry = getRegistry();
-        registry.loadDescriptors( stream, "MbeansDescriptorsDOM" );
+        registry.loadDescriptors( "MbeansDescriptorsDOMSource", stream, null );
     }
 
-
-    /** Source for descriptor data. More sources can be added.
-     *
-     */
-    public static class DescriptorSource {
-
-        public void loadDescriptors( Registry registry, String location,
-                                     String type, Object source)
-            throws Exception
-        {
-            // TODO
-        }
-    }
-
-    private DescriptorSource getDescriptorSource( String type )
-        throws Exception
-    {
-        if( type==null ) type="MbeansDescriptorsDOM";
-        String moduleType=type + "Source";
-        String sourceClassName=System.getProperty("org.apache.commons.modeler.source",
-                "org.apache.commons.modeler.modules." + moduleType);
-
-        Class c=Class.forName( sourceClassName );
-        DescriptorSource ds=(DescriptorSource)c.newInstance();
-        return ds;
-    }
-
-    public void loadDescriptors( String type, Object source )
-        throws Exception
-    {
-        log.trace("loadDescriptors " + source );
-
-        if( source instanceof URL ) {
-            System.out.println("Try " + source );
-            URL url=(URL)source;
-//            URL url1=new URL( url.toString() + ".ser");
-//            try {
-//                System.out.println("Ser: " + url1);
-//                InputStream stream=url1.openStream();
-//                if( stream != null ) {
-//                    DescriptorSource ds=getDescriptorSource("MbeansDescriptorsSer");
-//                    ds.loadDescriptors(this, url1.toString(), type, stream);
-//                    return;
-//                }
-//            }  catch( FileNotFoundException ex ) {
-//                // nothing
-//                log.debug("Not found: " + url1 );
-//            }  catch( Exception ex ) {
-//                ex.printStackTrace();
-//            }
-            InputStream stream=url.openStream();
-            DescriptorSource ds=getDescriptorSource(type);
-            ds.loadDescriptors(this, url.toString(), type, stream);
-        }
-
-        if( source instanceof InputStream ) {
-            DescriptorSource ds=getDescriptorSource(type);
-            ds.loadDescriptors(this, null, type, (InputStream)source);
-        }
-    }
 
     /**
      * Load the registry from the XML input found in the specified input
      * stream.
      *
-     * @param stream InputStream containing the registry configuration
-     *  information
+     * @param type The type of information to load. A name of a bean or
+     *      a local type.
+     * @param source InputStream or URL to be loaded
      *
      * @exception Exception if any parsing or processing error occurs
-     * @since 1.0
+     * @since 2.0
      */
-    public void loadDescriptors(InputStream stream, String type)
+    public void loadDescriptors( String sourceType, Object source, String param)
         throws Exception
     {
-        loadDescriptors( type, stream );
+        log.trace("loadDescriptors " + source );
+        ModelerSource ds=getModelerSource(sourceType);
+
+        if( source instanceof URL ) {
+            URL url=(URL)source;
+            InputStream stream=url.openStream();
+            ds.loadDescriptors(this, url.toString(), param, stream);
+        }
+
+        if( source instanceof InputStream ) {
+            ds.loadDescriptors(this, null, param, source);
+        }
+
+        if( source instanceof Class ) {
+            ds.loadDescriptors(this, ((Class)source).getName(), param, source);
+        }
     }
 
-    /**
-     * Set the <code>MBeanServer</code> to be utilized for our
-     * registered management beans.
-     *
-     * @param mbeanServer The new <code>MBeanServer</code> instance
-     */
-    public static void setServer(MBeanServer mbeanServer) {
-        server = mbeanServer;
-    }
-
-
-    // ---------------------- BaseRegistry overrides --------------------------
-    public Object getMBeanServer() {
-        return getServer();
-    }
-
+    // -------------------- Instance registration  --------------------
 
     /** Main registration method
+     *
+     * If the metadata is not found, introspection will be used to generate
+     * it automatically.
      *
      */
     public void registerComponent(Object bean, String domain, String type,
@@ -373,12 +340,17 @@ public final class Registry {
             }
             ManagedBean managed = registry.findManagedBean(type);
             if( managed==null ) {
-                // TODO: check package and parent packages
-
+                // check package and parent packages
+                findDescriptor( bean );
+                managed=findManagedBean(type);
                 // TODO: check super-class
-
+            }
+            if( managed==null ) {
                 // introspection
-                managed=createManagedBean(domain, bean.getClass(), type);
+                loadDescriptors("MbeansDescriptorsIntrospectionSource",
+                        bean.getClass(), type);
+
+                managed=findManagedBean(type);
                 managed.setName( type );
                 addManagedBean(managed);
             }
@@ -389,16 +361,24 @@ public final class Registry {
             sb.append( domain ).append(":");
             sb.append( name );
             nameStr=sb.toString();
-            getServer().registerMBean( mbean, new ObjectName( nameStr ));
+            ObjectName oname=new ObjectName( nameStr );
+
+            if(  getServer().isRegistered( oname )) {
+                if( log.isDebugEnabled())
+                    log.debug("Unregistering existing component " + oname );
+                getServer().unregisterMBean( oname );
+            }
+
+            getServer().registerMBean( mbean, oname);
         } catch( Exception ex) {
-            log.error("Error registering " + nameStr );
+            log.error("Error registering " + nameStr, ex );
             throw ex;
         }
     }
 
-    public void unregisterComponent( String name ) {
+    public void unregisterComponent( String domain, String name ) {
         try {
-            ObjectName oname=new ObjectName( name );
+            ObjectName oname=new ObjectName( domain + ":" + name );
 
             // XXX remove from our tables.
             getServer().unregisterMBean( oname );
@@ -407,28 +387,13 @@ public final class Registry {
         }
     }
 
-
-    public String registerMBean( String domain, String name ) {
-        try {
-            // XXX use aliases, suffix only, proxy.getName(), etc
-            String fullName=domain + ": " +  name;
-            ObjectName oname=new ObjectName( fullName );
-
-            if(  getServer().isRegistered( oname )) {
-                log.info("Unregistering " + oname );
-                getServer().unregisterMBean( oname );
-            }
-            getServer().registerMBean( this, oname );
-            return fullName;
-        } catch( Throwable t ) {
-            log.error( "Error creating mbean ", t );
-            return null;
-        }
-    }
-
+    // -------------------- Experimental: discovery  --------------------
     public static String MODELER_MANIFEST="/META-INF/modeler-mbeans.xml";
 
-    /** Discover all META-INF/modeler.xml files in classpath and register the components
+    /** Discover all META-INF/modeler.xml files in classpath and register
+     * the components
+     *
+     * @since EXPERIMENTAL
      */
     public void loadDescriptors(ClassLoader cl, String type) {
         try {
@@ -437,62 +402,26 @@ public final class Registry {
                 URL url=(URL)en.nextElement();
                 InputStream is=url.openStream();
                 if( log.isDebugEnabled()) log.debug("Loading " + url);
-                loadDescriptors(is, "modeler" );
+                loadDescriptors("MBeansDescriptorDOMSource", is, null );
             }
         } catch( Exception ex ) {
             ex.printStackTrace();
         }
     }
 
-    /**
-     *  todo Find if the 'className' is the name of the MBean or
-     *       the real class ( I suppose first ).
-     *  todo Read (optional) descriptions from a .properties, generated
-     *       from source.
-     *  todo Deal with constructors.
-     *
-     */
-    public ManagedBean createManagedBean(String domain, Class realClass,
-                                         String type)
-    {
-        try {
-            DescriptorSource ds=getDescriptorSource("MbeansDescriptorsIntrospection");
-            ds.loadDescriptors(this, type, type, realClass);
-            if( log.isDebugEnabled())
-                log.debug("Loading " + type + " " + realClass.getName());
-            return findManagedBean(type);
-        } catch( Exception ex ) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
-
-    /** Find the 'type' for this class
-     *
-     */
-    public String getType( String domain, Class realClass ) {
-        // first look at explicit mappings ( exceptions in MBeanUtils )
-
-        // We could also look up super classes and locate one we know about
-
-        // We could use the domain as a discriminator
-
-        String name=realClass.getName();
-        name=name.substring( name.lastIndexOf( ".") + 1 );
-
-
-        return name;
-    }
+    // -------------------- Support for unique names  --------------------
 
     // Store all objects that have been registered via modeler
     // it is used to generate unique names automatically - using seq=
     // scheme
     Hashtable instances=new Hashtable();
-    /** If a name was not provided, generate a name based on the
-     *  class name and a sequence number.
+
+    /**
+     * Help manage multiple instances with the same name prefix.
+     *
      */
-    public String generateSeqName(String domain, Class realClass) {
-        String name=getType( domain, realClass );
+    public int generateSeqNumber(String name) {
+        //String name=getType( domain, realClass );
 
         Integer iInt=(Integer)instances.get(name );
         int seq=0;
@@ -503,6 +432,77 @@ public final class Registry {
         } else {
             instances.put( name, new Integer( 0 ));
         }
-        return "name=" + name + ",seq=" + seq;
+        return seq;
     }
+
+    // -------------------- Notification codes  --------------------
+
+    // per registry
+    private int notificationId=0;
+    private Hashtable notificationCodes=new Hashtable();
+
+    /** Return an int ID for the notification name. Used for indexed
+     * access.
+     *
+     * @param domain Not used currently
+     * @param name  Type of the notification
+     * @return
+     */
+    public synchronized int getNotificationCode( String domain, String name) {
+        Integer i=(Integer)notificationCodes.get(name);
+        if( i!= null ) return i.intValue();
+
+        int code=notificationId++;
+        notificationCodes.put( name, new Integer( code ));
+        return code;
+    }
+
+    // -------------------- Implementation methods  --------------------
+
+    /** Lookup the component descriptor in the package and
+     * in the parent packages.
+     *
+     * @param bean
+     * @return
+     */
+    private boolean findDescriptor( Object bean ) {
+        String className=bean.getClass().getName();
+        String res=className.replace( '.', '/');
+        int lastComp=res.lastIndexOf( "/");
+        if( lastComp <= 0 ) return false;
+
+        String packageName=res.substring(0, lastComp);
+        String descriptors=packageName + "/mbeans-descriptors.xml";
+        if( log.isDebugEnabled() )
+            log.debug( "Finding " + descriptors );
+
+        URL dURL=bean.getClass().getClassLoader().getResource( descriptors );
+        if( dURL == null )
+            return false;
+
+        log.info( "Found " + dURL);
+        try {
+            loadDescriptors("MbeansDescriptorsDOMSource", dURL, null);
+        } catch(Exception ex ) {
+            log.error("Error loading " + dURL);
+        }
+
+        return false;
+    }
+
+
+    private ModelerSource getModelerSource( String type )
+            throws Exception
+    {
+        if( type==null ) type="MbeansDescriptorsDOMSource";
+        if( type.indexOf( ".") < 0 ) {
+            type="org.apache.commons.modeler.modules." + type;
+        }
+
+        Class c=Class.forName( type );
+        ModelerSource ds=(ModelerSource)c.newInstance();
+        return ds;
+    }
+
+
 }

@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseNotificationBroadcaster.java,v 1.2 2002/06/15 18:17:02 craigmcc Exp $
- * $Revision: 1.2 $
- * $Date: 2002/06/15 18:17:02 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseNotificationBroadcaster.java,v 1.3 2003/01/21 00:33:45 costin Exp $
+ * $Revision: 1.3 $
+ * $Date: 2003/01/21 00:33:45 $
  *
  * ====================================================================
  *
@@ -82,7 +82,7 @@ import javax.management.NotificationListener;
  *</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.2 $ $Date: 2002/06/15 18:17:02 $
+ * @author Costin Manolache
  */
 
 public class BaseNotificationBroadcaster implements NotificationBroadcaster {
@@ -258,6 +258,31 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
 
     }
 
+
+    // -------------------- Internal Extensions   --------------------
+
+    // Fast access. First index is the hook type
+    // ( FixedNotificationFilter.getType() ).
+    NotificationListener hooks[][]=new NotificationListener[20][];
+    int hookCount[]=new int[20];
+
+    private synchronized void registerNotifications( FixedNotificationFilter filter ) {
+        String names[]=filter.getNames();
+        Registry reg=Registry.getRegistry();
+        for( int i=0; i<names.length; i++ ) {
+            int code=reg.getNotificationCode(null, names[i]);
+            if( hooks.length < code ) {
+                // XXX reallocate
+                throw new RuntimeException( "Too many hooks " + code );
+            }
+            NotificationListener listeners[]=hooks[code];
+            if( listeners== null ) {
+
+            }
+
+
+        }
+    }
 
 }
 

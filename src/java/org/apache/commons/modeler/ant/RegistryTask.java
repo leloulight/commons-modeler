@@ -119,7 +119,7 @@ public final class RegistryTask  {
             throw new BuildException( "Resource or file attribute required");
         }
 
-        Registry.getRegistry().loadDescriptors( type, url);
+        Registry.getRegistry().loadDescriptors( type, url, null);
 
         if( outFile !=null ) {
             FileOutputStream fos=new FileOutputStream(outFile);

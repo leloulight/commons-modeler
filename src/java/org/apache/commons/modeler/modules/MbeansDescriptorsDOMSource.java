@@ -10,14 +10,49 @@ import org.apache.commons.logging.LogFactory;
 import java.io.InputStream;
 
 
-public class MbeansDescriptorsDOMSource extends Registry.DescriptorSource
+public class MbeansDescriptorsDOMSource extends ModelerSource
 {
     private static Log log = LogFactory.getLog(MbeansDescriptorsDOMSource.class);
 
+    Registry registry;
+    String location;
+    String type;
+    Object source;
+
+    public void setRegistry(Registry reg) {
+        this.registry=reg;
+    }
+
+    public void setLocation( String loc ) {
+        this.location=loc;
+    }
+
+    /** Used if a single component is loaded
+     *
+     * @param type
+     */
+    public void setType( String type ) {
+       this.type=type;
+    }
+
+    public void setSource( Object source ) {
+        this.source=source;
+    }
+
     public void loadDescriptors( Registry registry, String location,
                                  String type, Object source)
-        throws Exception
+            throws Exception
     {
+        setRegistry(registry);
+        setLocation(location);
+        setType(type);
+        setSource(source);
+        execute();
+    }
+
+    public void execute() throws Exception {
+        if( registry==null ) registry=Registry.getRegistry();
+
         try {
             InputStream stream=(InputStream)source;
             long t1=System.currentTimeMillis();

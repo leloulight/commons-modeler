@@ -13,14 +13,47 @@ import java.io.EOFException;
 import java.net.URL;
 
 
-public class MbeansDescriptorsSerSource extends Registry.DescriptorSource
+public class MbeansDescriptorsSerSource extends ModelerSource
 {
     private static Log log = LogFactory.getLog(MbeansDescriptorsSerSource.class);
+    Registry registry;
+    String location;
+    String type;
+    Object source;
+
+    public void setRegistry(Registry reg) {
+        this.registry=reg;
+    }
+
+    public void setLocation( String loc ) {
+        this.location=loc;
+    }
+
+    /** Used if a single component is loaded
+     *
+     * @param type
+     */
+    public void setType( String type ) {
+       this.type=type;
+    }
+
+    public void setSource( Object source ) {
+        this.source=source;
+    }
 
     public void loadDescriptors( Registry registry, String location,
                                  String type, Object source)
-        throws Exception
+            throws Exception
     {
+        setRegistry(registry);
+        setLocation(location);
+        setType(type);
+        setSource(source);
+        execute();
+    }
+
+    public void execute() throws Exception {
+        if( registry==null ) registry=Registry.getRegistry();
         long t1=System.currentTimeMillis();
         try {
             InputStream stream=null;

@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.11 2003/01/11 07:28:07 costin Exp $
- * $Revision: 1.11 $
- * $Date: 2003/01/11 07:28:07 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.12 2003/01/21 00:33:45 costin Exp $
+ * $Revision: 1.12 $
+ * $Date: 2003/01/21 00:33:45 $
  *
  * ====================================================================
  *
@@ -115,7 +115,7 @@ import javax.management.*;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.11 $ $Date: 2003/01/11 07:28:07 $
+ * @version $Revision: 1.12 $ $Date: 2003/01/21 00:33:45 $
  */
 
 public class BaseModelMBean implements ModelMBean, MBeanRegistration {
@@ -1178,7 +1178,8 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
             resource = c.newInstance();
             if( log.isDebugEnabled())
                 log.debug("Introspecting " + type);
-            descriptor=reg.createManagedBean(null, c, type);
+            reg.loadDescriptors("MbeansDescriptorsIntrospectionSource", c, type);
+            descriptor=reg.findManagedBean(type);
 
             this.setModelMBeanInfo(descriptor.createMBeanInfo());
         } catch( Exception ex) {

@@ -12,16 +12,51 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Hashtable;
 import java.util.Enumeration;
+import javax.management.ObjectName;
 
 
-public class MbeansDescriptorsIntrospectionSource extends Registry.DescriptorSource
+public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 {
     private static Log log = LogFactory.getLog(MbeansDescriptorsIntrospectionSource.class);
 
+    Registry registry;
+    String location;
+    String type;
+    Object source;
+
+    public void setRegistry(Registry reg) {
+        this.registry=reg;
+    }
+
+    public void setLocation( String loc ) {
+        this.location=loc;
+    }
+
+    /** Used if a single component is loaded
+     *
+     * @param type
+     */
+    public void setType( String type ) {
+       this.type=type;
+    }
+
+    public void setSource( Object source ) {
+        this.source=source;
+    }
+
     public void loadDescriptors( Registry registry, String location,
                                  String type, Object source)
-        throws Exception
+            throws Exception
     {
+        setRegistry(registry);
+        setLocation(location);
+        setType(type);
+        setSource(source);
+        execute();
+    }
+
+    public void execute() throws Exception {
+        if( registry==null ) registry=Registry.getRegistry();
         try {
             ManagedBean managed=createManagedBean(registry, null, (Class)source, type);
             if( managed==null ) return;
@@ -38,6 +73,11 @@ public class MbeansDescriptorsIntrospectionSource extends Registry.DescriptorSou
 
     // ------------ Implementation for non-declared introspection classes
 
+    static Hashtable specialMethods=new Hashtable();
+    static {
+        specialMethods.put( "preDeregister", "");
+        specialMethods.put( "postDeregister", "");
+    }
 
     // createMBean == registerClass + registerMBean
 
@@ -49,7 +89,8 @@ public class MbeansDescriptorsIntrospectionSource extends Registry.DescriptorSou
             ret == Long.TYPE ||
             ret == java.io.File.class ||
             ret == Boolean.class ||
-            ret == Boolean.TYPE
+            ret == Boolean.TYPE ||
+            ret == ObjectName.class
             ;
     }
 
@@ -97,6 +138,11 @@ public class MbeansDescriptorsIntrospectionSource extends Registry.DescriptorSou
                         log.debug("Wrong param count " + name + " " + params.length);
                     continue;
                 }
+                if( ! supportedType( params[0] ) ) {
+                    if( log.isDebugEnabled() )
+                        log.debug("Unsupported type " + methods[j] + " " + params[0]);
+                    continue;
+                }
                 if( ! Modifier.isPublic( methods[j].getModifiers() ) ) {
                     if( log.isDebugEnabled())
                         log.debug("Not public " + name);
@@ -113,6 +159,8 @@ public class MbeansDescriptorsIntrospectionSource extends Registry.DescriptorSou
                     continue;
                 if( ! Modifier.isPublic( methods[j].getModifiers() ) )
                     continue;
+                if( specialMethods.get( methods[j].getName() ) != null )
+                    continue;
                 invokeAttMap.put( name, methods[j]);
             }
         }
@@ -126,7 +174,9 @@ public class MbeansDescriptorsIntrospectionSource extends Registry.DescriptorSou
      * XXX Deal with constructors
      *
      */
-    public ManagedBean createManagedBean(Registry registry, String domain, Class realClass, String type) {
+    public ManagedBean createManagedBean(Registry registry, String domain,
+                                         Class realClass, String type)
+    {
         ManagedBean mbean= new ManagedBean();
 
         Method methods[]=null;
@@ -142,8 +192,6 @@ public class MbeansDescriptorsIntrospectionSource extends Registry.DescriptorSou
         methods = realClass.getMethods();
 
         initMethods(realClass, methods, attMap, getAttMap, setAttMap, invokeAttMap );
-
-        if( type==null) type=registry.generateSeqName(domain, realClass);
 
         try {
 
