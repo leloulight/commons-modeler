@@ -8,7 +8,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.management.*;
+import javax.management.loading.MLet;
 import java.io.InputStream;
+import java.net.URL;
 
 
 /** This will create mbeans based on a config file.
@@ -22,6 +24,7 @@ public class MbeansSource extends ModelerSource
     String location;
     String type;
     Object source;
+    static boolean loaderLoaded=false;
 
     public void setRegistry(Registry reg) {
         this.registry=reg;
@@ -80,6 +83,14 @@ public class MbeansSource extends ModelerSource
 
             MBeanServer server=(MBeanServer)Registry.getServer();
 
+            if( ! loaderLoaded ) {
+                // Register a loader that will be find ant classes.
+                ObjectName defaultLoader= new ObjectName("modeler",
+                        "loader", "modeler");
+                MLet mlet=new MLet( new URL[0], this.getClass().getClassLoader());
+                server.registerMBean(mlet, defaultLoader);
+                loaderLoaded=true;
+            }
             // We'll process all nodes at the same level.
             for (Node mbeanN = firstMbeanN; mbeanN != null;
                  mbeanN= DomUtil.getNext(mbeanN, null, Node.ELEMENT_NODE))
