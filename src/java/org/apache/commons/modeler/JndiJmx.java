@@ -87,9 +87,29 @@ import javax.management.*;
  * If this component is enabled, all MBeans will be registered in JNDI, and
  * all attributes that are set via JMX can be stored in a DirContext.
  *
+ * This acts as a "recorder" for creation of mbeans and attribute changes
+ * done via JMX.
+ *
+ * XXX How can we control ( filter ) which mbeans will be registere ? Or
+ * attributes ?
+ * XXX How can we get the beans and attributes loaded before jndijmx ?
+ *
+ * The intended use:
+ * - do whatever you want to start the application
+ * - load JndiJmx as an mbean
+ * - make changes via JMX. All changes are recorded
+ * - you can use JndiJmx to save the changes in a Jndi context.
+ * - you can use JndiJmx to load changes from a JndiContext and replay them.
+ *
+ * The main benefit is that only changed attributes are saved, and the Jndi
+ * layer can preserve most of the original structure of the config file. The
+ * alternative is to override the config files with config info extracted
+ * from the live objects - but it's very hard to save only what was actually
+ * changed and preserve structure and comments.
+ *
  * @author Costin Manolache
  */
-public class JndiJmx implements NotificationListener {
+public class JndiJmx extends BaseModelMBean implements NotificationListener {
 
 
     private static Log log= LogFactory.getLog(JndiJmx.class);
@@ -103,7 +123,8 @@ public class JndiJmx implements NotificationListener {
     /**
      * Protected constructor to require use of the factory create method.
      */
-    public JndiJmx() {
+    public JndiJmx() throws MBeanException {
+        super(JndiJmx.class.getName());
     }
 
 
@@ -178,6 +199,16 @@ public class JndiJmx implements NotificationListener {
             String name=anotif.getAttributeName();
             Object value=anotif.getNewValue();
             Object source=anotif.getSource();
+            String mname=null;
+
+            Hashtable mbeanAtt=(Hashtable)attributes.get( source );
+            if( mbeanAtt==null ) {
+                mbeanAtt=new Hashtable();
+                attributes.put( source, mbeanAtt);
+                if( log.isDebugEnabled())
+                    log.debug("First attribute for " + source );
+            }
+            mbeanAtt.put( name, anotif );
 
             log.debug( "Attribute change notification " + name + " " + value + " " + source );
 
@@ -185,11 +216,48 @@ public class JndiJmx implements NotificationListener {
 
     }
 
+    public String dumpStatus() throws Exception
+    {
+        StringBuffer sb=new StringBuffer();
+        Enumeration en=instances.keys();
+        while (en.hasMoreElements()) {
+            String on = (String) en.nextElement();
+            Object mbean=instances.get(on);
+            Hashtable mbeanAtt=(Hashtable)attributes.get(mbean);
 
-    public void init() throws Exception {
+            sb.append( "<mbean class=\"").append(on).append("\">");
+            sb.append( "\n");
+            Enumeration attEn=mbeanAtt.keys();
+            while (attEn.hasMoreElements()) {
+                String an = (String) attEn.nextElement();
+                AttributeChangeNotification anotif=
+                        (AttributeChangeNotification)mbeanAtt.get(an);
+                sb.append("  <attribute name=\"").append(an).append("\" ");
+                sb.append("value=\"").append(anotif.getNewValue()).append("\">");
+                sb.append( "\n");
+            }
+
+
+            sb.append( "</mbean>");
+            sb.append( "\n");
+        }
+        return sb.toString();
+    }
+
+    public void replay() throws Exception
+    {
+
+
+    }
+
+
+    public void init() throws Exception
+    {
 
         MBeanServer mserver=(MBeanServer)Registry.getRegistry().getMBeanServer();
         ObjectName delegate=new ObjectName("JMImplementation:type=MBeanServerDelegate");
+
+        // XXX need to extract info about previously loaded beans
 
         // we'll know of all registered beans
         mserver.addNotificationListener(delegate, this, null, null );
