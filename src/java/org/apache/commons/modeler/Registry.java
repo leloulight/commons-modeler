@@ -85,7 +85,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.7 $ $Date: 2002/11/05 19:15:52 $
+ * @version $Revision: 1.8 $ $Date: 2002/11/12 22:49:58 $
  */
 public final class Registry extends BaseRegistry {
 
@@ -441,9 +441,11 @@ public final class Registry extends BaseRegistry {
 
 
     public void registerClass(Class beanClass, String domain, String className,
-                                  String type, Object source)
+                              String type, Object source)
     {
+        // use intropsection. Source is not supported yet.
         ManagedBean managed=createManagedBean(domain, beanClass, type);
+
     }
 
 
@@ -568,7 +570,7 @@ public final class Registry extends BaseRegistry {
      * @todo Deal with constructors
      *       
      */
-    private ManagedBean createManagedBean(String domain, Class realClass, String type) {
+    public ManagedBean createManagedBean(String domain, Class realClass, String type) {
         ManagedBean mbean= new ManagedBean();
         
         Method methods[]=null;
@@ -594,8 +596,12 @@ public final class Registry extends BaseRegistry {
                 String name=(String)en.nextElement();
                 AttributeInfo ai=new AttributeInfo();
                 ai.setName( name );
-                ai.setGetMethod( ((Method)getAttMap.get(name)).getName());
-                ai.setSetMethod( ((Method)setAttMap.get(name)).getName());
+                Method m=(Method)getAttMap.get(name);
+                if( m!=null )
+                    ai.setGetMethod( m.getName());
+                m=(Method)setAttMap.get(name);
+                if( m!=null )
+                    ai.setSetMethod( m.getName());
                 ai.setDescription("Introspected attribute " + name );
                 
                 mbean.addAttribute(ai);
