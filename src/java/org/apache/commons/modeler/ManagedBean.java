@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ManagedBean.java,v 1.5 2003/01/23 19:42:04 craigmcc Exp $
- * $Revision: 1.5 $
- * $Date: 2003/01/23 19:42:04 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ManagedBean.java,v 1.6 2003/01/27 19:00:22 craigmcc Exp $
+ * $Revision: 1.6 $
+ * $Date: 2003/01/27 19:00:22 $
  *
  * ====================================================================
  *
@@ -86,7 +86,7 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.5 $ $Date: 2003/01/23 19:42:04 $
+ * @version $Revision: 1.6 $ $Date: 2003/01/27 19:00:22 $
  */
 
 public class ManagedBean implements java.io.Serializable
@@ -489,6 +489,7 @@ public class ManagedBean implements java.io.Serializable
                 FieldInfo field = (FieldInfo) fields.next();
                 descriptor.setField(field.getName(), field.getValue());
             }
+            info.setMBeanDescriptor(descriptor);
         } catch (MBeanException e) {
             ;
         }
