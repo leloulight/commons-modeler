@@ -70,7 +70,11 @@ import javax.management.Notification;
 public final class BaseNotification extends Notification {
 
     // ----------------------------------------------------------- Constructors
-    int code;
+    private int code;
+    private String type;
+    private Object source;
+    private long seq;
+    private long tstamp;
 
     /**
      * Private constructor.
@@ -81,8 +85,32 @@ public final class BaseNotification extends Notification {
                              long tstamp,
                              int code) {
         super(type, source, seq, tstamp);
+        init( type, source, seq, tstamp, code );
         this.code=code;
     }
+
+    public void recycle() {
+
+    }
+
+    public void init( String type, Object source,
+                      long seq, long tstamp, int code )
+    {
+        this.type=type;
+        this.source = source;
+        this.seq=seq;
+        this.tstamp=tstamp;
+        this.code = code;
+    }
+
+    // -------------------- Override base methods  --------------------
+    // All base methods need to be overriden - in order to support recycling.
+
+
+    // -------------------- Information associated with the notification  ----
+    // Like events ( which Notification extends ), notifications may store
+    // informations related with the event that trigered it. Source and type is
+    // one piece, but it is common to store more info.
 
     /** Action id, useable in switches and table indexes
      */
@@ -90,8 +118,7 @@ public final class BaseNotification extends Notification {
         return code;
     }
 
-    static int noteId[]=new int[4];
-    static String noteName[][]=new String[4][];
+    // XXX Make it customizable - or grow it
     private Object notes[]=new Object[32];
 
     public final Object getNote(int i ) {
@@ -101,17 +128,4 @@ public final class BaseNotification extends Notification {
     public final void setNote(int i, Object o ) {
         notes[i]=o;
     }
-
-    /** @deprecated JNDI should be used instead
-     */
-    public static int getNoteId( int type, String name ) {
-        for( int i=0; i<noteId[type]; i++ ) {
-            if( name.equals( noteName[type][i] ))
-                return i;
-        }
-        int id=noteId[type]++;
-        noteName[type][id]=name;
-        return id;
-    }
-
 }
