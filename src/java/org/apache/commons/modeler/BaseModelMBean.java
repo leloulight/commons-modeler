@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.19 2003/04/13 16:51:47 costin Exp $
- * $Revision: 1.19 $
- * $Date: 2003/04/13 16:51:47 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.20 2003/04/14 14:49:22 costin Exp $
+ * $Revision: 1.20 $
+ * $Date: 2003/04/14 14:49:22 $
  *
  * ====================================================================
  *
@@ -120,7 +120,7 @@ import javax.management.DynamicMBean;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.19 $ $Date: 2003/04/13 16:51:47 $
+ * @version $Revision: 1.20 $ $Date: 2003/04/14 14:49:22 $
  */
 
 public class BaseModelMBean implements ModelMBean, MBeanRegistration {
@@ -551,13 +551,17 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
      */
     public void setAttribute(Attribute attribute)
         throws AttributeNotFoundException, MBeanException,
-        ReflectionException, InvalidAttributeValueException
+        ReflectionException
     {
         if( log.isDebugEnabled() )
             log.debug("Setting attribute " + this + " " + attribute );
 
         if( resource instanceof DynamicMBean ) {
-            ((DynamicMBean)resource).setAttribute(attribute);
+            try {
+                ((DynamicMBean)resource).setAttribute(attribute);
+            } catch (InvalidAttributeValueException e) {
+                throw new MBeanException(e);                
+            }
             return;
         }
         
