@@ -1,13 +1,13 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ManagedBean.java,v 1.4 2003/01/07 06:39:36 costin Exp $
- * $Revision: 1.4 $
- * $Date: 2003/01/07 06:39:36 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ManagedBean.java,v 1.5 2003/01/23 19:42:04 craigmcc Exp $
+ * $Revision: 1.5 $
+ * $Date: 2003/01/23 19:42:04 $
  *
  * ====================================================================
  *
  * The Apache Software License, Version 1.1
  *
- * Copyright (c) 1999 The Apache Software Foundation.  All rights
+ * Copyright (c) 1999-2003 The Apache Software Foundation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -66,6 +66,10 @@ package org.apache.commons.modeler;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import javax.management.*;
 import javax.management.modelmbean.InvalidTargetObjectTypeException;
 import javax.management.modelmbean.ModelMBean;
@@ -82,7 +86,7 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.4 $ $Date: 2003/01/07 06:39:36 $
+ * @version $Revision: 1.5 $ $Date: 2003/01/23 19:42:04 $
  */
 
 public class ManagedBean implements java.io.Serializable
@@ -104,6 +108,7 @@ public class ManagedBean implements java.io.Serializable
     protected String group = null;
     protected String name = null;
 
+    protected List fields = new ArrayList();
     protected NotificationInfo notifications[] = new NotificationInfo[0];
     protected OperationInfo operations[] = new OperationInfo[0];
     protected String type = null;
@@ -166,6 +171,16 @@ public class ManagedBean implements java.io.Serializable
 
     public void setDomain(String domain) {
         this.domain = domain;
+    }
+
+
+    /**
+     * <p>Return a <code>List</code> of the {@link FieldInfo} objects for
+     * the name/value pairs that should be
+     * added to the Descriptor created from this metadata.</p>
+     */
+    public List getFields() {
+        return (this.fields);
     }
 
 
@@ -264,6 +279,17 @@ public class ManagedBean implements java.io.Serializable
             this.info = null;
         }
 
+    }
+
+
+    /**
+     * <p>Add a new field to the fields associated with the
+     * Descriptor that will be created from this metadata.</p>
+     *
+     * @param field The field to be added
+     */
+    public void addField(FieldInfo field) {
+        fields.add(field);
     }
 
 
@@ -456,6 +482,17 @@ public class ManagedBean implements java.io.Serializable
         info = new ModelMBeanInfoSupport
             (getClassName(), getDescription(),
              attributes, constructors, operations, notifications);
+        try {
+            Descriptor descriptor = info.getMBeanDescriptor();
+            Iterator fields = getFields().iterator();
+            while (fields.hasNext()) {
+                FieldInfo field = (FieldInfo) fields.next();
+                descriptor.setField(field.getName(), field.getValue());
+            }
+        } catch (MBeanException e) {
+            ;
+        }
+
         return (info);
 
     }

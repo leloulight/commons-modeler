@@ -1,13 +1,13 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ConstructorInfo.java,v 1.2 2003/01/07 06:39:36 costin Exp $
- * $Revision: 1.2 $
- * $Date: 2003/01/07 06:39:36 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ConstructorInfo.java,v 1.3 2003/01/23 19:42:04 craigmcc Exp $
+ * $Revision: 1.3 $
+ * $Date: 2003/01/23 19:42:04 $
  *
  * ====================================================================
  *
  * The Apache Software License, Version 1.1
  *
- * Copyright (c) 1999 The Apache Software Foundation.  All rights
+ * Copyright (c) 1999-2003 The Apache Software Foundation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -76,7 +76,7 @@ import java.io.Serializable;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.2 $ $Date: 2003/01/07 06:39:36 $
+ * @version $Revision: 1.3 $ $Date: 2003/01/23 19:42:04 $
  */
 
 public class ConstructorInfo extends FeatureInfo implements Serializable {

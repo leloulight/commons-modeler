@@ -1,13 +1,13 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/test/org/apache/commons/modeler/RegistryTestCase.java,v 1.1 2002/04/30 20:58:52 craigmcc Exp $
- * $Revision: 1.1 $
- * $Date: 2002/04/30 20:58:52 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/test/org/apache/commons/modeler/RegistryTestCase.java,v 1.2 2003/01/23 19:42:08 craigmcc Exp $
+ * $Revision: 1.2 $
+ * $Date: 2003/01/23 19:42:08 $
  *
  * ====================================================================
  *
  * The Apache Software License, Version 1.1
  *
- * Copyright (c) 1999-2001 The Apache Software Foundation.  All rights
+ * Copyright (c) 1999-2003 The Apache Software Foundation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -65,6 +65,10 @@ package org.apache.commons.modeler;
 
 import java.io.FileInputStream;
 import java.util.EmptyStackException;
+import java.util.List;
+import java.util.Map;
+import javax.management.Descriptor;
+import javax.management.modelmbean.ModelMBeanInfo;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -74,7 +78,7 @@ import junit.framework.TestSuite;
  * <p>Test Case for the Registry class.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.1 $ $Date: 2002/04/30 20:58:52 $
+ * @version $Revision: 1.2 $ $Date: 2003/01/23 19:42:08 $
  */
 
 public class RegistryTestCase extends TestCase {
@@ -148,6 +152,125 @@ public class RegistryTestCase extends TestCase {
 
 
     /**
+     * Test descriptor entries.
+     */
+    public void testDescriptorEntries() {
+
+        // Retrive the ManageBean that has descriptor info
+        ManagedBean http = registry.findManagedBean("HttpConnector");
+        assertNotNull("Found HttpConnector managed bean");
+
+        // Check descriptor fields on the ManagedBean itself
+        List beanFields = http.getFields();
+        assertNotNull("Found HttpConnector fields");
+        checkField(beanFields, "field1", "HttpConnector/field1");
+        checkField(beanFields, "field2", "HttpConnector/field2");
+
+        // Retrieve the AttributeInfo that has descriptors set
+        AttributeInfo attrs[] = http.getAttributes();
+        AttributeInfo attr = null;
+        for (int i = 0; i < attrs.length; i++) {
+            if ("acceptCount".equals(attrs[i].getName())) {
+                attr = attrs[i];
+                break;
+            }
+        }
+        assertNotNull("Found attribute");
+
+        // Check descriptor fields on the AttributeInfo
+        List attrFields = attr.getFields();
+        assertNotNull("Found attribute fields");
+        checkField(attrFields, "field1", "HttpConnector.acceptCount/field1");
+        checkField(attrFields, "field2", "HttpConnector.acceptCount/field2");
+
+        // Retrieve the ConstructorInfo that has descriptors set
+        ConstructorInfo constrs[] = http.getConstructors();
+        ConstructorInfo constr = null;
+        for (int i = 0; i < constrs.length; i++) {
+            if ("HttpConnector".equals(constrs[i].getName())) {
+                constr = constrs[i];
+                break;
+            }
+        }
+        assertNotNull("Found constructor");
+
+        // Check descriptor fields on the ConstructorInfo
+        List constrFields = constr.getFields();
+        assertNotNull("Found constructor fields");
+        checkField(constrFields, "field1", "HttpConnector.constructor/field1");
+        checkField(constrFields, "field2", "HttpConnector.constructor/field2");
+
+        // Retrieve the NotificationInfo that has descriptors set
+        NotificationInfo notifs[] = http.getNotifications();
+        NotificationInfo notif = null;
+        for (int i = 0; i < notifs.length; i++) {
+            if ("Problem".equals(notifs[i].getName())) {
+                notif = notifs[i];
+                break;
+            }
+        }
+        assertNotNull("Found notification");
+
+        // Check descriptor fields on the NotificationInfo
+        List notifFields = notif.getFields();
+        assertNotNull("Found notification fields");
+        checkField(notifFields, "field1", "HttpConnector.problem/field1");
+        checkField(notifFields, "field2", "HttpConnector.problem/field2");
+
+        // Retrieve the OperationInfo that has descriptors set
+        OperationInfo opers[] = http.getOperations();
+        OperationInfo oper = null;
+        for (int i = 0; i < opers.length; i++) {
+            if ("initialize".equals(opers[i].getName())) {
+                oper = opers[i];
+                break;
+            }
+        }
+        assertNotNull("Found operation");
+
+        // Check descriptor fields on the OperationInfo
+        List operFields = oper.getFields();
+        assertNotNull("Found operation fields");
+        checkField(operFields, "field1", "HttpConnector.initialize/field1");
+        checkField(operFields, "field2", "HttpConnector.initialize/field2");
+
+    }
+
+
+    /**
+     * Test ModelMBeanInfo information.
+     */
+    public void testModelMBeanInfo() throws Exception {
+
+        // Retrive a ManageBean
+        ManagedBean http = registry.findManagedBean("HttpConnector");
+        assertNotNull("Found HttpConnector managed bean");
+
+        // Create the associated ModelMBeanInfo
+        ModelMBeanInfo info = http.createMBeanInfo();
+        assertNotNull("Found HttpConnector ModelMBeanInfo", info);
+
+        // Check the basic properties
+        assertEquals("Correct className",
+                     "org.apache.catalina.mbeans.HttpConnectorModelMBean",
+                     info.getClassName());
+        assertEquals("Correct description",
+                     "HTTP/1.1 Connector for Tomcat Standalone",
+                     info.getDescription());
+
+        // Get the Descriptor
+        Descriptor desc = info.getMBeanDescriptor();
+        assertNotNull("Found HttpConnector MBeanDescriptor", desc);
+
+        // Check the configured fields
+        checkDescriptor(desc, "descriptortype", "MBean");
+        checkDescriptor(desc, "field1", "HttpConnector/field1");
+        checkDescriptor(desc, "field2", "HttpConnector/field2");
+
+    }
+
+
+    /**
      * Test registry creation.
      */
     public void testRegistryCreation() {
@@ -165,6 +288,47 @@ public class RegistryTestCase extends TestCase {
         for (int i = 0; i < names.length; i++)
             System.out.println("  " + names[i]);
         System.out.println("-------------------------");
+
+    }
+
+
+    // ------------------------------------------------------ Protected Methods
+
+
+    // Check presence of an appropriate name/value pair in the descriptor
+    protected void checkDescriptor(Descriptor desc, String name,
+                                   Object value) {
+
+        String names[] = desc.getFieldNames();
+        boolean found = false;
+        for (int i = 0; i < names.length; i++) {
+            if (name.equals(names[i])) {
+                found = true;
+                break;
+            }
+        }
+        assertTrue("Found name " + name, found);
+        assertEquals("Correct name " + name + " value",
+                     value,
+                     desc.getFieldValue(name));
+
+    }
+
+
+    // Check presence of an appropriate FieldInfo
+    protected void checkField(List fields, String name, Object value) {
+
+        int n = fields.size();
+        for (int i = 0; i < n; i++) {
+            FieldInfo field = (FieldInfo) fields.get(i);
+            if (name.equals(field.getName())) {
+                assertEquals("name=" + name + " value",
+                             value,
+                             field.getValue());
+                return;
+            }
+        }
+        fail("Cannot find field name=" + name + " and value=" + value);
 
     }
 

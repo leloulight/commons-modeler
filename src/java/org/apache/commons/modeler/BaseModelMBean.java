@@ -1,13 +1,13 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.12 2003/01/21 00:33:45 costin Exp $
- * $Revision: 1.12 $
- * $Date: 2003/01/21 00:33:45 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.13 2003/01/23 19:42:04 craigmcc Exp $
+ * $Revision: 1.13 $
+ * $Date: 2003/01/23 19:42:04 $
  *
  * ====================================================================
  *
  * The Apache Software License, Version 1.1
  *
- * Copyright (c) 1999 The Apache Software Foundation.  All rights
+ * Copyright (c) 1999-2003 The Apache Software Foundation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -115,7 +115,7 @@ import javax.management.*;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.12 $ $Date: 2003/01/21 00:33:45 $
+ * @version $Revision: 1.13 $ $Date: 2003/01/23 19:42:04 $
  */
 
 public class BaseModelMBean implements ModelMBean, MBeanRegistration {

@@ -12,9 +12,20 @@
           description="HTTP/1.1 Connector for Tomcat Standalone"
                  type="org.apache.catalina.connector.http.HttpConnector">
 
+    <descriptor>
+      <field     name="field1" value="HttpConnector/field1"/>
+      <field     name="field2" value="HttpConnector/field2"/>
+    </descriptor>
+
+
     <attribute   name="acceptCount"
           description="Maximum socket accept queue length"
-                 type="int"/>
+                 type="int">
+      <descriptor>
+        <field   name="field1" value="HttpConnector.acceptCount/field1"/>
+        <field   name="field2" value="HttpConnector.acceptCount/field2"/>
+      </descriptor>
+    </attribute>
 
     <attribute   name="address"
           description="Specific IP address to bind to"
@@ -101,12 +112,31 @@
           description="Set the TCP no-delay option on our connections?"
                  type="boolean"/>
 
-    <constructor name="HttpConnector"/>
+    <constructor name="HttpConnector">
+      <descriptor>
+        <field   name="field1" value="HttpConnector.constructor/field1"/>
+        <field   name="field2" value="HttpConnector.constructor/field2"/>
+      </descriptor>
+    </constructor>
+
+    <notification name="Problem">
+      <descriptor>
+        <field   name="field1" value="HttpConnector.problem/field1"/>
+        <field   name="field2" value="HttpConnector.problem/field2"/>
+      </descriptor>
+      <notification-type>This is a problem</notification-type>
+    </notification>
+
 
     <operation   name="initialize"
           description="Perform pre-startup initialization"
                impact="ACTION"
-           returnType="void"/>
+           returnType="void">
+      <descriptor>
+        <field   name="field1" value="HttpConnector.initialize/field1"/>
+        <field   name="field2" value="HttpConnector.initialize/field2"/>
+      </descriptor>
+    </operation>
 
     <operation   name="start"
           description="Start this Connector and processing threads"

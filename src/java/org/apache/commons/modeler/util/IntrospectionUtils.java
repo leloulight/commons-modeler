@@ -3,7 +3,7 @@
  *
  * The Apache Software License, Version 1.1
  *
- * Copyright (c) 1999 The Apache Software Foundation.  All rights
+ * Copyright (c) 1999-2003 The Apache Software Foundation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,7 @@
  *    Alternately, this acknowlegement may appear in the software itself,
  *    if and wherever such third-party acknowlegements normally appear.
  *
- * 4. The names "The Jakarta Project", "Tomcat", and "Apache Software
+ * 4. The names "The Jakarta Project", "Commons", and "Apache Software
  *    Foundation" must not be used to endorse or promote products derived
  *    from this software without prior written permission. For written
  *    permission, please contact apache@apache.org.
@@ -347,6 +347,11 @@ public final class IntrospectionUtils {
  			    d("Unable to resolve host name:" + value);
  			    ok=false;
  			}
+
+                    // Try a setFoo ( Object )
+                    } else if ("java.lang.Object".
+                               equals( paramType.getName())) {
+                        params[0] = value;
 
  		    // Unknown type
 		    } else {

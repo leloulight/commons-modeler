@@ -1,6 +1,6 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/FeatureInfo.java,v 1.3 2003/01/23 19:42:04 craigmcc Exp $
- * $Revision: 1.3 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/FieldInfo.java,v 1.1 2003/01/23 19:42:04 craigmcc Exp $
+ * $Revision: 1.1 $
  * $Date: 2003/01/23 19:42:04 $
  *
  * ====================================================================
@@ -66,55 +66,21 @@ package org.apache.commons.modeler;
 
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import javax.management.Descriptor;
 
 
 /**
- * <p>Convenience base class for <code>AttributeInfo</code>,
- * <code>ConstructorInfo</code>, and <code>OperationInfo</code> classes
- * that will be used to collect configuration information for the
- * <code>ModelMBean</code> beans exposed for management.</p>
- *
- * @author Craig R. McClanahan
- * @version $Revision: 1.3 $ $Date: 2003/01/23 19:42:04 $
+ * <p>Simple JavaBean representing the contents of a <code>&lt;field&gt;</code>
+ * element in an MBeans descriptor file.
  */
 
-public class FeatureInfo implements Serializable {
+public class FieldInfo implements Serializable {
 
-    protected String description = null;
-    protected List fields = new ArrayList();
+
+    /**
+     * <p>The field name for this field of a descriptor.</p>
+     */
     protected String name = null;
 
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * The human-readable description of this feature.
-     */
-    public String getDescription() {
-        return (this.description);
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-    /**
-     * The field information for this feature.
-     */
-    public List getFields() {
-        return (fields);
-    }
-
-
-    /**
-     * The name of this feature, which must be unique among features in the
-     * same collection.
-     */
     public String getName() {
         return (this.name);
     }
@@ -124,37 +90,17 @@ public class FeatureInfo implements Serializable {
     }
 
 
-    // --------------------------------------------------------- Public Methods
-
-
     /**
-     * <p>Add a new field to the fields associated with the
-     * Descriptor that will be created from this metadata.</p>
-     *
-     * @param field The field to be added
+     * <p>The field value for this field of a descriptor.</p>
      */
-    public void addField(FieldInfo field) {
-        fields.add(field);
+    protected Object value = null;
+
+    public Object getValue() {
+        return (this.value);
     }
 
-
-    // ------------------------------------------------------ Protected Methods
-
-
-    /**
-     * <p>Add the name/value fields that have been stored into the
-     * specified <code>Descriptor</code> instance.</p>
-     *
-     * @param descriptor The <code>Descriptor</code> to add fields to
-     */
-    protected void addFields(Descriptor descriptor) {
-
-        Iterator items = getFields().iterator();
-        while (items.hasNext()) {
-            FieldInfo item = (FieldInfo) items.next();
-            descriptor.setField(item.getName(), item.getValue());
-        }
-
+    public void setValue(Object value) {
+        this.value = value;
     }
 
 

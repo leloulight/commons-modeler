@@ -11,7 +11,7 @@
       "-//Apache Software Foundation//DTD Model MBeans Configuration File"
       "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
 
-     $Id: mbeans-descriptors.dtd,v 1.1 2002/04/30 20:58:52 craigmcc Exp $
+     $Id: mbeans-descriptors.dtd,v 1.2 2003/01/23 19:42:05 craigmcc Exp $
 -->
 
 
@@ -84,7 +84,7 @@
                       attribute is writeable by management applications.
                       By default, this is set to "true".
 -->
-<!ELEMENT attribute EMPTY>
+<!ELEMENT attribute (descriptor?)>
 <!ATTLIST attribute         id           ID             #IMPLIED>
 <!ATTLIST attribute         description  CDATA          #IMPLIED>
 <!ATTLIST attribute         displayName  CDATA          #IMPLIED>
@@ -107,10 +107,34 @@
      name             Name of this constructor (by Java convention, this must
                       be the same as the base class name).
 -->
-<!ELEMENT constructor (parameter*)>
+<!ELEMENT constructor (descriptor?, parameter*)>
 <!ATTLIST constructor       id           ID             #IMPLIED>
 <!ATTLIST constructor       displayName  CDATA          #IMPLIED>
 <!ATTLIST constructor       name         %VariableName; #IMPLIED>
+
+
+<!-- The "descriptor" element groups a set of descriptor fields whose
+     values will be included in the Descriptor for the corresponding
+     metatdata info classes.
+-->
+<!ELEMENT descriptor (field*)>
+<!ATTLIST descriptor        id           ID             #IMPLIED>
+
+
+<!-- The "field" element represents a single name/value pair that will
+     be included in the Descriptor corresponding to our enclosing
+     "descriptor" element.  The following attributes are supported:
+
+     name             Field name of the field to be included
+
+     value            Field value of the field to be included
+                      (will be stored as a String)
+-->
+<!ELEMENT field EMPTY>
+<!ATTLIST field             id           ID             #IMPLIED>
+<!ATTLIST field             name         CDATA          #REQUIRED>
+<!ATTLIST field             value        CDATA          #REQUIRED>
+
 
 
 <!-- The "mbean" element describes a particular JMX ModelMBean implementation,
@@ -137,7 +161,7 @@
      type             Fully qualified Java class name of the underlying
                       managed resource implementation class.
 -->
-<!ELEMENT mbean (attribute*, constructor*, notification*, operation*)>
+<!ELEMENT mbean (descriptor?, attribute*, constructor*, notification*, operation*)>
 <!ATTLIST mbean             id           ID             #IMPLIED>
 <!ATTLIST mbean             className    %ClassName;    #IMPLIED>
 <!ATTLIST mbean             description  CDATA          #IMPLIED>
@@ -155,7 +179,7 @@
 
      name             Name of this set of notification event types.
 -->
-<!ELEMENT notification (notification-type*)>
+<!ELEMENT notification (descriptor?, notification-type*)>
 <!ATTLIST notification      id           ID             #IMPLIED>
 <!ATTLIST notification      description  CDATA          #IMPLIED>
 <!ATTLIST notification      name         %VariableName; #IMPLIED>
@@ -183,7 +207,7 @@
      returnType       Fully qualified Java class name of the return
                       type of this method.
 -->
-<!ELEMENT operation   (parameter*)>
+<!ELEMENT operation   (descriptor?, parameter*)>
 <!ATTLIST operation         id           ID             #IMPLIED>
 <!ATTLIST operation         description  CDATA          #IMPLIED>
 <!ATTLIST operation         impact       CDATA          #IMPLIED>
