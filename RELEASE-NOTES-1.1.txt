@@ -1,4 +1,4 @@
-$Id: RELEASE-NOTES-1.1.txt,v 1.3 2003/04/14 01:09:14 costin Exp $
+$Id: RELEASE-NOTES-1.1.txt,v 1.4 2003/04/14 02:17:03 costin Exp $
 
                           Commons Modeler Package
                                 Version 1.1
@@ -55,4 +55,13 @@ All bugs reported against modeler have been fixed.
 
 In addition, this release fixes problems reported against jakarta-tomcat:
 
-* XXX Support for old connector and other components that are not declared in mbeans-descriptors.xml
+* Support for old connector and other components that are not declared in mbeans-descriptors.xml
+
+
+NOTES:
+======
+
+* the unit tests will fail with MX4J-1.1.1+ - there are 2 oposite tests for
+severity, it can never work. A patch was submited to mx4j.
+ 
+
