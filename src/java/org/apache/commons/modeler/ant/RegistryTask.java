@@ -85,7 +85,7 @@ public final class RegistryTask  {
     public void execute() throws Exception {
         if( resource != null ) {
             InputStream is=this.getClass().getClassLoader().getResourceAsStream(resource);
-            BaseRegistry.getBaseRegistry().loadDescriptors( is, "modeler" );
+            BaseRegistry.getBaseRegistry().loadDescriptors( resource, is, "mbeans-descriptors" );
         }
     }
 }
