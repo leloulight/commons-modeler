@@ -151,7 +151,7 @@ public class BaseRegistry {
      *
      */
     public void registerComponent(Object bean, String domain, String name) {
-        getRegistry().registerComponent(bean, domain,name );
+        getBaseRegistry().registerComponent(bean, domain,name );
     }
 
     /** The method used by applications to jmx-enable a component
@@ -163,7 +163,7 @@ public class BaseRegistry {
     public void registerClass(Class beanClass, String domain, String className,
                               String type, Object source)
     {
-        getRegistry().registerClass(beanClass, domain, className, type, source);
+        getBaseRegistry().registerClass(beanClass, domain, className, type, source);
     }
 
     /** Load component descriptors from a stream.
@@ -172,14 +172,18 @@ public class BaseRegistry {
      * @param type The type of the descriptor. Right now only 'modeler' is
      *      supported. In future we may add 'jboss' or other dtds.
      */
-    public void loadDescriptors( InputStream is, String type ) {
+    public void loadDescriptors( InputStream is, String type ) 
+        throws Exception
+    {
 
     }
 
     /** Locate descriptors in the class loader, using a discovery mechansim
      *  For "modeler" it'll use "/META-INF/modler-mbeans.xml".
      */
-    public void loadDescriptors( ClassLoader cl, String type ) {
+    public void loadDescriptors( ClassLoader cl, String type ) 
+        throws Exception
+    {
 
     }
 
@@ -206,7 +210,7 @@ public class BaseRegistry {
     }
 
     public void unregisterMBean( String name ) {
-        getRegistry().unregisterMBean(name);
+        getBaseRegistry().unregisterMBean(name);
     }
 
     // Store all objects that have been registered via modeler
@@ -265,7 +269,7 @@ public class BaseRegistry {
     // -------------- Implementation ----------------------
     private static BaseRegistry reg=null;
 
-    public static BaseRegistry getRegistry() {
+    public static BaseRegistry getBaseRegistry() {
         if( reg!=null ) return reg;
         try {
             Class.forName("javax.management.ObjectName");

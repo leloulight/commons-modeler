@@ -85,7 +85,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.5 $ $Date: 2002/11/02 00:35:14 $
+ * @version $Revision: 1.6 $ $Date: 2002/11/02 06:52:12 $
  */
 public final class Registry extends BaseRegistry {
 
@@ -403,6 +403,7 @@ public final class Registry extends BaseRegistry {
 
     public void registerComponent(Object bean, String domain, String type,
                                   String name)
+           throws Exception
     {
         ManagedBean managed = registry.findManagedBean(type);
 
@@ -567,7 +568,7 @@ public final class Registry extends BaseRegistry {
 
         initMethods(realClass, methods, attMap, getAttMap, setAttMap, invokeAttMap );
         
-        if( type==null) type=Modeler.getModeler().generateSeqName(domain, realClass);
+        if( type==null) type=super.generateSeqName(domain, realClass);
 
         try {
             
