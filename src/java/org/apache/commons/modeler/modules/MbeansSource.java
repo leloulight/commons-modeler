@@ -2,6 +2,7 @@ package org.apache.commons.modeler.modules;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.NamedNodeMap;
 import org.apache.commons.modeler.util.DomUtil;
 import org.apache.commons.modeler.*;
 import org.apache.commons.logging.Log;
@@ -9,7 +10,10 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.management.*;
 import javax.management.loading.MLet;
+import javax.xml.transform.TransformerException;
 import java.io.InputStream;
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +37,16 @@ public class MbeansSource extends ModelerSource
     String location;
     String type;
     Object source;
+
+    // true if we are during the original loading
+    boolean loading=true;
     List mbeans=new ArrayList();
     static boolean loaderLoaded=false;
     private Document document;
     private HashMap object2Node = new HashMap();
+
+    long lastUpdate;
+    long updateInterval=10000; // 10s
 
     public void setRegistry(Registry reg) {
         this.registry=reg;
@@ -204,22 +214,59 @@ public class MbeansSource extends ModelerSource
 
             long t2=System.currentTimeMillis();
             log.info( "Reading mbeans  " + (t2-t1));
+            loading=false;
         } catch( Exception ex ) {
             log.error( "Error reading mbeans ", ex);
         }
     }
     
     public void updateField( ObjectName oname, String name, 
-                             Object value ) {
-        // nothing by default 
+                             Object value )
+    {
+        if( loading ) return;
+        // nothing by default
         //log.info( "XXX UpdateField " + oname + " " + name + " " + value);
         Node n=(Node)object2Node.get( oname );
         if( n == null ) {
             log.info( "Node not found " + oname );
             return;
         }
-        n.getAttributes();
-        
+        // n is an <mbean> node
+        Node firstAttN=DomUtil.getChild(n, "attribute");
+        boolean found=false;
+        for (Node descN = firstAttN; descN != null;
+             descN = DomUtil.getNext( descN ))
+        {
+            String thisAttName=DomUtil.getAttribute(descN, "name");
+            if( name.equals( thisAttName )) {
+                // XXX value = null, remove existing, conversions
+                found=true;
+                DomUtil.setAttribute(descN, "value", value.toString());
+                break;
+            }
+        }
+        if( ! found ) {
+            Node attN=n.getOwnerDocument().createElement("attribute");
+            DomUtil.setAttribute(attN, "name", name);
+            DomUtil.setAttribute(attN, "value", value.toString());
+            n.appendChild(attN);
+        }
+
+
+        // XXX no often than, etc.
+        long time=System.currentTimeMillis();
+        if( location!=null &&
+                time - lastUpdate > updateInterval ) {
+            lastUpdate=time;
+            try {
+                FileOutputStream fos=new FileOutputStream(location);
+                DomUtil.writeXml(document, fos);
+            } catch (TransformerException e) {
+                log.error( "Error writing");
+            } catch (FileNotFoundException e) {
+                log.error( "Error writing" ,e );
+            }
+        }
     }
     
     public void store() {

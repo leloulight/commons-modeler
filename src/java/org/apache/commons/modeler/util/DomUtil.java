@@ -61,6 +61,12 @@ package org.apache.commons.modeler.util;
 import java.io.*;
 
 import javax.xml.parsers.*;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.*;
 import org.xml.sax.*;
@@ -119,6 +125,17 @@ public class DomUtil {
         Node attN=attrs.getNamedItem(attName);
         if( attN==null ) return null;
         return attN.getNodeValue();
+    }
+
+    public static void setAttribute(Node node, String attName, String val) {
+        Element element=(Element)node;
+        if( element.getAttribute(attName) != null ) {
+            element.removeAttribute(attName);
+        }
+//        Node attNode=element.getOwnerDocument().createAttribute(attName);
+//        attNode.setNodeValue(val);
+        element.setAttribute(attName, val);
+//        element.appendChild(attNode);
     }
 
     /** Get the first child's content ( ie it's included TEXT node ).
@@ -216,4 +233,12 @@ public class DomUtil {
         return doc;
     }
 
+    public static void writeXml( Node n, OutputStream os )
+            throws TransformerException
+    {
+        TransformerFactory tf=TransformerFactory.newInstance();
+        //identity
+        Transformer t=tf.newTransformer();
+        t.transform(new DOMSource( n ), new StreamResult( os ));
+    }
 }
