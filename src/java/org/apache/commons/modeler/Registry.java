@@ -372,7 +372,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     public void invoke( List mbeans, String operation, boolean failFirst )
             throws Exception
     {
-        if( mbeans==null ) return;
+        if( mbeans==null ) {
+            return;
+        }
         Iterator itr=mbeans.iterator();
         while(itr.hasNext()) {
             Object current=itr.next();
@@ -384,9 +386,12 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
                 if( current instanceof String ) {
                     oN=new ObjectName( (String)current );
                 }
-                if( oN==null ) continue;
-                if( getMethodInfo(oN, operation) == null)
+                if( oN==null ) {
                     continue;
+                }
+                if( getMethodInfo(oN, operation) == null) {
+                    continue;
+                }
                 getMBeanServer().invoke(oN, operation,
                         new Object[] {}, new String[] {});
 
@@ -408,16 +413,22 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * @since 1.1
      */
     public synchronized int getId( String domain, String name) {
-        if( domain==null) domain="";
+        if( domain==null) {
+            domain="";
+        }
         Hashtable domainTable=(Hashtable)idDomains.get( domain );
         if( domainTable == null ) {
             domainTable=new Hashtable();
             idDomains.put( domain, domainTable); 
         }
-        if( name==null ) name="";
+        if( name==null ) {
+            name="";
+        }
         Integer i=(Integer)domainTable.get(name);
         
-        if( i!= null ) return i.intValue();
+        if( i!= null ) {
+            return i.intValue();
+        }
 
         int id[]=(int [])ids.get( domain );
         if( id == null ) {
@@ -598,7 +609,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * 
      * @param oname
      * @param opName
-     * @return
+     * @return the operation info for the specified operation
      */ 
     public MBeanOperationInfo getMethodInfo( ObjectName oname, String opName )
     {
@@ -626,8 +637,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      */
     public void unregisterComponent( ObjectName oname ) {
         try {
-            if( getMBeanServer().isRegistered(oname))
+            if( getMBeanServer().isRegistered(oname)) {
                 getMBeanServer().unregisterMBean(oname);
+            }
         } catch( Throwable t ) {
             log.error( "Error unregistering mbean ", t);
         }
@@ -644,12 +656,14 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         if (server == null) {
             if( MBeanServerFactory.findMBeanServer(null).size() > 0 ) {
                 server=(MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
-                if( log.isDebugEnabled() )
+                if( log.isDebugEnabled() ) {
                     log.debug("Using existing MBeanServer " + (System.currentTimeMillis() - t1 ));
+                }
             } else {
                 server=MBeanServerFactory.createMBeanServer();
-                if( log.isDebugEnabled() )
+                if( log.isDebugEnabled() ) {
                     log.debug("Creating MBeanServer"+ (System.currentTimeMillis() - t1 ));
+                }
             }
         }
         return (server);
@@ -660,11 +674,13 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     public ManagedBean findManagedBean(Object bean, Class beanClass, String type)
         throws Exception
     {
-        if( bean!=null && beanClass==null )
+        if( bean!=null && beanClass==null ) {
             beanClass=bean.getClass();
+        }
         
-        if( type==null )
+        if( type==null ) {
             type=beanClass.getName();
+        }
         
         // first look for existing descriptor
         ManagedBean managed = registry.findManagedBean(type);
@@ -672,16 +688,18 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         // Search for a descriptor in the same package
         if( managed==null ) {
             // check package and parent packages
-            if( log.isDebugEnabled() )
+            if( log.isDebugEnabled() ) {
                 log.debug( "Looking for descriptor ");
+            }
             findDescriptor( beanClass, type );
 
             managed=findManagedBean(type);
         }
         
         if( bean instanceof DynamicMBean ) {
-            if( log.isDebugEnabled() )
+            if( log.isDebugEnabled() ) {
                 log.debug( "Dynamic mbean support ");
+            }
             // Dynamic mbean
             loadDescriptors("MbeansDescriptorsDynamicMBeanSource",
                     bean, type);
@@ -691,8 +709,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
 
         // Still not found - use introspection
         if( managed==null ) {
-            if( log.isDebugEnabled() )
+            if( log.isDebugEnabled() ) {
                 log.debug( "Introspecting ");
+            }
 
             // introspection
             loadDescriptors("MbeansDescriptorsIntrospectionSource",
@@ -714,9 +733,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * components. We could provide some pluggability. It is here to keep
      * things consistent and avoid duplication in other tasks 
      * 
-     * @param type
-     * @param value
-     * @return
+     * @param type Fully qualified class name of the resulting value
+     * @param value String value to be converted
+     * @return Converted value
      */ 
     public Object convertValue(String type, String value)
     {
@@ -747,15 +766,16 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * @param sourceType
      * @param source
      * @param param
-     * @return
+     * @return List of descriptors
      * @throws Exception
      * @deprecated bad interface, mixing of metadata and mbeans
      */
     public List load( String sourceType, Object source, String param)
         throws Exception
     {
-        if( log.isTraceEnabled())
+        if( log.isTraceEnabled()) {
             log.trace("load " + source );
+        }
         String location=null;
         String type=null;
         Object inputsource=null;
@@ -768,12 +788,16 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             location=url.toString();
             type=param;
             inputsource=url.openStream();
-            if( sourceType == null ) sourceType = sourceTypeFromExt(location);
+            if( sourceType == null ) {
+                sourceType = sourceTypeFromExt(location);
+            }
         } else if( source instanceof File ) {
             location=((File)source).getAbsolutePath();
             inputsource=new FileInputStream((File)source);            
             type=param;
-            if( sourceType == null ) sourceType = sourceTypeFromExt(location);
+            if( sourceType == null ) {
+                sourceType = sourceTypeFromExt(location);
+            }
         } else if( source instanceof InputStream ) {
             type=param;
             inputsource=source;
@@ -781,8 +805,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             location=((Class)source).getName();
             type=param;
             inputsource=source;
-            if( sourceType== null )
+            if( sourceType== null ) {
                 sourceType="MbeansDescriptorsIntrospectionSource";
+            }
         }
         
         if( sourceType==null ) {
@@ -795,10 +820,12 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     }
 
     private String sourceTypeFromExt( String s ) {
-        if( s.endsWith( ".ser")) 
+        if( s.endsWith( ".ser")) {
             return "MbeansDescriptorsSerSource";
-        else if( s.endsWith(".xml")) 
-            return "MbeansDescriptorsDOMSource"; 
+        }
+        else if( s.endsWith(".xml")) {
+            return "MbeansDescriptorsDOMSource";
+        }
         return null;
     }
 
@@ -813,8 +840,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     public void registerComponent(Object bean, ObjectName oname, String type)
            throws Exception
     {
-        if( log.isDebugEnabled() )
+        if( log.isDebugEnabled() ) {
             log.debug( "Managed= "+ oname);
+        }
 
         if( bean ==null ) {
             log.error("Null component " + oname );
@@ -832,8 +860,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             ModelMBean mbean = managed.createMBean(bean);
 
             if(  getMBeanServer().isRegistered( oname )) {
-                if( log.isDebugEnabled())
+                if( log.isDebugEnabled()) {
                     log.debug("Unregistering existing component " + oname );
+                }
                 getMBeanServer().unregisterMBean( oname );
             }
 
@@ -852,8 +881,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     public void loadDescriptors( String packageName, ClassLoader classLoader  ) {
         String res=packageName.replace( '.', '/');
 
-        if( log.isTraceEnabled() )
+        if( log.isTraceEnabled() ) {
             log.trace("Finding descriptor " + res );
+        }
 
         if( searchedPaths.get( packageName ) != null ) {
             return;
@@ -866,7 +896,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             descriptors=res + "/mbeans-descriptors.xml";
             dURL=classLoader.getResource( descriptors );
         }
-        if( dURL == null ) return;
+        if( dURL == null ) {
+            return;
+        }
 
         log.debug( "Found " + dURL);
         searchedPaths.put( packageName,  dURL );
@@ -928,31 +960,36 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     /** Lookup the component descriptor in the package and
      * in the parent packages.
      *
-     * @param bean
-     * @return
+     * @param beanClass
+     * @param type
      */
-    private boolean findDescriptor( Class beanClass, String type ) {
-        if( type==null ) type=beanClass.getName();
+    private void findDescriptor( Class beanClass, String type ) {
+        if( type==null ) {
+            type=beanClass.getName();
+        }
         ClassLoader classLoader=null;
-        if( beanClass!=null ) 
+        if( beanClass!=null ) {
             classLoader=beanClass.getClassLoader();
-        if( classLoader==null )
+        }
+        if( classLoader==null ) {
             classLoader=Thread.currentThread().getContextClassLoader();
-        if( classLoader==null )
-            classLoader=this.getClass().getClassLoader();    
+        }
+        if( classLoader==null ) {
+            classLoader=this.getClass().getClassLoader();
+        }
         
         String className=type;
         String pkg=className;
         while( pkg.indexOf( ".") > 0 ) {
             int lastComp=pkg.lastIndexOf( ".");
-            if( lastComp <= 0 ) return false;
+            if( lastComp <= 0 ) return;
             pkg=pkg.substring(0, lastComp);
             if( searchedPaths.get( pkg ) != null ) {
-                return false;
+                return;
             }
             loadDescriptors(pkg, classLoader);
         }
-        return false;
+        return;
     }
 
     private ModelerSource getModelerSource( String type )
