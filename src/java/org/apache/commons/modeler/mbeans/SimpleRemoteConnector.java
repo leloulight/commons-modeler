@@ -59,31 +59,23 @@
 package org.apache.commons.modeler.mbeans;
 
 import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
 import java.io.InputStream;
-import java.net.URLConnection;
 import java.net.URL;
-import java.util.List;
-import java.util.ArrayList;
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Map;
-import java.util.jar.Manifest;
 import java.util.jar.Attributes;
-import javax.management.*;
+import java.util.jar.Manifest;
+import javax.management.Attribute;
 import javax.management.AttributeNotFoundException;
-import javax.management.loading.ClassLoaderRepository;
-
-import org.apache.commons.modeler.Registry;
-import org.apache.commons.modeler.BaseModelMBean;
-import org.apache.commons.modeler.ManagedBean;
-import org.apache.commons.modeler.AttributeInfo;
-import org.apache.commons.modeler.OperationInfo;
+import javax.management.MBeanException;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.modeler.Registry;
 
 /**
  * Based on jk2 proxy.
