@@ -3,7 +3,7 @@
 
 <!--
         "Modeler" component of the Jakarta Commons Subproject
-        $Id: build.xml,v 1.16 2003/04/19 19:34:03 costin Exp $
+        $Id: build.xml,v 1.17 2003/04/20 20:22:18 costin Exp $
 -->
 
 
@@ -12,6 +12,7 @@
 
   <property file="${user.home}/build.properties"/>   <!-- User local        -->
   <property file="build.properties"/>                <!-- Component local   -->
+  <property file="build.properties.default"/>        <!-- Defaults   -->
   <property file="../build.properties"/>             <!-- Commons local     -->
 
 
@@ -317,5 +318,127 @@
     </java>
   </target>
 
+  <target name="release" >
+    <property name="ver" value="1.1M1" />
+    <property name="tag" value="MODELER_1_1_M1" />
+ <!--
+-->
+    <delete dir="release" />
+    <mkdir dir="release" />
+    <cvs command="checkout" 
+         package="jakarta-commons/modeler" 
+         cvsroot=":pserver:anoncvs@cvs.apache.org:/home/cvspublic"
+         dest="release" 
+         tag="{tag}"/> 
+    <rename src="release/jakarta-commons/modeler" dest="release/commons-modeler-${ver}-src" />
+    <delete dir="release/jakarta-commons"/>
+    <zip file="release/commons-modeler-${ver}-src.zip" >
+       <fileset dir="release" includes="commons-modeler-${ver}-src/**"/>
+    </zip>
+    <tar  tarfile="release/commons-modeler-${ver}-src.tar" >
+       <tarfileset dir="release" includes="commons-modeler-${ver}-src/**"/>
+    </tar> 
+    <gzip zipfile="release/commons-modeler-${ver}-src.tar.gz" src="release/commons-modeler-${ver}-src.tar"/>
+    <delete file="release/commons-modeler-${ver}-src.tar" />
+
+<!--
+    <ant dir="release/commons-modeler-${ver}-src" target="download" />
+-->
+    
+    <ant dir="release/commons-modeler-${ver}-src" target="dist"  />
+
+    <mkdir dir="release/commons-modeler-${ver}" />
+    <copy todir="release/commons-modeler-${ver}" >
+       <fileset dir="release/commons-modeler-${ver}-src/dist" includes="**"/>
+    </copy>
+    <copy file="release/commons-modeler-${ver}/commons-modeler.jar" tofile="release/commons-modeler-${ver}.jar" />
+    <zip file="release/commons-modeler-${ver}.zip" >
+       <fileset dir="release" includes="commons-modeler-${ver}/**"/>
+    </zip>
+    <tar  tarfile="release/commons-modeler-${ver}.tar" >
+       <tarfileset dir="release" includes="commons-modeler-${ver}/**"/>
+    </tar> 
+    <gzip zipfile="release/commons-modeler-${ver}.tar.gz" src="release/commons-modeler-${ver}.tar"/>
+    <ant dir="release/commons-modeler-${ver}-src" target="test"  />
+    
+  </target>
+
+  <target name="proxyflags">
+    <!-- check proxy parameters. -->
+    <condition property="useproxy">
+      <equals arg1="${proxy.use}" arg2="on" />
+    </condition>
+  </target>
+
+  <target name="setproxy"  if="useproxy">
+    <taskdef name="setproxy"
+      classname="org.apache.tools.ant.taskdefs.optional.net.SetProxy" />
+    <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"/> 
+    <echo message="Using ${proxy.host}:${proxy.port} to download ${sourcefile}"/>
+  </target>
+
+  <target name="testexist">
+    <echo message="Testing  for ${destfile}"/>
+    <available file="${destfile}" property="exist"/>
+  </target>
+
+  <target name="downloadzip" unless="exist" depends="setproxy,testexist">
+    <!-- Download and extract the package -->
+    <get src="${sourcefile}" dest="${base.path}/file.zip" />
+    <mkdir dir="${destdir}" />
+    <unzip src="${base.path}/file.zip" dest="${destdir}"/>
+    <delete file="${base.path}/file.zip"/>
+  </target>
+
+  <target name="downloadgz" unless="exist" depends="setproxy,testexist">
+    <!-- Download and extract the package -->
+    <get src="${sourcefile}" dest="${base.path}/file.tar.gz" />
+    <gunzip src="${base.path}/file.tar.gz" dest="${base.path}/file.tar"/>
+    <untar src="${base.path}/file.tar" dest="${base.path}"/>
+    <delete file="${base.path}/file.tar"/>
+    <delete file="${base.path}/file.tar.gz"/>
+  </target>
+
+  <target name="downloadfile" unless="exist" depends="setproxy,testexist">
+    <!-- Download extract the file -->
+    <mkdir dir="${destdir}" />
+    <get src="${sourcefile}" dest="${destfile}" />
+  </target>
+
+  <target name="download" depends="proxyflags" 
+          description="Download binary packages" >
+    <mkdir dir="${base.path}" />
+    
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${commons-logging.loc}"/>
+      <param name="destfile" value="${commons-logging.jar}"/>
+    </antcall>
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${commons-digester.loc}"/>
+      <param name="destfile" value="${commons-digester.jar}"/>
+    </antcall>
+
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${commons-beanutils.loc}"/>
+      <param name="destfile" value="${commons-beanutils.jar}"/>
+    </antcall>
+
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${commons-collections.loc}"/>
+      <param name="destfile" value="${commons-collections.jar}"/>
+    </antcall>
+
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${jmx.loc}"/>
+      <param name="destfile" value="${jmx.jar}"/>
+    </antcall>
+
+    <antcall target="downloadzip">
+      <param name="sourcefile" value="${junit.loc}"/>
+      <param name="destfile" value="${junit.jar}"/>
+      <param name="destdir" value="${base.path}"/>
+    </antcall>
+
+  </target>
 
 </project>
