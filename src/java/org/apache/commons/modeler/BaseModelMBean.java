@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.14 2003/02/03 22:13:16 costin Exp $
- * $Revision: 1.14 $
- * $Date: 2003/02/03 22:13:16 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.15 2003/02/28 23:39:20 costin Exp $
+ * $Revision: 1.15 $
+ * $Date: 2003/02/28 23:39:20 $
  *
  * ====================================================================
  *
@@ -115,7 +115,7 @@ import javax.management.*;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.14 $ $Date: 2003/02/03 22:13:16 $
+ * @version $Revision: 1.15 $ $Date: 2003/02/28 23:39:20 $
  */
 
 public class BaseModelMBean implements ModelMBean, MBeanRegistration {
@@ -280,7 +280,10 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
 
         Object result = null;
         try {
-            if( m.getDeclaringClass() == this.getClass() ) {
+            Class declaring=m.getDeclaringClass();
+            // workaround for catalina weird mbeans - the declaring class is BaseModelMBean.
+            // but this is the catalina class.
+            if( declaring.isAssignableFrom(this.getClass()) ) {
                 result = m.invoke(this, NO_ARGS_PARAM );
             } else {
                 result = m.invoke(resource, NO_ARGS_PARAM );
@@ -432,7 +435,7 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
         // Invoke the selected method on the appropriate object
         Object result = null;
         try {
-            if( method.getDeclaringClass() == this.getClass() ) {
+            if( method.getDeclaringClass().isAssignableFrom( this.getClass()) ) {
                 result = method.invoke(this, params );
             } else {
                 result = method.invoke(resource, params);
@@ -591,7 +594,7 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
 
         Object result = null;
         try {
-            if( m.getDeclaringClass() == this.getClass() ) {
+            if( m.getDeclaringClass().isAssignableFrom( this.getClass()) ) {
                 result = m.invoke(this, new Object[] { value });
             } else {
                 result = m.invoke(resource, new Object[] { value });
