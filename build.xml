@@ -3,7 +3,7 @@
 
 <!--
         "Modeler" component of the Jakarta Commons Subproject
-        $Id: build.xml,v 1.19 2003/07/23 20:41:02 dims Exp $
+        $Id: build.xml,v 1.20 2003/07/29 00:50:44 yoavs Exp $
 -->
 
 
@@ -53,7 +53,7 @@
   <property name="component.title"         value="Model MBeans Support Package"/>
 
   <!-- The current version number of this component -->
-  <property name="component.version"       value="1.1-M1"/>
+  <property name="component.version"       value="1.1"/>
 
   <!-- The base directory for compilation targets -->
   <property name="build.home"              value="target"/>
@@ -123,7 +123,6 @@
 
 <!-- ========== Executable Targets ======================================== -->
 
-
   <target name="init"
    description="Initialize and evaluate conditionals">
     <echo message="-------- ${component.name} ${component.version} --------"/>
@@ -178,7 +177,8 @@
     <delete    dir="${dist.home}"/>
   </target>
 
-  <target name="init-dist" >
+  <target name="init-dist"
+    description="Create distribution directory">
     <mkdir      dir="${dist.home}"/>
   </target>
 
@@ -187,7 +187,6 @@
 
   <target name="all" depends="clean,compile"
    description="Clean and compile all components"/>
-
 
   <target name="javadoc" depends="compile" unless="docs-uptodate"
    description="Create component Javadoc documentation">
@@ -202,7 +201,7 @@
                 version="true"
                doctitle="&lt;h1&gt;${component.title} (Version ${component.version})&lt;/h1&gt;"
             windowtitle="${component.title} (Version ${component.version})"
-                 bottom="Copyright (c) 2001-2002 - Apache Software Foundation"
+                 bottom="Copyright (c) 2001-2003 - Apache Software Foundation"
            classpathref="compile.classpath" />
   </target>
 
@@ -238,7 +237,7 @@
        </fileset>
     </copy>
 
-    <!-- the src is similar with the JDK sources - and very usefull for users of
+    <!-- the src is similar with the JDK sources - and very useful for users of
          IDEs, where the jar can be "mounted" and used when debugging -->
     <jar file="${dist.home}/commons-modeler-src.jar">
          <fileset dir="src/java" includes="**" />        
@@ -258,11 +257,13 @@
      <copy file="src/java/MANIFEST.MF" todir="src/conf" />
   </target>
   
+  <!-- Why is this target here? -->
   <target name="check-deps" >
-    
   </target>
 
-  <target name="dist-build" description="Buid target for the dist"  depends="dist-build-prepare,check-deps,compile">
+  <target name="dist-build"
+    description="Buid target for the dist"
+    depends="dist-build-prepare,check-deps,compile">
      <antcall target="jar" >
         <param name="commons-modeler.jar" location="commons-modeler.jar" />
         <param name="build.home" location="target" />
@@ -312,11 +313,11 @@
     </java>
   </target>
 
-  <target name="release" >
-    <property name="ver" value="1.1M1" />
-    <property name="tag" value="MODELER_1_1_M1" />
- <!--
--->
+<!-- ========== Release Targets ===================================== -->
+
+  <target name="release" description="Create the release">
+    <property name="ver" value="1.1" />
+    <property name="tag" value="MODELER_1_1" />
     <delete dir="release" />
     <mkdir dir="release" />
     <cvs command="checkout" 
@@ -357,26 +358,32 @@
     
   </target>
 
-  <target name="proxyflags">
+<!-- ========== Network/Utility Targets ===================================== -->
+
+  <target name="proxyflags" description="Checks whether to use proxy">
     <!-- check proxy parameters. -->
     <condition property="useproxy">
       <equals arg1="${proxy.use}" arg2="on" />
     </condition>
   </target>
 
-  <target name="setproxy"  if="useproxy">
+  <target name="setproxy" if="useproxy"
+    description="Sets the prixy host, port for downloading">
     <taskdef name="setproxy"
       classname="org.apache.tools.ant.taskdefs.optional.net.SetProxy" />
     <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"/> 
     <echo message="Using ${proxy.host}:${proxy.port} to download ${sourcefile}"/>
   </target>
 
-  <target name="testexist">
+  <target name="testexist" description="Tests if a file exists">
     <echo message="Testing  for ${destfile}"/>
     <available file="${destfile}" property="exist"/>
   </target>
 
-  <target name="downloadzip" unless="exist" depends="setproxy,testexist">
+  <target name="downloadzip"
+    unless="exist"
+    depends="setproxy,testexist"
+    description="Downloads and extracts a package">
     <!-- Download and extract the package -->
     <get src="${sourcefile}" dest="${base.path}/file.zip" />
     <mkdir dir="${destdir}" />
