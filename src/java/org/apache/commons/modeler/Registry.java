@@ -215,7 +215,6 @@ public final class Registry {
     {
         if( type==null )
             type=bean.getName();
-
         ManagedBean managed = registry.findManagedBean(type);
 
         // Search for a descriptor in the same package
@@ -241,6 +240,10 @@ public final class Registry {
                     bean, type);
 
             managed=findManagedBean(type);
+            if( managed==null ) {
+                log.warn( "No metadata found for " + type );
+                return null;
+            }
             managed.setName( type );
             addManagedBean(managed);
         }
@@ -413,13 +416,7 @@ public final class Registry {
         }
         String descriptors=res + "/mbeans-descriptors.ser";
 
-        if( classLoader==null )
-            classLoader=Thread.currentThread().getContextClassLoader();
-        if( classLoader==null )
-            classLoader=this.getClass().getClassLoader();
-
         URL dURL=classLoader.getResource( descriptors );
-
 
         if( dURL == null ) {
             descriptors=res + "/mbeans-descriptors.xml";
@@ -517,6 +514,11 @@ public final class Registry {
             mbeans=ds.loadDescriptors(this, url.toString(), param, stream);
         }
 
+        if( source instanceof File ) {
+            mbeans=ds.loadDescriptors(this, ((File)source).getAbsolutePath(),
+                    param, new FileInputStream((File)source));            
+        }        
+        
         if( source instanceof InputStream ) {
             mbeans=ds.loadDescriptors(this, null, param, source);
         }
@@ -791,11 +793,18 @@ public final class Registry {
      * @param bean
      * @return
      */
-    private boolean findDescriptor( Class beanClass, String pkg ) {
-
-        if( beanClass!=null ) {
-            pkg=beanClass.getName();
-        }
+    private boolean findDescriptor( Class beanClass, String type ) {
+        if( type==null ) type=beanClass.getName();
+        ClassLoader classLoader=null;
+        if( beanClass!=null ) 
+            classLoader=beanClass.getClassLoader();
+        if( classLoader==null )
+            classLoader=Thread.currentThread().getContextClassLoader();
+        if( classLoader==null )
+            classLoader=this.getClass().getClassLoader();    
+        
+        String className=type;
+        String pkg=className;
         while( pkg.indexOf( ".") > 0 ) {
             int lastComp=pkg.lastIndexOf( ".");
             if( lastComp <= 0 ) return false;
@@ -803,10 +812,7 @@ public final class Registry {
             if( searchedPaths.get( pkg ) != null ) {
                 return false;
             }
-            if( beanClass!=null )
-                loadDescriptors(pkg, beanClass.getClassLoader());
-            else
-                loadDescriptors(pkg, null);
+            loadDescriptors(pkg, classLoader);
         }
         return false;
     }
