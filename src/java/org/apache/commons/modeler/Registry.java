@@ -313,8 +313,8 @@ public final class Registry {
     public void loadDescriptors( String sourceType, Object source, String param)
         throws Exception
     {
-        if( log.isDebugEnabled())
-            log.debug("loadDescriptors " + source, new Throwable() );
+        if( log.isTraceEnabled())
+            log.trace("loadDescriptors " + source );
         ModelerSource ds=getModelerSource(sourceType);
 
         if( source instanceof URL ) {
@@ -344,6 +344,10 @@ public final class Registry {
                                   String name)
            throws Exception
     {
+        if( bean ==null ) {
+            log.error("Null component " + name );
+            return;
+        }
         String nameStr=null;
         try {
             if( type==null ) {
