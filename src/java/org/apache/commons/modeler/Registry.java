@@ -85,7 +85,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.8 $ $Date: 2002/11/12 22:49:58 $
+ * @version $Revision: 1.9 $ $Date: 2002/11/13 06:25:32 $
  */
 public final class Registry extends BaseRegistry {
 
@@ -98,7 +98,7 @@ public final class Registry extends BaseRegistry {
      *  It is called from BaseRegistry
      */
      protected Registry() {
-        
+
         super();
 
     }
@@ -131,7 +131,7 @@ public final class Registry extends BaseRegistry {
     public void addManagedBean(ManagedBean bean) {
         // called from digester
         descriptors.put(bean.getName(), bean);
-        
+
     }
 
 
@@ -232,7 +232,7 @@ public final class Registry extends BaseRegistry {
 
     // XXX This should be decoupled - Registry should only deal with
     // type info, and it may be nice to not depend directly on JMX.
-    
+
     /**
      * Factory method to create (if necessary) and return our
      * <code>MBeanServer</code> instance.
@@ -266,7 +266,7 @@ public final class Registry extends BaseRegistry {
         Registry registry = getRegistry();
         registry.loadDescriptors( stream, "modeler" );
     }
-    
+
     /**
      * Load the registry from the XML input found in the specified input
      * stream.
@@ -277,22 +277,22 @@ public final class Registry extends BaseRegistry {
      * @exception Exception if any parsing or processing error occurs
      */
     public void loadDescriptors(InputStream stream, String type)
-        throws Exception 
+        throws Exception
     {
         long t1=System.currentTimeMillis();
 
         // Create a digester to use for parsing
         Registry registry = this;
-        
+
         Digester digester = new Digester();
         digester.setNamespaceAware(false);
-        digester.setValidating(false); 
+        digester.setValidating(false);
         URL url = registry.getClass().getResource
             ("/org/apache/commons/modeler/mbeans-descriptors.dtd");
         digester.register
             ("-//Apache Software Foundation//DTD Model MBeans Configuration File",
              url.toString());
-             
+
         // Push our registry object onto the stack
         digester.push(registry);
 
@@ -486,9 +486,9 @@ public final class Registry extends BaseRegistry {
     }
 
     // ------------ Implementation for non-declared introspection classes
-    
 
-    // createMBean == registerClass + registerMBean 
+
+    // createMBean == registerClass + registerMBean
 
     private boolean supportedType( Class ret ) {
         return ret == String.class ||
@@ -498,39 +498,43 @@ public final class Registry extends BaseRegistry {
             ret == Long.TYPE ||
             ret == java.io.File.class ||
             ret == Boolean.class ||
-            ret == Boolean.TYPE 
-            ; 
+            ret == Boolean.TYPE
+            ;
     }
 
-    /** Process the methods and extract 'attributes', methods, etc 
+    /** Process the methods and extract 'attributes', methods, etc
       *
       */
-    private void initMethods(Class realClass, 
-                             Method methods[], 
+    private void initMethods(Class realClass,
+                             Method methods[],
                              Hashtable attMap, Hashtable getAttMap,
-                             Hashtable setAttMap, Hashtable invokeAttMap) 
+                             Hashtable setAttMap, Hashtable invokeAttMap)
     {
         for (int j = 0; j < methods.length; ++j) {
             String name=methods[j].getName();
-            
+
             if( name.startsWith( "get" ) ) {
-                if( methods[j].getParameterTypes().length != 0 ) {
+                Class params[]=methods[j].getParameterTypes();
+                if( params.length != 0 ) {
+                    if( log.isDebugEnabled())
+                        log.debug("Wrong param count " + name + " " + params.length);
                     continue;
                 }
                 if( ! Modifier.isPublic( methods[j].getModifiers() ) ) {
-                    //log.debug("not public " + methods[j] );
+                    if( log.isDebugEnabled())
+                        log.debug("Not public " + methods[j] );
                     continue;
                 }
                 Class ret=methods[j].getReturnType();
                 if( ! supportedType( ret ) ) {
                     if( log.isDebugEnabled() )
-                        log.debug("Unsupported " + ret );
+                        log.debug("Unsupported type " + methods[j] + " " + ret );
                     continue;
                 }
                 name=unCapitalize( name.substring(3));
 
                 getAttMap.put( name, methods[j] );
-                // just a marker, we don't use the value 
+                // just a marker, we don't use the value
                 attMap.put( name, methods[j] );
             } else if( name.startsWith( "is" ) ) {
                 // not used in our code. Add later
@@ -538,12 +542,13 @@ public final class Registry extends BaseRegistry {
             } else if( name.startsWith( "set" ) ) {
                 Class params[]=methods[j].getParameterTypes();
                 if( params.length != 1 ) {
+                    if( log.isDebugEnabled())
+                        log.debug("Wrong param count " + name + " " + params.length);
                     continue;
                 }
-                if( ! Modifier.isPublic( methods[j].getModifiers() ) )
-                    continue;
-                Class ret=params[0];
-                if( ! supportedType( ret ) ) {
+                if( ! Modifier.isPublic( methods[j].getModifiers() ) ) {
+                    if( log.isDebugEnabled())
+                        log.debug("Not public " + name);
                     continue;
                 }
                 name=unCapitalize( name.substring(3));
@@ -568,45 +573,56 @@ public final class Registry extends BaseRegistry {
      * @todo Read (optional) descriptions from a .properties, generated
      *       from source
      * @todo Deal with constructors
-     *       
+     *
      */
     public ManagedBean createManagedBean(String domain, Class realClass, String type) {
         ManagedBean mbean= new ManagedBean();
-        
+
         Method methods[]=null;
-        
+
         Hashtable attMap=new Hashtable();
         // key: attribute val: getter method
         Hashtable getAttMap=new Hashtable();
         // key: attribute val: setter method
         Hashtable setAttMap=new Hashtable();
         // key: operation val: invoke method
-        Hashtable invokeAttMap=new Hashtable();        
-        
+        Hashtable invokeAttMap=new Hashtable();
+
         methods = realClass.getMethods();
 
         initMethods(realClass, methods, attMap, getAttMap, setAttMap, invokeAttMap );
-        
+
         if( type==null) type=super.generateSeqName(domain, realClass);
 
         try {
-            
+
             Enumeration en=attMap.keys();
             while( en.hasMoreElements() ) {
                 String name=(String)en.nextElement();
                 AttributeInfo ai=new AttributeInfo();
                 ai.setName( name );
-                Method m=(Method)getAttMap.get(name);
-                if( m!=null )
-                    ai.setGetMethod( m.getName());
-                m=(Method)setAttMap.get(name);
-                if( m!=null )
-                    ai.setSetMethod( m.getName());
-                ai.setDescription("Introspected attribute " + name );
-                
+                Method gm=(Method)getAttMap.get(name);
+                if( gm!=null ) {
+                    //ai.setGetMethodObj( gm );
+                    ai.setGetMethod( gm.getName());
+                    Class t=gm.getReturnType();
+                    if( t!=null )
+                        ai.setType( t.getName() );
+                }
+                Method sm=(Method)setAttMap.get(name);
+                if( sm!=null ) {
+                    //ai.setSetMethodObj(sm);
+                    Class t=sm.getParameterTypes()[0];
+                    if( t!=null )
+                        ai.setType( t.getName());
+                    ai.setSetMethod( sm.getName());
+                }
+                ai.setDescription("Introspected attribute " + name);
+                if( log.isDebugEnabled()) log.debug("Introspected attribute " +
+                        name + " " + gm + " " + sm);
                 mbean.addAttribute(ai);
             }
-            
+
             en=invokeAttMap.keys();
             while( en.hasMoreElements() ) {
                 String name=(String)en.nextElement();
@@ -638,7 +654,7 @@ public final class Registry extends BaseRegistry {
         }
     }
 
-    
+
     // -------------------- Utils --------------------
 
     private static String unCapitalize(String name) {
@@ -651,4 +667,3 @@ public final class Registry extends BaseRegistry {
     }
 
 }
- 

@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/AttributeInfo.java,v 1.1 2002/04/30 20:58:51 craigmcc Exp $
- * $Revision: 1.1 $
- * $Date: 2002/04/30 20:58:51 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/AttributeInfo.java,v 1.2 2002/11/13 06:25:32 costin Exp $
+ * $Revision: 1.2 $
+ * $Date: 2002/11/13 06:25:32 $
  *
  * ====================================================================
  *
@@ -67,6 +67,7 @@ package org.apache.commons.modeler;
 
 import javax.management.Descriptor;
 import javax.management.modelmbean.ModelMBeanAttributeInfo;
+import java.lang.reflect.Method;
 
 
 /**
@@ -74,7 +75,7 @@ import javax.management.modelmbean.ModelMBeanAttributeInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.1 $ $Date: 2002/04/30 20:58:51 $
+ * @version $Revision: 1.2 $ $Date: 2002/11/13 06:25:32 $
  */
 
 public class AttributeInfo extends FeatureInfo {
@@ -133,6 +134,8 @@ public class AttributeInfo extends FeatureInfo {
      * The name of the property getter method, if non-standard.
      */
     protected String getMethod = null;
+    protected Method getMethodObj = null;
+    protected Method setMethodObj = null;
 
     public String getGetMethod() {
         return (this.getMethod);
@@ -143,6 +146,21 @@ public class AttributeInfo extends FeatureInfo {
         this.info = null;
     }
 
+    public Method getGetMethodObj() {
+        return getMethodObj;
+    }
+
+    public void setGetMethodObj(Method getMethodObj) {
+        this.getMethodObj = getMethodObj;
+    }
+
+    public Method getSetMethodObj() {
+        return setMethodObj;
+    }
+
+    public void setSetMethodObj(Method setMethodObj) {
+        this.setMethodObj = setMethodObj;
+    }
 
     /**
      * Is this a boolean attribute with an "is" getter?
@@ -227,10 +245,18 @@ public class AttributeInfo extends FeatureInfo {
      * corresponds to the attribute described by this instance.
      */
     public ModelMBeanAttributeInfo createAttributeInfo() {
-
         // Return our cached information (if any)
         if (info != null)
             return (info);
+        if((getMethodObj != null) || (setMethodObj != null) ) {
+            try {
+                info=new ModelMBeanAttributeInfo(getName(), getDescription(),
+                                        getMethodObj,  setMethodObj);
+                return info;
+            } catch( Exception ex) {
+                ex.printStackTrace();
+            }
+        }
 
         // Create and return a new information object
         info = new ModelMBeanAttributeInfo
