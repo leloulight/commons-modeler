@@ -64,6 +64,11 @@
       <version>3.7</version>
     </dependency>
 
+    <dependency>
+      <id>ant</id>
+      <version>1.5</version>
+    </dependency>
+
   </dependencies>
 
 </project>
