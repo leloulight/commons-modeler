@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/test/org/apache/commons/modeler/RegistryTestCase.java,v 1.3 2003/01/27 19:22:45 craigmcc Exp $
- * $Revision: 1.3 $
- * $Date: 2003/01/27 19:22:45 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/test/org/apache/commons/modeler/RegistryTestCase.java,v 1.4 2003/01/27 19:27:43 craigmcc Exp $
+ * $Revision: 1.4 $
+ * $Date: 2003/01/27 19:27:43 $
  *
  * ====================================================================
  *
@@ -69,6 +69,7 @@ import java.util.List;
 import java.util.Map;
 import javax.management.Descriptor;
 import javax.management.MBeanConstructorInfo;
+import javax.management.modelmbean.ModelMBeanAttributeInfo;
 import javax.management.modelmbean.ModelMBeanConstructorInfo;
 import javax.management.modelmbean.ModelMBeanInfo;
 import junit.framework.Test;
@@ -80,7 +81,7 @@ import junit.framework.TestSuite;
  * <p>Test Case for the Registry class.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.3 $ $Date: 2003/01/27 19:22:45 $
+ * @version $Revision: 1.4 $ $Date: 2003/01/27 19:27:43 $
  */
 
 public class RegistryTestCase extends TestCase {
@@ -151,6 +152,34 @@ public class RegistryTestCase extends TestCase {
 
 
     // ------------------------------------------------ Individual Test Methods
+
+
+    /**
+     * Test ModelMBeanAttributeInfo information.
+     */
+    public void testModelMBeanAttributeInfo() throws Exception {
+
+        // Retrieve a ManagedBean
+        ManagedBean http = registry.findManagedBean("HttpConnector");
+        assertNotNull("Found HttpConnector managed bean");
+
+        // Create the associated ModelMBeanInfo
+        ModelMBeanInfo info = http.createMBeanInfo();
+        assertNotNull("Found HttpConnector ModelMBeanInfo", info);
+
+        // Retrieve the specified ModelMBeanAttributeInfo
+        ModelMBeanAttributeInfo mmainfo = info.getAttribute("acceptCount");
+        assertNotNull("Found HttpConnector acceptCount info", mmainfo);
+
+        // Get the Descriptor
+        Descriptor desc = mmainfo.getDescriptor();
+        assertNotNull("Found HttpConnector acceptCount descriptor", desc);
+
+        // Check the configured fields
+        checkDescriptor(desc, "field1", "HttpConnector.acceptCount/field1");
+        checkDescriptor(desc, "field2", "HttpConnector.acceptCount/field2");
+
+    }
 
 
     /**
