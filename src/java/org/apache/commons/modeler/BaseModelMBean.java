@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.9 2002/12/26 18:19:01 costin Exp $
- * $Revision: 1.9 $
- * $Date: 2002/12/26 18:19:01 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.10 2003/01/06 05:53:00 costin Exp $
+ * $Revision: 1.10 $
+ * $Date: 2003/01/06 05:53:00 $
  *
  * ====================================================================
  *
@@ -130,7 +130,7 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.9 $ $Date: 2002/12/26 18:19:01 $
+ * @version $Revision: 1.10 $ $Date: 2003/01/06 05:53:00 $
  */
 
 public class BaseModelMBean implements ModelMBean {
@@ -449,8 +449,8 @@ public class BaseModelMBean implements ModelMBean {
                 result = method.invoke(resource, params);
             }
         } catch (InvocationTargetException e) {
-            log.error("Exception invoking method " + name , e );
             Throwable t = e.getTargetException();
+            log.error("Exception invoking method " + name , t );
             if (t == null)
                 t = e;
             if (t instanceof RuntimeException)
