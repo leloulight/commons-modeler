@@ -3,4 +3,6 @@ Specification-Vendor: Apache Software Foundation
 Specification-Version: 1.0
 Implementation-Vendor: Apache Software Foundation
 Implementation-Version: @version@
+Class-Path: mx4j-jmx.jar jmxri.jar commons-logging.jar commons-logging-api.jar crimson.jar xercesImpl.jar xmlParserAPI.jar mx4j-tools.jar jmxtools.jar
+Main-Class: org.apache.commons.modeler.Main
 

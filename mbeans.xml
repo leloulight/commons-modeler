@@ -1,0 +1,62 @@
+<server>
+
+  <!-- 
+  -->
+    
+    <mbean name="Http:name=HttpAdaptor"
+	 code="mx4j.adaptor.http.HttpAdaptor">
+    <attribute name="Port" value="9999" type="int" />  
+  </mbean>
+
+  <mbean name="Http:name=XSLTProcessor"
+         code="mx4j.adaptor.http.XSLTProcessor"/>
+
+  <jmx-attribute objectName="Http:name=HttpAdaptor"
+		 name="ProcessorName"
+		 type="ObjectName"
+                 value="Http:name=XSLTProcessor"/>
+
+  <jmx-operation objectName="Http:name=HttpAdaptor"
+                 operation="start" />
+
+
+  <!-- MX4J RMI
+  -->
+          
+  <MLET name="Naming:name=rmiregistry" 
+        code="mx4j.tools.naming.NamingService" >
+  </MLET>
+
+  <jmx-operation objectName="Naming:name=rmiregistry"
+                 operation="start" />
+
+  <mbean name="Adaptor:protocol=jrmp"
+         code="mx4j.adaptor.rmi.jrmp.JRMPAdaptor">
+    <attribute name="JNDIName" value="jrmp" />
+  </mbean>
+            
+  <jmx-operation objectName="Adaptor:protocol=jrmp"
+                 operation="putNamingProperty" >
+    <arg type="java.lang.Object">java.naming.factory.initial</arg>
+    <arg type="java.lang.Object">com.sun.jndi.rmi.registry.RegistryContextFactory</arg>
+  </jmx-operation>
+
+  <jmx-operation objectName="Adaptor:protocol=jrmp"
+                 operation="putNamingProperty" >
+    <arg type="java.lang.Object">java.naming.provider.url</arg>
+    <arg type="java.lang.Object">rmi://localhost:1099</arg>
+  </jmx-operation>
+
+  <jmx-operation objectName="Adaptor:protocol=jrmp"
+                 operation="start" />
+
+
+  <mbean code="com.sun.jdmk.comm.HtmlAdaptorServer"
+         name="Adaptor:name=html,port=9998">
+    <attribute name="Port" type="int" value="9998"/>
+  </mbean>
+
+  <jmx-operation objectName="Adaptor:name=html,port=9998"
+                 operation="start" />
+
+</server>
