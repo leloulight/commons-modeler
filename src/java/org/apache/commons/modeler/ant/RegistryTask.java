@@ -62,11 +62,12 @@ package org.apache.commons.modeler.ant;
 
 
 import java.io.*;
-import java.net.*;
-import java.lang.reflect.*;
-import java.util.*;
-import org.apache.commons.modeler.BaseRegistry;
+import java.net.URL;
+
 import org.apache.commons.modeler.ManagedBean;
+import org.apache.commons.modeler.Registry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 
 /**
@@ -75,6 +76,7 @@ import org.apache.tools.ant.BuildException;
  * @author Costin Manolache
  */
 public final class RegistryTask  {
+    private static Log log = LogFactory.getLog(RegistryTask.class);
 
     public RegistryTask() {
     }
@@ -99,21 +101,40 @@ public final class RegistryTask  {
         this.resource=res;
     }
 
+    String outFile;
+
+    public void setOut( String outFile ) {
+        this.outFile=outFile;
+    }
+
     public void execute() throws Exception {
-        InputStream is=null;
-        String id=null;
+        URL url=null;
 
         if( resource != null ) {
-            is=this.getClass().getClassLoader().getResourceAsStream(resource);
-            id=resource;
+            url=this.getClass().getClassLoader().getResource(resource);
         } else if( file != null ) {
-            is=new FileInputStream( file );
-            id=file;
+            File f=new File(file);
+            url=new URL("file", null, f.getAbsolutePath());
         } else {
             throw new BuildException( "Resource or file attribute required");
         }
 
-        BaseRegistry.getBaseRegistry().loadDescriptors( resource, is, type );
+        Registry.getRegistry().loadDescriptors( type, url);
+
+        if( outFile !=null ) {
+            FileOutputStream fos=new FileOutputStream(outFile);
+            ObjectOutputStream oos=new ObjectOutputStream(fos);
+            Registry reg=Registry.getRegistry();
+            String beans[]=reg.findManagedBeans();
+            ManagedBean mbeans[]=new ManagedBean[beans.length];
+            for( int i=0; i<beans.length; i++ ) {
+                mbeans[i]=reg.findManagedBean(beans[i]);
+            }
+            oos.writeObject( mbeans );
+            oos.flush();
+            oos.close();
+            fos.close();
+        }
     }
 }
  
