@@ -58,29 +58,29 @@ import org.apache.tools.ant.*;
 import javax.management.*;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import java.util.Vector;
 
 /**
  * Set mbean properties.
  *
  */
 public class JmxInvoke extends Task {
-    String name;
+    String objectName;
 
     String method;
+    Vector args;
 
     public JmxInvoke() {
 
     }
 
-
-    public void setName(String name) {
-        this.name = name;
+    public void setObjectName(String name) {
+        this.objectName = name;
     }
 
-    public void setMethod(String method) {
+    public void setOperation(String method) {
             this.method = method;
     }
-
 
     public void execute() {
         try {
@@ -96,10 +96,24 @@ public class JmxInvoke extends Task {
                 project.addReference("jmx.server", server);
             }
 
-            ObjectName oname=new ObjectName(name);
+            ObjectName oname=new ObjectName(objectName);
 
-            server.invoke(oname, method, null, null);
-
+            if( args==null ) {
+                server.invoke(oname, method, null, null);
+            } else {
+                // XXX Use the loader ref, if any
+                Object argsA[]=new Object[ args.size()];
+                String sigA[]=new String[args.size()];
+                for( int i=0; i<args.size(); i++ ) {
+                    Arg arg=(Arg)args.elementAt(i);
+                    if( arg.type==null )
+                        arg.type="java.lang.String";
+                    sigA[i]=arg.getType();
+                    argsA[i]=arg.getValue();
+                    // XXX Deal with not string types - IntrospectionUtils
+                }
+                server.invoke(oname, method, argsA, sigA);
+            }
         } catch(Exception ex) {
             ex.printStackTrace();
         }
