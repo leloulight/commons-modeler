@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.10 2003/01/06 05:53:00 costin Exp $
- * $Revision: 1.10 $
- * $Date: 2003/01/06 05:53:00 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.11 2003/01/11 07:28:07 costin Exp $
+ * $Revision: 1.11 $
+ * $Date: 2003/01/11 07:28:07 $
  *
  * ====================================================================
  *
@@ -72,23 +72,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Hashtable;
-import javax.management.Attribute;
-import javax.management.AttributeChangeNotification;
-import javax.management.AttributeList;
-import javax.management.AttributeNotFoundException;
-import javax.management.Descriptor;
-import javax.management.ListenerNotFoundException;
-import javax.management.MBeanException;
-import javax.management.MBeanInfo;
-import javax.management.MBeanNotificationInfo;
-import javax.management.Notification;
-import javax.management.NotificationFilter;
-import javax.management.NotificationListener;
-import javax.management.InstanceNotFoundException;
-import javax.management.ReflectionException;
-import javax.management.RuntimeErrorException;
-import javax.management.RuntimeOperationsException;
-import javax.management.ServiceNotFoundException;
+
 import javax.management.modelmbean.DescriptorSupport;
 import javax.management.modelmbean.InvalidTargetObjectTypeException;
 import javax.management.modelmbean.ModelMBean;
@@ -97,6 +81,7 @@ import javax.management.modelmbean.ModelMBeanInfo;
 import javax.management.modelmbean.ModelMBeanInfoSupport;
 import javax.management.modelmbean.ModelMBeanNotificationInfo;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
+import javax.management.*;
 
 // TODO: enable ant-like substitutions ? ( or at least discuss it )
 
@@ -130,10 +115,10 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.10 $ $Date: 2003/01/06 05:53:00 $
+ * @version $Revision: 1.11 $ $Date: 2003/01/11 07:28:07 $
  */
 
-public class BaseModelMBean implements ModelMBean {
+public class BaseModelMBean implements ModelMBean, MBeanRegistration {
     private static Log log = LogFactory.getLog(BaseModelMBean.class);
 
     // ----------------------------------------------------------- Constructors
@@ -244,7 +229,7 @@ public class BaseModelMBean implements ModelMBean {
      */
     public Object getAttribute(String name)
         throws AttributeNotFoundException, MBeanException,
-        ReflectionException {
+            ReflectionException {
         // Validate the input parameters
         if (name == null)
             throw new RuntimeOperationsException
@@ -1201,6 +1186,13 @@ public class BaseModelMBean implements ModelMBean {
         }
     }
 
+    public String getClassName() {
+        if( resource==null ) {
+            return null;
+        }
+        return resource.getClass().getName();
+    }
+
     // ------------------------------------------------------ Protected Methods
 
 
@@ -1228,4 +1220,37 @@ public class BaseModelMBean implements ModelMBean {
         return (true);
     }
 
+    // -------------------- Registration  --------------------
+    // XXX We can add some method patterns here - like setName() and
+    // setDomain() for code that doesn't implement the Registration
+
+    public ObjectName preRegister(MBeanServer server,
+                                  ObjectName name)
+            throws Exception
+    {
+        if( log.isDebugEnabled())
+            log.debug("preRegister " + resource + " " + name );
+        if( resource instanceof MBeanRegistration ) {
+            return ((MBeanRegistration)resource).preRegister(server, name );
+        }
+        return name;
+    }
+
+    public void postRegister(Boolean registrationDone) {
+        if( resource instanceof MBeanRegistration ) {
+            ((MBeanRegistration)resource).postRegister(registrationDone);
+        }
+    }
+
+    public void preDeregister() throws Exception {
+        if( resource instanceof MBeanRegistration ) {
+            ((MBeanRegistration)resource).preDeregister();
+        }
+    }
+
+    public void postDeregister() {
+        if( resource instanceof MBeanRegistration ) {
+            ((MBeanRegistration)resource).postDeregister();
+        }
+    }
 }
