@@ -121,7 +121,8 @@ public class SimpleRemoteConnector
 
     // XXX Not used - allow translations
     String localDomain;
-
+    String filter;
+    
     //
     long lastRefresh=0;
     long updateInterval=5000; // 5 sec - it's min time between updates
@@ -197,6 +198,13 @@ public class SimpleRemoteConnector
         this.statusPath = statusPath;
     }
 
+    public String getFilter() {
+        return filter;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
+    }
 
     /* ==================== Start/stop ==================== */
 
@@ -253,8 +261,11 @@ public class SimpleRemoteConnector
         try {
             int cnt=0;
             // connect to apache, get a list of mbeans
+            if( filter==null ) {
+                filter=domain + ":*";
+            }
 
-            InputStream is=getStream( "qry=" + domain + ":*");
+            InputStream is=getStream( "qry=" + filter);
             if( is==null ) return;
 
             Manifest mf=new Manifest(is);
@@ -267,7 +278,7 @@ public class SimpleRemoteConnector
 
                 MBeanProxy proxy=(MBeanProxy)mbeans.get(name);
                 if( proxy==null ) {
-                    log.info( "Unknown object " + name);
+                    log.debug( "New object " + name);
                     String code=attrs.getValue("modelerType");
                     if(log.isDebugEnabled())
                         log.debug("Register " + name  + " " + code );
@@ -279,15 +290,15 @@ public class SimpleRemoteConnector
                     MBeanServer mserver=Registry.getRegistry().getMBeanServer();
                     ObjectName oname=new ObjectName(name);
                     mserver.registerMBean(proxy, oname);
-                } else {
-                    Iterator it2=attrs.keySet().iterator();
-                    while( it2.hasNext() ) {
-                        String att=(String)it2.next();
-                        if( "modelerType".equals( att )) continue;
-                        String val=attrs.getValue(att);
-                        proxy.update(att, val);
-                        cnt++;
-                    }
+                } 
+                Iterator it2=attrs.keySet().iterator();
+                while( it2.hasNext() ) {
+                    Object o=it2.next();
+                    String att=(o==null) ? null : o.toString();
+                    if( "modelerType".equals( att )) continue;
+                    String val=attrs.getValue(att);
+                    proxy.update(att, val);
+                    cnt++;
                 }
             }
             log.info( "Refreshing attributes " + cnt);
