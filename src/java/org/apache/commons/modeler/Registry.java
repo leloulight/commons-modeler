@@ -263,7 +263,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             loadMetaInfDescriptors((ClassLoader)source);
             return;
         } else {
-            registry.loadDescriptors( null, source, null );
+            loadDescriptors( null, source, null );
         }
         
     }
@@ -642,7 +642,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         }
         
         // first look for existing descriptor
-        ManagedBean managed = registry.findManagedBean(type);
+        ManagedBean managed = findManagedBean(type);
 
         // Search for a descriptor in the same package
         if( managed==null ) {
@@ -813,7 +813,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
                 type=bean.getClass().getName();
             }
 
-            ManagedBean managed = registry.findManagedBean(bean.getClass(), type);
+            ManagedBean managed = findManagedBean(bean.getClass(), type);
 
             // The real mbean is created and registered
             ModelMBean mbean = managed.createMBean(bean);
