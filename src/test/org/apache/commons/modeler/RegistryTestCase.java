@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/test/org/apache/commons/modeler/RegistryTestCase.java,v 1.2 2003/01/23 19:42:08 craigmcc Exp $
- * $Revision: 1.2 $
- * $Date: 2003/01/23 19:42:08 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/test/org/apache/commons/modeler/RegistryTestCase.java,v 1.3 2003/01/27 19:22:45 craigmcc Exp $
+ * $Revision: 1.3 $
+ * $Date: 2003/01/27 19:22:45 $
  *
  * ====================================================================
  *
@@ -68,6 +68,8 @@ import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Map;
 import javax.management.Descriptor;
+import javax.management.MBeanConstructorInfo;
+import javax.management.modelmbean.ModelMBeanConstructorInfo;
 import javax.management.modelmbean.ModelMBeanInfo;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -78,7 +80,7 @@ import junit.framework.TestSuite;
  * <p>Test Case for the Registry class.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.2 $ $Date: 2003/01/23 19:42:08 $
+ * @version $Revision: 1.3 $ $Date: 2003/01/27 19:22:45 $
  */
 
 public class RegistryTestCase extends TestCase {
@@ -149,6 +151,41 @@ public class RegistryTestCase extends TestCase {
 
 
     // ------------------------------------------------ Individual Test Methods
+
+
+    /**
+     * Test ModelMBeanConstructorInfo information.
+     */
+    public void testModelMBeanConstructorInfo() throws Exception {
+
+        // Retrieve a ManagedBean
+        ManagedBean http = registry.findManagedBean("HttpConnector");
+        assertNotNull("Found HttpConnector managed bean");
+
+        // Create the associated ModelMBeanInfo
+        ModelMBeanInfo info = http.createMBeanInfo();
+        assertNotNull("Found HttpConnector ModelMBeanInfo", info);
+
+        // Retrieve the relevant MBeanConstructorInfo array
+        MBeanConstructorInfo mcinfo[] = info.getConstructors();
+        assertNotNull("Found HttpConnector MBeanConstructorInfo array", mcinfo);
+        assertEquals("Found HttpConnector MBeanConstructorInfo entry",
+                     1, mcinfo.length);
+
+        // Cast first entry to ModelMBeanConstructorInfo
+        ModelMBeanConstructorInfo mmcinfo =
+            (ModelMBeanConstructorInfo) mcinfo[0];
+
+        // Get the Descriptor
+        Descriptor desc = mmcinfo.getDescriptor();
+        assertNotNull("Found HttpConnector constructor descriptor", desc);
+
+        // Check the configured fields
+        checkDescriptor(desc, "role", "constructor");
+        checkDescriptor(desc, "field1", "HttpConnector.constructor/field1");
+        checkDescriptor(desc, "field2", "HttpConnector.constructor/field2");
+
+    }
 
 
     /**
@@ -242,7 +279,7 @@ public class RegistryTestCase extends TestCase {
      */
     public void testModelMBeanInfo() throws Exception {
 
-        // Retrive a ManageBean
+        // Retrive a ManagedBean
         ManagedBean http = registry.findManagedBean("HttpConnector");
         assertNotNull("Found HttpConnector managed bean");
 

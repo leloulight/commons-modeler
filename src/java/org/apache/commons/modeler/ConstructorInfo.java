@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ConstructorInfo.java,v 1.3 2003/01/23 19:42:04 craigmcc Exp $
- * $Revision: 1.3 $
- * $Date: 2003/01/23 19:42:04 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ConstructorInfo.java,v 1.4 2003/01/27 19:22:45 craigmcc Exp $
+ * $Revision: 1.4 $
+ * $Date: 2003/01/27 19:22:45 $
  *
  * ====================================================================
  *
@@ -76,7 +76,7 @@ import java.io.Serializable;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.3 $ $Date: 2003/01/23 19:42:04 $
+ * @version $Revision: 1.4 $ $Date: 2003/01/27 19:22:45 $
  */
 
 public class ConstructorInfo extends FeatureInfo implements Serializable {
@@ -182,6 +182,7 @@ public class ConstructorInfo extends FeatureInfo implements Serializable {
         descriptor.removeField("class");
         if (getDisplayName() != null)
             descriptor.setField("displayName", getDisplayName());
+        addFields(descriptor);
         info.setDescriptor(descriptor);
         return (info);
 
