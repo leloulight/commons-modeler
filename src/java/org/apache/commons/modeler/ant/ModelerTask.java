@@ -59,96 +59,34 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
 import javax.management.*;
-import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.management.MBeanServer;
+import javax.management.loading.MLet;
+import java.util.*;
+import java.net.URL;
 
 /**
- * Set mbean properties.
+ * Like MLETTask, but it wraps the bean in a BaseModelMBean.
  *
  */
-public class JmxSet extends Task {
-    private static Log log = LogFactory.getLog(JmxSet.class);
+public class ModelerTask extends MLETTask {
 
-    String attribute;
-    String value;
-    String valueRef;
-    Object objValue;
-    String objectName;
-    String type;
+    private static Log log = LogFactory.getLog(ModelerTask.class);
 
-
-    public JmxSet() {
+    public ModelerTask() {
     }
 
-    public void setAttribute(String attribute) {
-        this.attribute = attribute;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public void addText( String value ) {
-        this.value=value;
-    }
-
-    public void setValueRef(String valueRef) {
-        this.valueRef = valueRef;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public void setObjValue(Object objValue) {
-        this.objValue = objValue;
-    }
-
-    public void setObjectName(String name) {
-        this.objectName = name;
-    }
-
-
-    public void execute() {
+    public void execute() throws BuildException {
         try {
-            MBeanServer server=(MBeanServer)project.getReference("jmx.server");
-
-            if (server == null) {
-                if( MBeanServerFactory.findMBeanServer(null).size() > 0 ) {
-                    server=(MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
-                } else {
-                    if( log.isDebugEnabled())
-                        log.debug("Creating mbean server");
-                    server=MBeanServerFactory.createMBeanServer();
-                }
-                project.addReference("jmx.server", server);
-            }
-
-            ObjectName oname=new ObjectName(objectName);
-
-            // XXX convert value, use meta data to find type
-            if( objValue==null && valueRef != null ) {
-                 objValue=project.getReference(valueRef);
-             }
-             if( objValue==null ) {
-                 if( type==null) {// string is default
-                     objValue=value;
-                 } else if( "ObjectName".equals( type )) {
-                     if( log.isTraceEnabled())
-                        log.trace("Convert to ObjectName " + value);
-                     objValue=new ObjectName( value );
-                 } else if( "int".equals( type )) {
-                     objValue=new Integer( value );
-                 } else if( "boolean".equals( type )) {
-                     objValue=new Boolean( value );
-                 }
-
-            }
-            if( log.isDebugEnabled())
-                log.debug("Setting " + oname + " " + attribute + " " +
-                        objValue );
-            server.setAttribute(oname, new Attribute(attribute, objValue));
-
+            Arg codeArg=new Arg();
+            codeArg.setType("java.lang.String");
+            codeArg.setValue( code );
+            if( args==null) args=new Vector();
+            args.insertElementAt(codeArg, 0);
+            super.bindJmx(objectName,
+                    "org.apache.commons.modeler.BaseModelMBean",
+                    null,
+                    args );
         } catch(Exception ex) {
             ex.printStackTrace();
         }

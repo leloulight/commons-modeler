@@ -61,6 +61,7 @@ import org.apache.commons.logging.Log;
 import javax.management.*;
 import javax.management.ObjectName;
 import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
 import javax.management.loading.MLet;
 import java.util.*;
 import java.net.URL;
@@ -113,49 +114,75 @@ public class MLETTask extends Task {
         this.objectName = name;
     }
 
+    MBeanServer server;
+
+    public MBeanServer getMBeanServer() {
+        if( server!= null ) return server;
+
+        server=(MBeanServer)project.getReference("jmx.server");
+
+        if (server != null) return server;
+
+        try {
+            if( MBeanServerFactory.findMBeanServer(null).size() > 0 ) {
+                server=(MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
+            } else {
+                server=MBeanServerFactory.createMBeanServer();
+
+                // Register a loader that will be find ant classes.
+                ObjectName defaultLoader= new ObjectName("modeler-ant",
+                        "loader", "ant");
+                MLet mlet=new MLet( new URL[0], this.getClass().getClassLoader());
+                server.registerMBean(mlet, defaultLoader);
+
+                if( log.isDebugEnabled())
+                    log.debug("Creating mbean server and loader "+ mlet +
+                            " " + this.getClass().getClassLoader());
+            }
+            project.addReference("jmx.server", server);
+
+            // Create the MLet object
+        } catch( JMException ex ) {
+            log.error("Error creating server", ex);
+        }
+
+        if( log.isDebugEnabled()) log.debug("Using Mserver " + server );
+
+        return server;
+    }
+
+
+    protected void bindJmx(String objectName, String code,
+                        String arg0, Vector args)
+            throws Exception
+    {
+        MBeanServer server=getMBeanServer();
+        ObjectName oname=new ObjectName( objectName );
+
+        // XXX Use the loader ref, if any
+        if( args==null ) {
+            server.createMBean(code, oname);
+        } else {
+            Object argsA[]=new Object[ args.size()];
+            String sigA[]=new String[args.size()];
+            for( int i=0; i<args.size(); i++ ) {
+                Arg arg=(Arg)args.elementAt(i);
+                if( arg.type==null )
+                    arg.type="java.lang.String";
+                sigA[i]=arg.getType();
+                argsA[i]=arg.getValue();
+                // XXX Deal with not string types - IntrospectionUtils
+            }
+            server.createMBean(code, oname, argsA, sigA );
+        }
+    }
+
+
     public void execute() throws BuildException {
         try {
-            ObjectName defaultLoader= new ObjectName("ant", "mlet", "default");
-            MBeanServer server=(MBeanServer)project.getReference("jmx.server");
-
-            if (server == null) {
-                if( MBeanServerFactory.findMBeanServer(null).size() > 0 ) {
-                    server=(MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
-                } else {
-                    server=MBeanServerFactory.createMBeanServer();
-                    MLet mlet=new MLet( new URL[0], this.getClass().getClassLoader());
-                    server.registerMBean(mlet, defaultLoader);
-                    if( log.isDebugEnabled())
-                        log.debug("Creating mbean server and loader "+ mlet +
-                                " " + this.getClass().getClassLoader());
-                }
-                project.addReference("jmx.server", server);
-                // Create the MLet object
-            }
-
-            if( log.isDebugEnabled()) log.debug("Using Mserver " + server );
-
-            ObjectName oname=new ObjectName( objectName );
-            if( args==null ) {
-                // XXX Use the loader ref, if any
-                server.createMBean(code, oname, defaultLoader);
-            } else {
-                // XXX Use the loader ref, if any
-                Object argsA[]=new Object[ args.size()];
-                String sigA[]=new String[args.size()];
-                for( int i=0; i<args.size(); i++ ) {
-                    Arg arg=(Arg)args.elementAt(i);
-                    if( arg.type==null )
-                        arg.type="java.lang.String";
-                    sigA[i]=arg.getType();
-                    argsA[i]=arg.getValue();
-                    // XXX Deal with not string types - IntrospectionUtils
-                }
-                server.createMBean(code, oname, defaultLoader, argsA, sigA );
-            }
-
+            bindJmx( objectName, code, null, args);
         } catch(Exception ex) {
-            ex.printStackTrace();
+            log.error("Can't create mbean " + objectName, ex);
         }
     }
 
