@@ -55,6 +55,9 @@
 package org.apache.commons.modeler.ant;
 
 import org.apache.tools.ant.*;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
+
 import javax.management.*;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -64,6 +67,8 @@ import javax.management.ObjectName;
  *
  */
 public class JmxSet extends Task {
+    private static Log log = LogFactory.getLog(JmxSet.class);
+
     String attribute;
     String value;
     String valueRef;
@@ -73,7 +78,6 @@ public class JmxSet extends Task {
 
 
     public JmxSet() {
-
     }
 
     public void setAttribute(String attribute) {
@@ -125,12 +129,17 @@ public class JmxSet extends Task {
                  if( type==null) {// string is default
                      objValue=value;
                  } else if( "ObjectName".equals( type )) {
+                     if( log.isTraceEnabled())
+                        log.trace("Convert to ObjectName " + value);
                      objValue=new ObjectName( value );
                  } else if( "int".equals( type )) {
                      objValue=new Integer( value );
                  }
 
             }
+            if( log.isDebugEnabled())
+                log.debug("Setting " + oname + " " + attribute + " " +
+                        objValue );
             server.setAttribute(oname, new Attribute(attribute, objValue));
 
         } catch(Exception ex) {

@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.7 2002/11/12 22:48:40 costin Exp $
- * $Revision: 1.7 $
- * $Date: 2002/11/12 22:48:40 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.8 2002/11/13 06:27:22 costin Exp $
+ * $Revision: 1.8 $
+ * $Date: 2002/11/13 06:27:22 $
  *
  * ====================================================================
  *
@@ -125,7 +125,7 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.7 $ $Date: 2002/11/12 22:48:40 $
+ * @version $Revision: 1.8 $ $Date: 2002/11/13 06:27:22 $
  */
 
 public class BaseModelMBean implements ModelMBean {
@@ -520,7 +520,9 @@ public class BaseModelMBean implements ModelMBean {
 
         try {
             // XXX Is it before or after ?
-            Object oldValue=getAttribute( name );
+            Object oldValue=null;
+            if( getAttMap.get(name) != null )
+                oldValue=getAttribute( name );
             sendAttributeChangeNotification(new Attribute( name, oldValue),
                     attribute);
         } catch( Exception ex ) {
@@ -535,14 +537,17 @@ public class BaseModelMBean implements ModelMBean {
             ModelMBeanAttributeInfo attrInfo = info.getAttribute(name);
             if (attrInfo == null)
                 throw new AttributeNotFoundException("Cannot find attribute " + name);
+
             Descriptor attrDesc = attrInfo.getDescriptor();
             if (attrDesc == null)
                 throw new AttributeNotFoundException("Cannot find attribute " + name + " descriptor");
+
             String setMethod = (String) attrDesc.getFieldValue("setMethod");
             if (setMethod == null)
                 throw new AttributeNotFoundException("Cannot find attribute " + name + " set method name");
 
             String argType=attrInfo.getType();
+
             Class signature[] = new Class[] { getAttributeClass( argType ) };
 
             Object object = null;
