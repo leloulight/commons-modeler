@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.5 2002/11/01 23:10:10 costin Exp $
- * $Revision: 1.5 $
- * $Date: 2002/11/01 23:10:10 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.6 2002/11/05 19:10:19 costin Exp $
+ * $Revision: 1.6 $
+ * $Date: 2002/11/05 19:10:19 $
  *
  * ====================================================================
  *
@@ -125,7 +125,7 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.5 $ $Date: 2002/11/01 23:10:10 $
+ * @version $Revision: 1.6 $ $Date: 2002/11/05 19:10:19 $
  */
 
 public class BaseModelMBean implements ModelMBean {
@@ -209,9 +209,6 @@ public class BaseModelMBean implements ModelMBean {
 
     // key: operation val: invoke method
     Hashtable invokeAttMap=new Hashtable();
-
-    // All attributes that are set via this interface ( original values )
-    Hashtable attributes=new Hashtable();
 
     /**
      * Obtain and return the value of a specific attribute of this MBean.
@@ -590,8 +587,6 @@ public class BaseModelMBean implements ModelMBean {
             throw new MBeanException
                 (e, "Exception invoking method " + name);
         }
-
-        attributes.put( name, value );
     }
 
 
@@ -1116,22 +1111,6 @@ public class BaseModelMBean implements ModelMBean {
             (new IllegalStateException("Persistence is not supported"),
              "Persistence is not supported");
 
-    }
-
-    // ------------------- Special methods ----------------------------------
-
-    /** Get all attributes that were set via JMX. This data can be persisted.
-     *
-     */
-    public Hashtable getAttributes() {
-        return attributes;
-    }
-
-    /** "Backdoor"  method to push configuration data that
-     *  was set using other methods ( like digester and direct introspection )
-     */
-    public void putAttribute( String name, Object value ) {
-        attributes.put(name, value );
     }
 
     // ------------------------------------------------------ Protected Methods
