@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.13 2003/01/23 19:42:04 craigmcc Exp $
- * $Revision: 1.13 $
- * $Date: 2003/01/23 19:42:04 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.14 2003/02/03 22:13:16 costin Exp $
+ * $Revision: 1.14 $
+ * $Date: 2003/02/03 22:13:16 $
  *
  * ====================================================================
  *
@@ -115,7 +115,7 @@ import javax.management.*;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.13 $ $Date: 2003/01/23 19:42:04 $
+ * @version $Revision: 1.14 $ $Date: 2003/02/03 22:13:16 $
  */
 
 public class BaseModelMBean implements ModelMBean, MBeanRegistration {
@@ -135,8 +135,8 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
     public BaseModelMBean() throws MBeanException, RuntimeOperationsException {
 
         super();
-        setModelMBeanInfo(createDefaultModelMBeanInfo());
         if( log.isDebugEnabled()) log.debug("default constructor");
+        setModelMBeanInfo(createDefaultModelMBeanInfo());
     }
 
 
@@ -172,8 +172,11 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
     public BaseModelMBean( String type )
         throws MBeanException, RuntimeOperationsException
     {
-        super();
-        setModeledType(type);
+        try {
+            setModeledType(type);
+        } catch( Throwable ex ) {
+            log.error( "Error creating mbean ", ex);
+        }
     }
 
     // ----------------------------------------------------- Instance Variables
@@ -339,6 +342,7 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
      */
     public MBeanInfo getMBeanInfo() {
         // XXX Why do we have to clone ?
+        if( info== null ) return null;
         return ((MBeanInfo) info.clone());
     }
 
@@ -446,7 +450,7 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
                     ((Error) t, "Error invoking method " + name);
             else
                 throw new MBeanException
-                    (e, "Exception invoking method " + name);
+                    ((Exception)t, "Exception invoking method " + name);
         } catch (Exception e) {
             log.error("Exception invoking method " + name , e );
             throw new MBeanException
@@ -573,12 +577,15 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
                     m = object.getClass().getMethod(setMethod, signature);
                     exception=null;
                 } catch (NoSuchMethodException e) {
+                    if( log.isDebugEnabled())
+                        log.debug("Method not found in resource " +resource);
                     exception = e;
                 }
             }
             if( exception != null )
                 throw new ReflectionException(exception,
-                                              "Cannot find setter method " + setMethod);
+                                              "Cannot find setter method " + setMethod +
+                        " " + resource);
             setAttMap.put( name, m );
         }
 
@@ -1164,26 +1171,28 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
                 log.debug("setModeledType " + type);
 
             Registry reg=Registry.getRegistry();
+            //Thread.currentThread().setContextClassLoader(BaseModelMBean.class.getClassLoader());
+            Class c=Class.forName( type);
+            resource = c.newInstance();
             ManagedBean descriptor=reg.findManagedBean(type);
 
             if( descriptor != null ) {
                 if( log.isDebugEnabled())
-                    log.debug("Using descriptor " + type);
+                    log.debug("Using descriptor " + type + " " + descriptor);
                 this.setModelMBeanInfo( descriptor.createMBeanInfo());
                 return;
             }
 
             // Maybe it's a real class name. Use introspection
-            Class c=Class.forName( type);
-            resource = c.newInstance();
             if( log.isDebugEnabled())
                 log.debug("Introspecting " + type);
             reg.loadDescriptors("MbeansDescriptorsIntrospectionSource", c, type);
             descriptor=reg.findManagedBean(type);
 
             this.setModelMBeanInfo(descriptor.createMBeanInfo());
-        } catch( Exception ex) {
-            ex.printStackTrace();
+        } catch( Throwable ex) {
+            log.error( "TCL: " + Thread.currentThread().getContextClassLoader(),
+                    ex);
         }
     }
 
