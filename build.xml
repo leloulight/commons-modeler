@@ -1,9 +1,9 @@
-<project name="Modeler" default="compile" basedir=".">
+<project name="Modeler" default="jar" basedir=".">
 
 
 <!--
         "Modeler" component of the Jakarta Commons Subproject
-        $Id: build.xml,v 1.3 2002/05/01 00:33:41 craigmcc Exp $
+        $Id: build.xml,v 1.4 2002/11/12 22:53:41 costin Exp $
 -->
 
 
@@ -71,6 +71,7 @@
   <!-- The base directory for unit test sources -->
   <property name="test.home"               value="src/test"/>
 
+  <property name="commons-modeler.jar" value="${dist.home}/commons-${component.name}.jar"/>
 
 <!-- ========== Compiler Defaults ========================================= -->
 
@@ -152,8 +153,7 @@
   </target>
 
 
-  <target name="compile" depends="static"
-   description="Compile shareable components">
+  <target name="compile-only" >
     <javac  srcdir="${source.home}"
            destdir="${build.home}/classes"
              debug="${compile.debug}"
@@ -168,6 +168,8 @@
     </copy>
   </target>
 
+  <target name="compile" depends="static,compile-only"
+   description="Compile shareable components" />
 
   <target name="clean"
    description="Clean build and distribution directories">
@@ -197,9 +199,17 @@
            classpathref="compile.classpath" />
   </target>
 
+  <target name="jar" depends="compile-only" > 
+    <jar    jarfile="${commons-modeler.jar}"
+            basedir="${build.home}/classes"
+           manifest="src/conf/MANIFEST.MF">
+       <include name="org/apache/commons/modeler/**" />
+       <include name="META-INF/ant.properties" />
+    </jar>
+  </target>
 
-  <target name="dist" depends="compile,javadoc"
-   description="Create binary distribution">
+  <target name="dist" depends="compile,javadoc,jar"
+    description="Create binary distribution">
     <mkdir      dir="${dist.home}"/>
     <copy      file="../LICENSE"
               todir="${dist.home}"/>
@@ -210,9 +220,6 @@
     <mkdir      dir="${build.home}/classes/META-INF"/>
     <copy      file="../LICENSE"
              tofile="${build.home}/classes/META-INF/LICENSE.txt"/>
-    <jar    jarfile="${dist.home}/commons-${component.name}.jar"
-            basedir="${build.home}/classes"
-           manifest="${build.home}/conf/MANIFEST.MF"/>
   </target>
 
 
@@ -249,6 +256,47 @@
     </java>
   </target>
 
+  <target name="ant.test" depends="init">
+    <property name="tomcat.home" location="../../jakarta-tomcat-5/build" />
+
+    <path id="jmx.test.classpath">
+      <pathelement location="target/classes" />
+      <fileset dir="${tomcat.home}/common/lib" includes="*.jar"/>
+      <fileset dir="${tomcat.home}/server/lib" includes="*.jar"/>
+      <pathelement location="${commons-logging.jar}" />
+      <pathelement location="${jmx.jar}" />
+      <pathelement location="${ide.classes}" />
+    </path>
+
+    <taskdef resource="META-INF/ant.properties"
+             classpathref="jmx.test.classpath" />
+
+    <MLET code="org.apache.commons.modeler.BaseModelMBean"
+          name="catalina: type=server" >
+       <arg value="org.apache.catalina.startup.Catalina" />
+    </MLET>
+
+    <MLET code="mx4j.adaptor.http.HttpAdaptor"
+          name="Http:name=HttpAdaptor" />
+    <MLET code="mx4j.adaptor.http.XSLTProcessor"
+          name="Http:name=XSLTProcessor"/>
+
+    <jmxSet name="Http:name=HttpAdaptor"
+            attribute="Port"
+            type="int"
+            value="9999" />
+
+    <jmxSet name="Http:name=HttpAdaptor"
+            attribute="ProcessorName"
+            type="ObjectName"
+            value="Http:name=XSLTProcessor" />
+
+    <jmx name="Http:name=HttpAdaptor"
+         method="start" />
+
+    <sleep hours="1"/>
+        
+  </target>
 
 <!-- ========== Demonstration Targets ===================================== -->
 
