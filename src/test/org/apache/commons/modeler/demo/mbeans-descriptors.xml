@@ -84,7 +84,7 @@
     <operation   name="findServices"
           description="Return all child Services"
                impact="INFO"
-           returnType="org.apache.commons.modeler.demo.Service[]"/>
+           returnType="[Lorg.apache.commons.modeler.demo.Service;"/>
 
     <operation   name="removeService"
           description="Remove an existing child Service"
@@ -129,7 +129,7 @@
     <operation   name="findConnectors"
           description="Return all associated Connectors"
                impact="ACTION"
-           returnType="org.apache.commons.modeler.demo.Connector[]"/>
+           returnType="[Lorg.apache.commons.modeler.demo.Connector;"/>
 
     <operation   name="removeConnector"
           description="Remove an existing associated Connector"
