@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.18 2003/04/08 04:07:07 costin Exp $
- * $Revision: 1.18 $
- * $Date: 2003/04/08 04:07:07 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.19 2003/04/13 16:51:47 costin Exp $
+ * $Revision: 1.19 $
+ * $Date: 2003/04/13 16:51:47 $
  *
  * ====================================================================
  *
@@ -85,6 +85,7 @@ import javax.management.modelmbean.ModelMBeanInfoSupport;
 import javax.management.modelmbean.ModelMBeanNotificationInfo;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
 import javax.management.*;
+import javax.management.DynamicMBean;
 
 // TODO: enable ant-like substitutions ? ( or at least discuss it )
 
@@ -119,7 +120,7 @@ import javax.management.*;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.18 $ $Date: 2003/04/08 04:07:07 $
+ * @version $Revision: 1.19 $ $Date: 2003/04/13 16:51:47 $
  */
 
 public class BaseModelMBean implements ModelMBean, MBeanRegistration {
@@ -271,6 +272,10 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
                 (new IllegalArgumentException("Attribute name is null"),
                  "Attribute name is null");
 
+        if( resource instanceof DynamicMBean ) {
+            return ((DynamicMBean)resource).getAttribute(name);
+        }
+        
         // Extract the method from cache
         Method m=(Method)getAttMap.get( name );
 
@@ -402,8 +407,12 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
      *  occurs when invoking a method
      */
     public Object invoke(String name, Object params[], String signature[])
-        throws MBeanException, ReflectionException {
-
+        throws MBeanException, ReflectionException 
+    {
+        if( resource instanceof DynamicMBean ) {
+            return ((DynamicMBean)resource).invoke(name, params, signature);
+        }
+    
         // Validate the input parameters
         if (name == null)
             throw new RuntimeOperationsException
@@ -542,11 +551,16 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
      */
     public void setAttribute(Attribute attribute)
         throws AttributeNotFoundException, MBeanException,
-        ReflectionException
+        ReflectionException, InvalidAttributeValueException
     {
         if( log.isDebugEnabled() )
             log.debug("Setting attribute " + this + " " + attribute );
 
+        if( resource instanceof DynamicMBean ) {
+            ((DynamicMBean)resource).setAttribute(attribute);
+            return;
+        }
+        
         // Validate the input parameters
         if (attribute == null)
             throw new RuntimeOperationsException
