@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/Registry.java,v 1.1 2002/04/30 20:58:52 craigmcc Exp $
- * $Revision: 1.1 $
- * $Date: 2002/04/30 20:58:52 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/Registry.java,v 1.2 2002/07/29 22:25:54 costin Exp $
+ * $Revision: 1.2 $
+ * $Date: 2002/07/29 22:25:54 $
  *
  * ====================================================================
  *
@@ -88,7 +88,7 @@ import org.apache.commons.logging.LogFactory;
  * synchronized.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.1 $ $Date: 2002/04/30 20:58:52 $
+ * @version $Revision: 1.2 $ $Date: 2002/07/29 22:25:54 $
  */
 
 public final class Registry {
@@ -241,8 +241,13 @@ public final class Registry {
     public synchronized static MBeanServer getServer() {
 
         if (server == null) {
-            log.info("Creating MBeanServer");
-            server = MBeanServerFactory.createMBeanServer();
+            if( MBeanServerFactory.findMBeanServer(null).size() > 0 ) {
+                log.info("Using existing MBeanServer");
+                server=(MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
+            } else {
+                log.info("Creating MBeanServer");
+                server=MBeanServerFactory.createMBeanServer();
+            }
         }
         return (server);
 
