@@ -82,6 +82,16 @@ import javax.naming.directory.*;
 /**
  * JMX-enable components.
  *
+ * Component metadata can be set:
+ * <ul>
+ * <li>from a stream - loadDescriptors(Stream )
+ * <li>from resources in a class loader ( discovery )
+ * <li>using introspection
+ * <li>mapping of class names into existing types
+ * <ul>
+ *
+ * Each metadata is associated with a 'type' and a 'domain'.
+ *
  * This class has no dependency on JMX - if JMX is not available it'll
  * just do nothing. This allows applications to compile with a dependency
  * on commons-modeler, but without requiring jmx.jar.
@@ -100,59 +110,47 @@ public class BaseRegistry {
 
     private static Log log= LogFactory.getLog(BaseRegistry.class);
 
-    protected Context componentContext;
-    protected Context descriptorContext;
-    protected Context configContext;
-
     /**
      * Protected constructor to require use of the factory create method.
      */
     protected BaseRegistry() {
     }
 
+    // --------------------  Registration/unregistration --------------------
 
-    /** If a JNDI context is set, all components
-     * will be registered in the context.
+    /** The main method used to jmx-enable and register components. If the
+     * bean descriptor cannot be found it'll use introspection to create one.
      *
-     * @param ctx
+     * XXX Should we use seq or hash ?
+     * XXX more explicit control
+     *
+     * @param bean Any object ( including an MBean ). An MBean proxy will be
+     * provided.
+     * @param domain Domain for registration. If null, the default information
+     *  from the descriptor will be used, or the default server domain. In future
+     *  this will also be used to discriminate descriptors
+     * @param type The key used to create the 'type=' name component and to
+     *  locate the descriptor. If null we'll use the explicit overrides in
+     *   addTypeMappings, or compute it from the bean name.
+     * @param name Local part of the name. If null a seq=XXX will be generated.
      */
-    public void setComponentContext(Context ctx) {
-        this.componentContext= ctx;
+    public void registerComponent(Object bean, String domain, String type,
+                                  String name) 
+        throws Exception
+    {
+        getBaseRegistry().registerComponent(bean, domain, type, name );
     }
 
-    public Object getMBeanServer() {
-        return null;
-    }
-
-    /** Register all component descriptors in this
-     * naming context.
-     *
-     * @param ctx
-     */
-    public void setDescriptorContext(Context ctx) {
-        this.descriptorContext= ctx;
-    }
-
-    public void setConfigContext( Context ctx ) {
-        this.configContext= ctx;
-    }
-
-    // -------------------- API exposed by Modeler --------------------
-
-    /** The method used by applications to jmx-enable a component
-     *  instance.
-     *
-     *  @param bean Any object. If a description is registered, it'll be used. If not
-     *                          introspection will be used.
-     *  @param domain Domain for the object. Default domain used if null.
-     *                XXX call a getDomain() on the component ?
-     *  @param name Desired name for the object. If the name is already registered, a
-     *              seq=... will be appened. XXX How do we parse it ? JNDI-style ?
+    /** Unregister the component. This will remove all references from the
+     * mbean server and modeler
      *
      */
-    public void registerComponent(Object bean, String domain, String name) {
-        getBaseRegistry().registerComponent(bean, domain,name );
+    public void unregisterComponent( String name ) {
+        getBaseRegistry().unregisterComponent(name);
     }
+
+    // --------------------  Metadata --------------------
+
 
     /** The method used by applications to jmx-enable a component
      *  class.
@@ -187,6 +185,22 @@ public class BaseRegistry {
 
     }
 
+
+    HashMap typeMappings;
+
+    /** Add a mapping between a className and a type. The type is the
+     * key used to locate the mbean descriptors ( type=foo in the mbean name ).
+     * It serve the same purpose as 'modules.xml' in tomcat3 and the exceptions
+     * in tomcat4 MBeanUtils.
+     *
+     */
+    public void addTypeMapping( String className, String type ) {
+        typeMappings.put( className, type );
+    }
+
+
+    // --------------------  Other methods --------------------
+
     /** Find an mbean descriptor for the type
      *
      */
@@ -209,9 +223,6 @@ public class BaseRegistry {
         return null;
     }
 
-    public void unregisterMBean( String name ) {
-        getBaseRegistry().unregisterMBean(name);
-    }
 
     // Store all objects that have been registered via modeler
     // it is used to generate unique names automatically - using seq=
@@ -254,16 +265,11 @@ public class BaseRegistry {
     }
 
 
-    HashMap typeMappings;
-
-    /** Add a mapping between a className and a type. The type is the
-     * key used to locate the mbean descriptors ( type=foo in the mbean name ).
-     * It serve the same purpose as 'modules.xml' in tomcat3 and the exceptions
-     * in tomcat4 MBeanUtils.
+    /** Access the MBean server.
      *
      */
-    public void addTypeMapping( String className, String type ) {
-        typeMappings.put( className, type );
+    public Object getMBeanServer() {
+        return null;
     }
 
     // -------------- Implementation ----------------------
