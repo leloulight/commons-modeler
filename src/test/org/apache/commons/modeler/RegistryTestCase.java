@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/test/org/apache/commons/modeler/RegistryTestCase.java,v 1.5 2003/01/27 19:31:49 craigmcc Exp $
- * $Revision: 1.5 $
- * $Date: 2003/01/27 19:31:49 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/test/org/apache/commons/modeler/RegistryTestCase.java,v 1.6 2003/01/27 19:57:07 craigmcc Exp $
+ * $Revision: 1.6 $
+ * $Date: 2003/01/27 19:57:07 $
  *
  * ====================================================================
  *
@@ -72,6 +72,7 @@ import javax.management.MBeanConstructorInfo;
 import javax.management.modelmbean.ModelMBeanAttributeInfo;
 import javax.management.modelmbean.ModelMBeanConstructorInfo;
 import javax.management.modelmbean.ModelMBeanInfo;
+import javax.management.modelmbean.ModelMBeanNotificationInfo;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -82,7 +83,7 @@ import junit.framework.TestSuite;
  * <p>Test Case for the Registry class.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.5 $ $Date: 2003/01/27 19:31:49 $
+ * @version $Revision: 1.6 $ $Date: 2003/01/27 19:57:07 $
  */
 
 public class RegistryTestCase extends TestCase {
@@ -330,9 +331,36 @@ public class RegistryTestCase extends TestCase {
         assertNotNull("Found HttpConnector MBeanDescriptor", desc);
 
         // Check the configured fields
-        checkDescriptor(desc, "descriptortype", "MBean");
         checkDescriptor(desc, "field1", "HttpConnector/field1");
         checkDescriptor(desc, "field2", "HttpConnector/field2");
+
+    }
+
+
+    /**
+     * Test ModelMBeanNotificationInfo information.
+     */
+    public void testModelMBeanNotificationInfo() throws Exception {
+
+        // Retrieve a ManagedBean
+        ManagedBean http = registry.findManagedBean("HttpConnector");
+        assertNotNull("Found HttpConnector managed bean");
+
+        // Create the associated ModelMBeanInfo
+        ModelMBeanInfo info = http.createMBeanInfo();
+        assertNotNull("Found HttpConnector ModelMBeanInfo", info);
+
+        // Retrieve the specified ModelMBeanNotificationInfo
+        ModelMBeanNotificationInfo mmninfo = info.getNotification("Problem");
+        assertNotNull("Found HttpConnector problem info", mmninfo);
+
+        // Get the Descriptor
+        Descriptor desc = mmninfo.getDescriptor();
+        assertNotNull("Found HttpConnector problem descriptor", desc);
+
+        // Check the configured fields
+        checkDescriptor(desc, "field1", "HttpConnector.problem/field1");
+        checkDescriptor(desc, "field2", "HttpConnector.problem/field2");
 
     }
 
