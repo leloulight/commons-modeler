@@ -67,6 +67,8 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
+import java.util.ArrayList;
 
 public class MbeansDescriptorsDigesterSource extends ModelerSource
 {
@@ -77,6 +79,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
     String location;
     String type;
     Object source;
+    List mbeans=new ArrayList();
 
     public void setRegistry(Registry reg) {
         this.registry=reg;
@@ -98,7 +101,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
         this.source=source;
     }
 
-    public void loadDescriptors( Registry registry, String location,
+    public List loadDescriptors( Registry registry, String location,
                                  String type, Object source)
             throws Exception
     {
@@ -107,6 +110,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
         setType(type);
         setSource(source);
         execute();
+        return mbeans;
     }
 
     public void execute() throws Exception {
@@ -126,7 +130,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
                         url.toString());
 
         // Push our registry object onto the stack
-        digester.push(registry);
+        digester.push(mbeans);
 
         // Configure the parsing rules
         digester.addObjectCreate
@@ -136,8 +140,8 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
                 ("mbeans-descriptors/mbean");
         digester.addSetNext
                 ("mbeans-descriptors/mbean",
-                        "addManagedBean",
-                        "org.apache.commons.modeler.ManagedBean");
+                        "add",
+                        "java.lang.Object");
 
         digester.addObjectCreate
                 ("mbeans-descriptors/mbean/attribute",

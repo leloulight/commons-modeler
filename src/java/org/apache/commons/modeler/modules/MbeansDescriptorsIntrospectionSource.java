@@ -12,6 +12,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.List;
 import javax.management.ObjectName;
 
 
@@ -23,6 +25,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
     String location;
     String type;
     Object source;
+    List mbeans=new ArrayList();
 
     public void setRegistry(Registry reg) {
         this.registry=reg;
@@ -44,7 +47,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
         this.source=source;
     }
 
-    public void loadDescriptors( Registry registry, String location,
+    public List loadDescriptors( Registry registry, String location,
                                  String type, Object source)
             throws Exception
     {
@@ -53,6 +56,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
         setType(type);
         setSource(source);
         execute();
+        return mbeans;
     }
 
     public void execute() throws Exception {
@@ -62,7 +66,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
             if( managed==null ) return;
             managed.setName( type );
 
-            registry.addManagedBean(managed);
+            mbeans.add(managed);
 
         } catch( Exception ex ) {
             log.error( "Error reading descriptors ", ex);

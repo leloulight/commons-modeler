@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.EOFException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MbeansDescriptorsSerSource extends ModelerSource
@@ -20,6 +22,7 @@ public class MbeansDescriptorsSerSource extends ModelerSource
     String location;
     String type;
     Object source;
+    List mbeans=new ArrayList();
 
     public void setRegistry(Registry reg) {
         this.registry=reg;
@@ -41,7 +44,7 @@ public class MbeansDescriptorsSerSource extends ModelerSource
         this.source=source;
     }
 
-    public void loadDescriptors( Registry registry, String location,
+    public List loadDescriptors( Registry registry, String location,
                                  String type, Object source)
             throws Exception
     {
@@ -50,6 +53,7 @@ public class MbeansDescriptorsSerSource extends ModelerSource
         setType(type);
         setSource(source);
         execute();
+        return mbeans;
     }
 
     public void execute() throws Exception {
@@ -73,7 +77,7 @@ public class MbeansDescriptorsSerSource extends ModelerSource
             ManagedBean beans[]=(ManagedBean[])obj;
             // after all are read without error
             for( int i=0; i<beans.length; i++ ) {
-                registry.addManagedBean(beans[i]);
+                mbeans.add(beans[i]);
             }
 
         } catch( Exception ex ) {

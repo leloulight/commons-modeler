@@ -11,6 +11,8 @@ import javax.management.*;
 import javax.management.loading.MLet;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /** This will create mbeans based on a config file.
@@ -24,6 +26,7 @@ public class MbeansSource extends ModelerSource
     String location;
     String type;
     Object source;
+    List mbeans=new ArrayList();
     static boolean loaderLoaded=false;
 
     public void setRegistry(Registry reg) {
@@ -46,7 +49,16 @@ public class MbeansSource extends ModelerSource
         this.source=source;
     }
 
-    public void loadDescriptors( Registry registry, String location,
+    /** Return the list of mbeans created by this source.
+     *  It can be used to implement runtime services.
+     *
+     * @return
+     */
+    public List getMBeans() {
+        return mbeans;
+    }
+
+    public List loadDescriptors( Registry registry, String location,
                                  String type, Object source)
             throws Exception
     {
@@ -55,6 +67,7 @@ public class MbeansSource extends ModelerSource
         setType(type);
         setSource(source);
         execute();
+        return mbeans;
     }
 
     public void execute() throws Exception {
@@ -97,8 +110,12 @@ public class MbeansSource extends ModelerSource
             {
                 String nodeName=mbeanN.getNodeName();
 
-                if( "mbean".equals(nodeName) || "MLET".equals(nodeName)) {
+                if( "mbean".equals(nodeName) || "MLET".equals(nodeName) ||
+                        "service".equals(nodeName)) {
                     String code=DomUtil.getAttribute( mbeanN, "code" );
+                    if( code==null ) {
+                        code=DomUtil.getAttribute( mbeanN, "class" );
+                    }
                     String objectName=DomUtil.getAttribute( mbeanN, "objectName" );
                     if( objectName==null ) {
                         objectName=DomUtil.getAttribute( mbeanN, "name" );
@@ -117,6 +134,7 @@ public class MbeansSource extends ModelerSource
                     try {
                         ObjectName oname=new ObjectName(objectName);
                         server.createMBean(code, oname);
+                        mbeans.add(oname);
                         // XXX Arguments, loader !!!
                     } catch( Exception ex ) {
                         log.error( "Error creating mbean " + objectName, ex);
@@ -182,7 +200,7 @@ public class MbeansSource extends ModelerSource
                                   Node descN, String objectName ) {
         String attName=DomUtil.getAttribute(descN, "name");
         String value=DomUtil.getAttribute(descN, "value");
-        String type=DomUtil.getAttribute(descN, "type");
+        String type=null; // DomUtil.getAttribute(descN, "type");
         if( value==null ) {
             // The value may be specified as CDATA
             value=DomUtil.getContent(descN);
@@ -192,8 +210,18 @@ public class MbeansSource extends ModelerSource
                 log.debug("Set attribute " + objectName + " " + attName +
                         " " + value);
             ObjectName oname=new ObjectName(objectName);
-            Object valueO=getValueObject( value, type);
-            server.setAttribute(oname, new Attribute(attName, valueO));
+            // find the type
+            MBeanInfo info=server.getMBeanInfo(oname);
+            MBeanAttributeInfo attInfo[]=info.getAttributes();
+            for( int i=0; i<attInfo.length; i++ ) {
+                if( attName.equals(attInfo[i].getName())) {
+                    type=attInfo[i].getType();
+                    Object valueO=getValueObject( value, type);
+                    server.setAttribute(oname, new Attribute(attName, valueO));
+                    return;
+                }
+            }
+            log.info("Can't find attribute " + objectName + " " + attName );
         } catch( Exception ex) {
             log.error("Error processing attribute " + objectName + " " +
                     attName + " " + value, ex);

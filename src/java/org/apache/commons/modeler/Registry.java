@@ -313,22 +313,65 @@ public final class Registry {
     public void loadDescriptors( String sourceType, Object source, String param)
         throws Exception
     {
+        List mbeans=load( sourceType, source, param );
+        if( mbeans == null) return;
+        Iterator itr=mbeans.iterator();
+        while( itr.hasNext() ) {
+            Object mb=itr.next();
+            if( mb instanceof ManagedBean) {
+                addManagedBean((ManagedBean)mb);
+            }
+        }
+    }
+
+    public List load( String sourceType, Object source, String param)
+        throws Exception
+    {
         if( log.isTraceEnabled())
-            log.trace("loadDescriptors " + source );
+            log.trace("load " + source );
+
         ModelerSource ds=getModelerSource(sourceType);
+        List mbeans=null;
 
         if( source instanceof URL ) {
             URL url=(URL)source;
             InputStream stream=url.openStream();
-            ds.loadDescriptors(this, url.toString(), param, stream);
+            mbeans=ds.loadDescriptors(this, url.toString(), param, stream);
         }
 
         if( source instanceof InputStream ) {
-            ds.loadDescriptors(this, null, param, source);
+            mbeans=ds.loadDescriptors(this, null, param, source);
         }
 
         if( source instanceof Class ) {
-            ds.loadDescriptors(this, ((Class)source).getName(), param, source);
+            mbeans=ds.loadDescriptors(this, ((Class)source).getName(), param, source);
+        }
+        return mbeans;
+    }
+
+    public void invoke( List mbeans, String operation, boolean failFirst )
+            throws Throwable
+    {
+        if( mbeans==null ) return;
+        Iterator itr=mbeans.iterator();
+        while(itr.hasNext()) {
+            Object current=itr.next();
+            ObjectName oN=null;
+            try {
+                if( current instanceof ObjectName) {
+                    oN=(ObjectName)current;
+                }
+                if( current instanceof String ) {
+                    oN=new ObjectName( (String)current );
+                }
+                if( oN==null ) continue;
+                getMBeanServer().invoke(oN, operation,
+                        new Object[] {}, new String[] {});
+
+            } catch( Throwable t ) {
+                if( failFirst ) throw t;
+                log.info("Error initializing " + current);
+            }
         }
     }
 
