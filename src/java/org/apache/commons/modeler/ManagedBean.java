@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ManagedBean.java,v 1.7 2003/04/07 06:45:02 costin Exp $
- * $Revision: 1.7 $
- * $Date: 2003/04/07 06:45:02 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/ManagedBean.java,v 1.8 2003/04/15 18:19:12 costin Exp $
+ * $Revision: 1.8 $
+ * $Date: 2003/04/15 18:19:12 $
  *
  * ====================================================================
  *
@@ -86,7 +86,7 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.7 $ $Date: 2003/04/07 06:45:02 $
+ * @version $Revision: 1.8 $ $Date: 2003/04/15 18:19:12 $
  */
 
 public class ManagedBean implements java.io.Serializable
@@ -394,11 +394,25 @@ public class ManagedBean implements java.io.Serializable
 
         // Load the ModelMBean implementation class
         Class clazz = null;
+        Exception ex = null;
         try {
             clazz = Class.forName(getClassName());
         } catch (Exception e) {
+        }
+      
+        if( clazz==null ) {  
+            try {
+                ClassLoader cl= Thread.currentThread().getContextClassLoader();
+                if ( cl != null)
+                    clazz= cl.loadClass(getClassName());
+            } catch (Exception e) {
+                ex=e;
+            }
+        }
+
+        if( clazz==null) { 
             throw new MBeanException
-                (e, "Cannot load ModelMBean class " + getClassName());
+                (ex, "Cannot load ModelMBean class " + getClassName());
         }
 
         // Create a new ModelMBean instance
