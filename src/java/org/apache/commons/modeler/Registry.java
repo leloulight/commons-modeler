@@ -334,24 +334,35 @@ public final class Registry {
 
     // -------------------- Instance registration  --------------------
 
+    public void registerComponent(Object bean, String domain, String type,
+                                  String name)
+            throws Exception
+    {
+        StringBuffer sb=new StringBuffer();
+        sb.append( domain ).append(":");
+        sb.append( name );
+        String nameStr=sb.toString();
+        ObjectName oname=new ObjectName( nameStr );
+        registerComponent(bean, oname, type );
+    }
+
     /** Main registration method
      *
      * If the metadata is not found, introspection will be used to generate
      * it automatically.
      *
      */
-    public void registerComponent(Object bean, String domain, String type,
-                                  String name)
+    public void registerComponent(Object bean, ObjectName oname, String type)
            throws Exception
     {
+
         if( bean ==null ) {
-            log.error("Null component " + name );
+            log.error("Null component " + oname );
             return;
         }
-        String nameStr=null;
         try {
             if( type==null ) {
-                // XXX find type from bean name.
+                type=bean.getClass().getName();
             }
             ManagedBean managed = registry.findManagedBean(type);
             if( managed==null ) {
@@ -372,11 +383,6 @@ public final class Registry {
 
             // The real mbean is created and registered
             ModelMBean mbean = managed.createMBean(bean);
-            StringBuffer sb=new StringBuffer();
-            sb.append( domain ).append(":");
-            sb.append( name );
-            nameStr=sb.toString();
-            ObjectName oname=new ObjectName( nameStr );
 
             if(  getMBeanServer().isRegistered( oname )) {
                 if( log.isDebugEnabled())
@@ -386,7 +392,7 @@ public final class Registry {
 
             getMBeanServer().registerMBean( mbean, oname);
         } catch( Exception ex) {
-            log.error("Error registering " + nameStr, ex );
+            log.error("Error registering " + oname, ex );
             throw ex;
         }
     }
