@@ -11,23 +11,8 @@ base.path=/usr/share/java
 #base.path=../repository
 
 # --------------------------------------------------
-#                REQUIRED LIBRARIES
+#                OPTIONAL LIBRARIES
 # --------------------------------------------------
-
-
-# ----- Commons Beanutils, version 1.4 or later -----
-commons-beanutils.home=${base.path}/commons-beanutils-1.6.1
-commons-beanutils.lib=${commons-beanutils.home}
-commons-beanutils.jar=${commons-beanutils.lib}/commons-beanutils.jar
-commons-beanutils.loc=http://www.apache.org/dist/jakarta/commons/beanutils/binaries/commons-beanutils-1.6.1.tar.gz
-
-
-# ----- Commons Collections, version 2.0 or later -----
-commons-collections.home=${base.path}/commons-collections-2.1
-commons-collections.lib=${commons-collections.home}
-commons-collections.jar=${commons-collections.lib}/commons-collections.jar
-commons-collections.loc=http://www.apache.org/dist/jakarta/commons/collections/binaries/collections-2.1.tar.gz
-
 
 # ----- Commons Digester, version 1.4 or later -----
 commons-digester.home=${base.path}/commons-digester-1.4.1
@@ -35,6 +20,9 @@ commons-digester.lib=${commons-digester.home}
 commons-digester.jar=${commons-digester.lib}/commons-digester.jar
 commons-digester.loc=http://www.apache.org/dist/jakarta/commons/digester/binaries/commons-digester-1.4.1.tar.gz
 
+# --------------------------------------------------
+#                REQUIRED LIBRARIES
+# --------------------------------------------------
 
 # ----- Commons Logging, version 1.0.1 or later -----
 commons-logging.home=${base.path}/commons-logging-1.0.3

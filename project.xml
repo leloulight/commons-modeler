@@ -25,16 +25,6 @@
   <dependencies>
 
     <dependency>
-      <id>commons-beanutils</id>
-      <version>SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <id>commons-collections</id>
-      <version>2.0</version>
-    </dependency>
-
-    <dependency>
       <id>commons-digester</id>
       <version>1.2</version>
     </dependency>

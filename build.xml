@@ -3,7 +3,7 @@
 
 <!--
         "Modeler" component of the Jakarta Commons Subproject
-        $Id: build.xml,v 1.18 2003/04/20 20:37:05 costin Exp $
+        $Id: build.xml,v 1.19 2003/07/23 20:41:02 dims Exp $
 -->
 
 
@@ -25,8 +25,6 @@
   <property name="junit.home"              value="${base.path}/junit3.7"/>
   <property name="commons.home"            location="../../jakarta-commons"/>
   <property name="sandbox.home"            location="../../jakarta-commons-sandbox"/>
-  <property name="beanutils.home"          value="${commons.home}/beanutils"/>
-  <property name="collections.home"        value="${commons.home}/collections"/>
   <property name="digester.home"           value="${commons.home}/digester"/>
   <property name="jmx.home"                value="${base.path}/jmx-ri_1.0.1/jmx"/>
   <property name="logging.home"            value="${commons.home}/logging"/>
@@ -41,8 +39,6 @@
   <property name="jaxp.xalan.jar"          value="${jaxp.home}/xalan.jar"/>
   <property name="jmx.jar"                 value="${jmx.home}/lib/jmxri.jar"/>
   <property name="junit.jar"               value="${junit.home}/junit.jar"/>
-  <property name="commons-beanutils.jar"   value="${beanutils.home}/dist/commons-beanutils.jar"/>
-  <property name="commons-collections.jar" value="${collections.home}/dist/commons-collections.jar"/>
   <property name="commons-digester.jar"    value="${digester.home}/dist/commons-digester.jar"/>
   <property name="commons-logging.jar"     value="${logging.home}/target/commons-logging.jar"/>
 
@@ -95,8 +91,6 @@
     <pathelement location="${jaxp.jaxp.jar}"/>
     <pathelement location="${jaxp.parser.jar}"/>
     <pathelement location="${jaxp.xalan.jar}"/>
-    <pathelement location="${commons-beanutils.jar}"/>
-    <pathelement location="${commons-collections.jar}"/>
     <pathelement location="${commons-digester.jar}"/>
     <pathelement location="${commons-logging.jar}"/>
     <pathelement location="${jmx.jar}"/>
@@ -114,8 +108,6 @@
     <pathelement location="${jaxp.jaxp.jar}"/>
     <pathelement location="${jaxp.parser.jar}"/>
     <pathelement location="${jaxp.xalan.jar}"/>
-    <pathelement location="${commons-beanutils.jar}"/>
-    <pathelement location="${commons-collections.jar}"/>
     <pathelement location="${commons-digester.jar}"/>
     <pathelement location="${commons-logging.jar}"/>
     <pathelement location="${jmx.jar}"/>
@@ -160,6 +152,7 @@
 
   <target name="compile-only" >
     <available property="ant16.available"  classname="org.apache.tools.ant.PropertyHelper" />
+    <available property="digester.available"  classname="org.apache.commons.digester.Digester" />
 
     <javac  srcdir="${source.home}"
            destdir="${build.home}/classes"
@@ -168,6 +161,7 @@
           optimize="${compile.optimize}">
       <classpath refid="compile.classpath"/>
       <exclude name="org/apache/commons/modeler/ant/*PropertyHelper.java" unless="ant16.available" />
+      <exclude name="org/apache/commons/modeler/modules/MbeansDescriptorsDigesterSource.java" unless="digester.available" />
     </javac>
     <copy    todir="${build.home}/classes" filtering="on">
       <fileset dir="${source.home}"
@@ -416,16 +410,6 @@
     <antcall target="downloadgz">
       <param name="sourcefile" value="${commons-digester.loc}"/>
       <param name="destfile" value="${commons-digester.jar}"/>
-    </antcall>
-
-    <antcall target="downloadgz">
-      <param name="sourcefile" value="${commons-beanutils.loc}"/>
-      <param name="destfile" value="${commons-beanutils.jar}"/>
-    </antcall>
-
-    <antcall target="downloadgz">
-      <param name="sourcefile" value="${commons-collections.loc}"/>
-      <param name="destfile" value="${commons-collections.jar}"/>
     </antcall>
 
     <antcall target="downloadgz">
