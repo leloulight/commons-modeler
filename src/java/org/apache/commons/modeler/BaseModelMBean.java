@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.6 2002/11/05 19:10:19 costin Exp $
- * $Revision: 1.6 $
- * $Date: 2002/11/05 19:10:19 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.7 2002/11/12 22:48:40 costin Exp $
+ * $Revision: 1.7 $
+ * $Date: 2002/11/12 22:48:40 $
  *
  * ====================================================================
  *
@@ -125,7 +125,7 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.6 $ $Date: 2002/11/05 19:10:19 $
+ * @version $Revision: 1.7 $ $Date: 2002/11/12 22:48:40 $
  */
 
 public class BaseModelMBean implements ModelMBean {
@@ -170,6 +170,12 @@ public class BaseModelMBean implements ModelMBean {
 
     }
 
+    public BaseModelMBean( String type )
+        throws MBeanException, RuntimeOperationsException
+    {
+        super();
+        setModeledType(type);
+    }
 
     // ----------------------------------------------------- Instance Variables
 
@@ -1113,6 +1119,36 @@ public class BaseModelMBean implements ModelMBean {
 
     }
 
+    // --------------------  BaseModelMBean methods --------------------
+
+    /** Set the type of the mbean. This is used as a key to locate
+     * the description in the Registry.
+     *
+     * @param type the type of classname of the modeled object
+     */
+    public void setModeledType( String type ) {
+        try {
+            Registry reg=Registry.getRegistry();
+            ManagedBean descriptor=reg.findManagedBean(type);
+
+            if( descriptor != null ) {
+                System.out.println("Using descriptor " + type);
+                this.setModelMBeanInfo( descriptor.createMBeanInfo());
+                return;
+            }
+
+            // Maybe it's a real class name. Use introspection
+            Class c=Class.forName( type);
+            resource = c.newInstance();
+            System.out.println("Introspecting " + type);
+            descriptor=reg.createManagedBean(null, c, type);
+
+            this.setModelMBeanInfo(descriptor.createMBeanInfo());
+        } catch( Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     // ------------------------------------------------------ Protected Methods
 
 
@@ -1126,7 +1162,6 @@ public class BaseModelMBean implements ModelMBean {
                                           null, null, null, null));
 
     }
-
 
     /**
      * Is the specified <code>ModelMBeanInfo</code> instance valid?
