@@ -1,0 +1,24 @@
+                      Release Plan for Jakarta Commons Modeler 1.1                                            ============================================
+
+
+Introduction:
+------------
+
+This document is a release plan for the final release of Jakarta
+Commons Modeler 1.1.  The 1.1-M1 release has been available for
+several weeks now, with no bugs reported against it.  A final
+stable release is desired for Tomcat 5.
+
+The release notes are in this directory's RELEASE-NOTES-1.1.txt
+file.
+
+This Release Plan the following prospective target dates:
+
+  2003-07-29: commons-dev vote on this Release Plan
+
+Assuming this plan is approved by committer majority:
+  2003-08-03: Code freeze for modeler 1.1
+  2003-08-04: Modeler 1.1 final build built and tagged in CVS
+
+This release plan is subject should change should bugs be
+reported against the 1.1-M1 release of Modeler.
