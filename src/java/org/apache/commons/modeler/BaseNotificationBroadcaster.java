@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseNotificationBroadcaster.java,v 1.1 2002/04/30 20:58:51 craigmcc Exp $
- * $Revision: 1.1 $
- * $Date: 2002/04/30 20:58:51 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseNotificationBroadcaster.java,v 1.2 2002/06/15 18:17:02 craigmcc Exp $
+ * $Revision: 1.2 $
+ * $Date: 2002/06/15 18:17:02 $
  *
  * ====================================================================
  *
@@ -76,13 +76,13 @@ import javax.management.NotificationListener;
 
 
 /**
- * <p>Implementation of <code>NotificationBroadcaster</p> for attribute change
- * notifications.  This class is used by <code>BaseModelMBean</code> to
+ * <p>Implementation of <code>NotificationBroadcaster</code> for attribute
+ * change notifications.  This class is used by <code>BaseModelMBean</code> to
  * handle notifications of attribute change events to interested listeners.
  *</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.1 $ $Date: 2002/04/30 20:58:51 $
+ * @version $Revision: 1.2 $ $Date: 2002/06/15 18:17:02 $
  */
 
 public class BaseNotificationBroadcaster implements NotificationBroadcaster {
