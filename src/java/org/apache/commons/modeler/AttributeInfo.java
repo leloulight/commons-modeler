@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/AttributeInfo.java,v 1.4 2003/01/23 19:42:03 craigmcc Exp $
- * $Revision: 1.4 $
- * $Date: 2003/01/23 19:42:03 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/AttributeInfo.java,v 1.5 2003/02/03 21:42:32 costin Exp $
+ * $Revision: 1.5 $
+ * $Date: 2003/02/03 21:42:32 $
  *
  * ====================================================================
  *
@@ -76,7 +76,7 @@ import java.io.Serializable;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.4 $ $Date: 2003/01/23 19:42:03 $
+ * @version $Revision: 1.5 $ $Date: 2003/02/03 21:42:32 $
  */
 
 public class AttributeInfo extends FeatureInfo implements Serializable {
@@ -255,7 +255,7 @@ public class AttributeInfo extends FeatureInfo implements Serializable {
         // Create and return a new information object
         info = new ModelMBeanAttributeInfo
             (getName(), getType(), getDescription(),
-             isReadable(), isWriteable(), isIs());
+             isReadable(), isWriteable(), false);
         Descriptor descriptor = info.getDescriptor();
         if (getDisplayName() != null)
             descriptor.setField("displayName", getDisplayName());
