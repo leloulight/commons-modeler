@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.21 2003/04/16 06:00:51 costin Exp $
- * $Revision: 1.21 $
- * $Date: 2003/04/16 06:00:51 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.22 2003/04/17 04:31:36 costin Exp $
+ * $Revision: 1.22 $
+ * $Date: 2003/04/17 04:31:36 $
  *
  * ====================================================================
  *
@@ -119,7 +119,7 @@ import javax.management.DynamicMBean;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.21 $ $Date: 2003/04/16 06:00:51 $
+ * @version $Revision: 1.22 $ $Date: 2003/04/17 04:31:36 $
  */
 
 public class BaseModelMBean implements ModelMBean, MBeanRegistration {
@@ -528,6 +528,12 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
         else if (signature.equals(Short.TYPE.getName()))
             return Short.TYPE;
         else {
+            try {
+                ClassLoader cl=Thread.currentThread().getContextClassLoader();
+                if( cl!=null )
+                    return cl.loadClass(signature); 
+            } catch( ClassNotFoundException e ) {
+            }
             try {
                 return Class.forName(signature);
             } catch (ClassNotFoundException e) {
@@ -1359,7 +1365,7 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
     }
 
     // -------------------- Registration  --------------------
-    // XXX We can add some method patterns here - like setName() and
+    // XXX We can add some method patterns here- like setName() and
     // setDomain() for code that doesn't implement the Registration
 
     public ObjectName preRegister(MBeanServer server,
