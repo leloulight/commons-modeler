@@ -39,7 +39,7 @@ JavaDocs</a> for the Modeler package.</p>
 
 <section name="Documentation">
 
-<p>The <a href="http://jakarta.apache.org/commons/modeler/RELEASE-NOTES.txt">
+<p>The <a href="http://jakarta.apache.org/commons/modeler/RELEASE-NOTES-1.1.txt">
 Release Notes</a> document the new features and bug fixes that have been
 included in this release.</p>
 
@@ -52,6 +52,7 @@ JavaDoc API documents</a> for the current version are available online.</p>
 <section name="Releases">
 
 <ul>
+<li><a href="http://www.apache.org/dist/jakarta/commons/modeler">Version 1.1</a></li>
 <li><a href="http://jakarta.apache.org/builds/jakarta-commons/release/commons-modeler/v1.0/">Version 1.0</a></li>
 </ul>
 
