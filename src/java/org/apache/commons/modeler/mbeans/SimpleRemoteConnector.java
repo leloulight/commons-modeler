@@ -209,7 +209,7 @@ public class SimpleRemoteConnector
             Iterator mbeansIt=mbeans.values().iterator();
             while( mbeansIt.hasNext()) {
                 MBeanProxy proxy=(MBeanProxy)mbeansIt.next();
-                ObjectName oname=proxy.getObjectName();
+                ObjectName oname=proxy.getJmxName();
                 Registry.getRegistry().getMBeanServer().unregisterMBean(oname);
             }
         } catch( Throwable t ) {

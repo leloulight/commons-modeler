@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.24 2003/07/21 04:43:16 craigmcc Exp $
- * $Revision: 1.24 $
- * $Date: 2003/07/21 04:43:16 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.25 2003/09/03 00:07:36 luehe Exp $
+ * $Revision: 1.25 $
+ * $Date: 2003/09/03 00:07:36 $
  *
  * ====================================================================
  *
@@ -139,7 +139,7 @@ import org.apache.commons.modeler.modules.ModelerSource;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.24 $ $Date: 2003/07/21 04:43:16 $
+ * @version $Revision: 1.25 $ $Date: 2003/09/03 00:07:36 $
  */
 
 public class BaseModelMBean implements ModelMBean, MBeanRegistration {
@@ -1339,8 +1339,16 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
         return getModelerType();
     }
 
-    public ObjectName getObjectName() {
+    public ObjectName getJmxName() {
         return oname;
+    }
+
+    public String getObjectName() {
+        if (oname != null) {
+            return oname.toString();
+        } else {
+            return null;
+        }
     }
 
     public void setRegistry(Registry registry) {
