@@ -69,10 +69,8 @@ import java.util.*;
 import javax.management.*;
 import javax.management.modelmbean.ModelMBean;
 
-import org.apache.commons.digester.Digester;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 
 /**
  * <p>Registry for MBean descriptor information.  This class implements
@@ -85,7 +83,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.9 $ $Date: 2002/11/13 06:25:32 $
+ * @version $Revision: 1.10 $ $Date: 2002/12/26 18:21:01 $
  */
 public final class Registry extends BaseRegistry {
 
@@ -267,6 +265,34 @@ public final class Registry extends BaseRegistry {
         registry.loadDescriptors( stream, "modeler" );
     }
 
+
+    /** Source for descriptor data. More sources can be added.
+     *
+     */
+    public static class DescriptorSource {
+
+        public void loadDescriptors( Registry registry, String location,
+                                     String type, InputStream stream)
+            throws Exception
+        {
+            // TODO
+        }
+    }
+
+    public void loadDescriptors( String location, String type, InputStream stream )
+        throws Exception
+    {
+        if( type==null ) type="MbeansDescriptorsDOM";
+        String moduleType=type + "Source";
+        String sourceClassName=System.getProperty("org.apache.commons.modeler.source",
+                "org.apache.commons.modeler.modules." + moduleType);
+        // "org.apache.commons.modeler.modules.MBeansDescriptorsDigesterSource")
+
+        Class c=Class.forName( sourceClassName );
+        DescriptorSource ds=(DescriptorSource)c.newInstance();
+        ds.loadDescriptors(this, location, type, stream);
+    }
+
     /**
      * Load the registry from the XML input found in the specified input
      * stream.
@@ -279,107 +305,7 @@ public final class Registry extends BaseRegistry {
     public void loadDescriptors(InputStream stream, String type)
         throws Exception
     {
-        long t1=System.currentTimeMillis();
-
-        // Create a digester to use for parsing
-        Registry registry = this;
-
-        Digester digester = new Digester();
-        digester.setNamespaceAware(false);
-        digester.setValidating(false);
-        URL url = registry.getClass().getResource
-            ("/org/apache/commons/modeler/mbeans-descriptors.dtd");
-        digester.register
-            ("-//Apache Software Foundation//DTD Model MBeans Configuration File",
-             url.toString());
-
-        // Push our registry object onto the stack
-        digester.push(registry);
-
-        // Configure the parsing rules
-        digester.addObjectCreate
-            ("mbeans-descriptors/mbean",
-             "org.apache.commons.modeler.ManagedBean");
-        digester.addSetProperties
-            ("mbeans-descriptors/mbean");
-        digester.addSetNext
-            ("mbeans-descriptors/mbean",
-             "addManagedBean",
-             "org.apache.commons.modeler.ManagedBean");
-
-        digester.addObjectCreate
-            ("mbeans-descriptors/mbean/attribute",
-             "org.apache.commons.modeler.AttributeInfo");
-        digester.addSetProperties
-            ("mbeans-descriptors/mbean/attribute");
-        digester.addSetNext
-            ("mbeans-descriptors/mbean/attribute",
-             "addAttribute",
-             "org.apache.commons.modeler.AttributeInfo");
-
-        digester.addObjectCreate
-            ("mbeans-descriptors/mbean/constructor",
-             "org.apache.commons.modeler.ConstructorInfo");
-        digester.addSetProperties
-            ("mbeans-descriptors/mbean/constructor");
-        digester.addSetNext
-            ("mbeans-descriptors/mbean/constructor",
-             "addConstructor",
-             "org.apache.commons.modeler.ConstructorInfo");
-
-        digester.addObjectCreate
-            ("mbeans-descriptors/mbean/constructor/parameter",
-             "org.apache.commons.modeler.ParameterInfo");
-        digester.addSetProperties
-            ("mbeans-descriptors/mbean/constructor/parameter");
-        digester.addSetNext
-            ("mbeans-descriptors/mbean/constructor/parameter",
-             "addParameter",
-             "org.apache.commons.modeler.ParameterInfo");
-
-        digester.addObjectCreate
-            ("mbeans-descriptors/mbean/notification",
-             "org.apache.commons.modeler.NotificationInfo");
-        digester.addSetProperties
-            ("mbeans-descriptors/mbean/notification");
-        digester.addSetNext
-            ("mbeans-descriptors/mbean/notification",
-             "addNotification",
-             "org.apache.commons.modeler.NotificationInfo");
-        digester.addCallMethod
-            ("mbeans-descriptors/mbean/notification/notification-type",
-             "addNotifType", 0);
-
-        digester.addObjectCreate
-            ("mbeans-descriptors/mbean/operation",
-             "org.apache.commons.modeler.OperationInfo");
-        digester.addSetProperties
-            ("mbeans-descriptors/mbean/operation");
-        digester.addSetNext
-            ("mbeans-descriptors/mbean/operation",
-             "addOperation",
-             "org.apache.commons.modeler.OperationInfo");
-
-        digester.addObjectCreate
-            ("mbeans-descriptors/mbean/operation/parameter",
-             "org.apache.commons.modeler.ParameterInfo");
-        digester.addSetProperties
-             ("mbeans-descriptors/mbean/operation/parameter");
-        digester.addSetNext
-             ("mbeans-descriptors/mbean/operation/parameter",
-              "addParameter",
-              "org.apache.commons.modeler.ParameterInfo");
-
-        // Process the input file to configure our registry
-        try {
-            digester.parse(stream);
-        } catch (Exception e) {
-            log.error("Error digesting Registry data", e);
-            throw e;
-        }
-        long t2=System.currentTimeMillis();
-        if( t2-t1 > 500 )
-            log.info("Loaded registry information " + ( t2 - t1 ) + " ms");
+        loadDescriptors(null, type, stream );
     }
 
     /**
@@ -389,9 +315,7 @@ public final class Registry extends BaseRegistry {
      * @param mbeanServer The new <code>MBeanServer</code> instance
      */
     public static void setServer(MBeanServer mbeanServer) {
-
         server = mbeanServer;
-
     }
 
 
