@@ -3,7 +3,7 @@
 
 <!--
         "Modeler" component of the Jakarta Commons Subproject
-        $Id: build.xml,v 1.7 2003/01/07 21:07:40 craigmcc Exp $
+        $Id: build.xml,v 1.8 2003/01/16 19:23:28 costin Exp $
 -->
 
 
@@ -158,13 +158,15 @@
 
 
   <target name="compile-only" >
+    <available property="ant16.available"  classname="org.apache.tools.ant.PropertyHelper" />
+
     <javac  srcdir="${source.home}"
            destdir="${build.home}/classes"
              debug="${compile.debug}"
        deprecation="${compile.deprecation}"
-          optimize="${compile.optimize}"
-          excludes="org/apache/commons/workflow/demo/**">
+          optimize="${compile.optimize}">
       <classpath refid="compile.classpath"/>
+      <exclude name="org/apache/commons/modeler/ant/*PropertyHelper.java" unless="ant16.available" />
     </javac>
     <copy    todir="${build.home}/classes" filtering="on">
       <fileset dir="${source.home}"
@@ -181,6 +183,12 @@
     <delete    dir="${dist.home}"/>
   </target>
 
+  <target name="init-dist" >
+    <mkdir      dir="${dist.home}"/>
+  </target>
+
+  <target name="dist-lite" depends="init-dist,compile,jar"
+          description="Dist without javadoc" />
 
   <target name="all" depends="clean,compile"
    description="Clean and compile all components"/>
@@ -212,9 +220,8 @@
     </jar>
   </target>
 
-  <target name="dist" depends="compile,javadoc,jar"
+  <target name="dist" depends="dist-lite,javadoc"
     description="Create binary distribution">
-    <mkdir      dir="${dist.home}"/>
     <copy      file="../LICENSE"
               todir="${dist.home}"/>
     <copy      file="RELEASE-NOTES.txt"
