@@ -215,6 +215,7 @@ public final class Registry {
     {
         if( type==null )
             type=bean.getName();
+
         ManagedBean managed = registry.findManagedBean(type);
 
         // Search for a descriptor in the same package
@@ -223,7 +224,7 @@ public final class Registry {
             if( log.isDebugEnabled() )
                 log.debug( "Looking for descriptor ");
 
-            findDescriptor( bean );
+            findDescriptor( bean, type );
 
             managed=findManagedBean(type);
             // TODO: check super-class
@@ -412,7 +413,13 @@ public final class Registry {
         }
         String descriptors=res + "/mbeans-descriptors.ser";
 
+        if( classLoader==null )
+            classLoader=Thread.currentThread().getContextClassLoader();
+        if( classLoader==null )
+            classLoader=this.getClass().getClassLoader();
+
         URL dURL=classLoader.getResource( descriptors );
+
 
         if( dURL == null ) {
             descriptors=res + "/mbeans-descriptors.xml";
@@ -784,9 +791,11 @@ public final class Registry {
      * @param bean
      * @return
      */
-    private boolean findDescriptor( Class beanClass ) {
-        String className=beanClass.getName();
-        String pkg=className;
+    private boolean findDescriptor( Class beanClass, String pkg ) {
+
+        if( beanClass!=null ) {
+            pkg=beanClass.getName();
+        }
         while( pkg.indexOf( ".") > 0 ) {
             int lastComp=pkg.lastIndexOf( ".");
             if( lastComp <= 0 ) return false;
@@ -794,7 +803,10 @@ public final class Registry {
             if( searchedPaths.get( pkg ) != null ) {
                 return false;
             }
-            loadDescriptors(pkg, beanClass.getClassLoader());
+            if( beanClass!=null )
+                loadDescriptors(pkg, beanClass.getClassLoader());
+            else
+                loadDescriptors(pkg, null);
         }
         return false;
     }
@@ -814,4 +826,34 @@ public final class Registry {
     }
 
 
+    /** Convert a string to object, based on type. Used by several
+     * components. We could provide some pluggability.
+     * @param type
+     * @param value
+     * @return
+     */ 
+    public Object convertValue(String type, String value)
+    {
+        Object objValue=value;
+        
+        if( type==null || "java.lang.String".equals( type )) {
+            // string is default
+            objValue=value;
+        } else if( "javax.management.ObjectName".equals( type ) ||
+                "ObjectName".equals( type )) {
+            try {
+                objValue=new ObjectName( value );
+            } catch (MalformedObjectNameException e) {
+                return null;
+            }
+        } else if( "java.lang.Integer".equals( type ) ||
+                "int".equals( type )) {
+            objValue=new Integer( value );
+        } else if( "java.lang.Boolean".equals( type ) ||
+                "boolean".equals( type )) {
+            objValue=new Boolean( value );
+        }
+        return objValue;
+    }
+    
 }
