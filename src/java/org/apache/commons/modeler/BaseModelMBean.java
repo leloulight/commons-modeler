@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.20 2003/04/14 14:49:22 costin Exp $
- * $Revision: 1.20 $
- * $Date: 2003/04/14 14:49:22 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.21 2003/04/16 06:00:51 costin Exp $
+ * $Revision: 1.21 $
+ * $Date: 2003/04/16 06:00:51 $
  *
  * ====================================================================
  *
@@ -67,7 +67,6 @@ package org.apache.commons.modeler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.modeler.modules.MbeansSource;
 import org.apache.commons.modeler.modules.ModelerSource;
 
 import java.lang.reflect.InvocationTargetException;
@@ -120,7 +119,7 @@ import javax.management.DynamicMBean;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.20 $ $Date: 2003/04/14 14:49:22 $
+ * @version $Revision: 1.21 $ $Date: 2003/04/16 06:00:51 $
  */
 
 public class BaseModelMBean implements ModelMBean, MBeanRegistration {
@@ -272,7 +271,8 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
                 (new IllegalArgumentException("Attribute name is null"),
                  "Attribute name is null");
 
-        if( resource instanceof DynamicMBean ) {
+        if( (resource instanceof DynamicMBean) && 
+             ! ( resource instanceof BaseModelMBean )) {
             return ((DynamicMBean)resource).getAttribute(name);
         }
         
@@ -409,7 +409,8 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
     public Object invoke(String name, Object params[], String signature[])
         throws MBeanException, ReflectionException 
     {
-        if( resource instanceof DynamicMBean ) {
+        if( (resource instanceof DynamicMBean) && 
+             ! ( resource instanceof BaseModelMBean )) {
             return ((DynamicMBean)resource).invoke(name, params, signature);
         }
     
@@ -556,7 +557,8 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
         if( log.isDebugEnabled() )
             log.debug("Setting attribute " + this + " " + attribute );
 
-        if( resource instanceof DynamicMBean ) {
+        if( (resource instanceof DynamicMBean) && 
+             ! ( resource instanceof BaseModelMBean )) {
             try {
                 ((DynamicMBean)resource).setAttribute(attribute);
             } catch (InvalidAttributeValueException e) {
@@ -671,7 +673,8 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
     }
 
     public String toString() {
-        if( resource==null ) return "BaseModelMbean[" + resourceType + "]";
+        if( resource==null ) 
+            return "BaseModelMbean[" + resourceType + "]";
         return resource.toString();
     }
 
@@ -775,7 +778,7 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
 
         this.resource = resource;
         this.resourceType = resource.getClass().getName();
-
+        
         // Make the resource aware of the model mbean.
         try {
             Method m=resource.getClass().getMethod("setModelMBean",
@@ -1367,7 +1370,7 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
             log.debug("preRegister " + resource + " " + name );
         oname=name;
         if( resource instanceof MBeanRegistration ) {
-            oname= ((MBeanRegistration)resource).preRegister(server, name );
+            oname = ((MBeanRegistration)resource).preRegister(server, name );
         }
         return oname;
     }
