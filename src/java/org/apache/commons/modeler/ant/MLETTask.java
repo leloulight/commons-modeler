@@ -194,6 +194,7 @@ public class MLETTask extends Task {
         } else {
             server.createMBean(code, oname, argsA, sigA );
         }
+        log.debug( "Created MBEAN " + oname + " " + code);
     }
 
     public ObjectName getObjectName() {

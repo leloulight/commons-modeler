@@ -365,6 +365,8 @@ public final class Registry {
                     oN=new ObjectName( (String)current );
                 }
                 if( oN==null ) continue;
+                if( getMethodInfo(oN, operation) == null)
+                    continue;
                 getMBeanServer().invoke(oN, operation,
                         new Object[] {}, new String[] {});
 

@@ -143,20 +143,23 @@ public class JmxSet extends Task {
                  if( type==null || "java.lang.String".equals( type )) {
                      // string is default
                      objValue=value;
-                 } else if( "ObjectName".equals( type )) {
+                 } else if( "javax.management.ObjectName".equals( type ) ||
+                         "ObjectName".equals( type )) {
                      if( log.isTraceEnabled())
                         log.trace("Convert to ObjectName " + value);
                      objValue=new ObjectName( value );
-                 } else if( "int".equals( type )) {
+                 } else if( "java.lang.Integer".equals( type ) ||
+                         "int".equals( type )) {
                      objValue=new Integer( value );
-                 } else if( "boolean".equals( type )) {
+                 } else if( "java.lang.Boolean".equals( type ) ||
+                         "boolean".equals( type )) {
                      objValue=new Boolean( value );
                  }
 
             }
             if( log.isDebugEnabled())
                 log.debug("Setting " + oname + " " + attribute + " " +
-                        objValue );
+                        objValue);
             server.setAttribute(oname, new Attribute(attribute, objValue));
 
         } catch(Exception ex) {
