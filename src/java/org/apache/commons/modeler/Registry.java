@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/Registry.java,v 1.1 2002/04/30 20:58:52 craigmcc Exp $
- * $Revision: 1.1 $
- * $Date: 2002/04/30 20:58:52 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/Registry.java,v 1.3 2002/08/08 05:34:12 costin Exp $
+ * $Revision: 1.3 $
+ * $Date: 2002/08/08 05:34:12 $
  *
  * ====================================================================
  *
@@ -88,7 +88,7 @@ import org.apache.commons.logging.LogFactory;
  * synchronized.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.1 $ $Date: 2002/04/30 20:58:52 $
+ * @version $Revision: 1.3 $ $Date: 2002/08/08 05:34:12 $
  */
 
 public final class Registry {
@@ -226,7 +226,7 @@ public final class Registry {
     public synchronized static Registry getRegistry() {
 
         if (registry == null) {
-            log.info("Creating new Registry instance");
+            log.debug("Creating new Registry instance");
             registry = new Registry();
         }
         return (registry);
@@ -239,13 +239,18 @@ public final class Registry {
      * <code>MBeanServer</code> instance.
      */
     public synchronized static MBeanServer getServer() {
+        long t1=System.currentTimeMillis();
 
         if (server == null) {
-            log.info("Creating MBeanServer");
-            server = MBeanServerFactory.createMBeanServer();
+            if( MBeanServerFactory.findMBeanServer(null).size() > 0 ) {
+                server=(MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
+                log.debug("Using existing MBeanServer " + (System.currentTimeMillis() - t1 ));
+            } else {
+                server=MBeanServerFactory.createMBeanServer();
+                log.debug("Creating MBeanServer"+ (System.currentTimeMillis() - t1 ));
+            }
         }
         return (server);
-
     }
 
 
@@ -260,14 +265,13 @@ public final class Registry {
      */
     public static void loadRegistry(InputStream stream)
         throws Exception {
-
-        log.info("Loading registry information");
+        long t1=System.currentTimeMillis();
 
         // Create a digester to use for parsing
         Registry registry = getRegistry();
         Digester digester = new Digester();
         digester.setNamespaceAware(false);
-        digester.setValidating(true);
+        digester.setValidating(false); 
         URL url = registry.getClass().getResource
             ("/org/apache/commons/modeler/mbeans-descriptors.dtd");
         digester.register
@@ -358,9 +362,10 @@ public final class Registry {
             log.error("Error digesting Registry data", e);
             throw e;
         }
-
+        long t2=System.currentTimeMillis();
+        if( t2-t1 > 500 )
+            log.info("Loaded registry information " + ( t2 - t1 ) + " ms");
     }
-
 
     /**
      * Set the <code>MBeanServer</code> to be utilized for our
@@ -373,6 +378,5 @@ public final class Registry {
         server = mbeanServer;
 
     }
-
 
 }

@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+
+<document>
+
+ <properties>
+  <title>Commons</title>
+  <author email="commons-dev@jakarta.apache.org">Commons Documentation Team</author>
+ </properties>
+
+ <body>
+
+<section name="The Modeler Component">
+
+<p>Java Management Extensions (JMX) is an API that facilitates building
+management applications that can configure, and perform operations on, a
+server application.  In general, each manageable component of the server
+application is represented by a <em>Management Bean</em> (or MBean, for
+short).  JMX defines three types of MBeans, of which <em>Model MBeans</em>
+are the most flexible.  Model MBeans provide a way to define MBeans for
+many different components, without having to write a specific MBean
+implementation class for each one.</p>
+
+<p>However, this power comes at a price.  It is necessary to set up a
+substantial amount of metadata about each MBean, including the attributes
+it should expose (similar to JavaBeans properties), the operations it should
+make available (similar to calling methods of a Java object via reflection),
+and other related information.  The <em>Modeler</em> component is designed to
+make this process fairly painless -- the required metadata is configured from
+an XML description of each Model MBean to be supported.  In addition,
+Modeler provides a factory mechanism to create the actual Model MBean instances
+themselves.</p>
+
+<p>For further information, see the package description in the
+<a href="http://jakarta.apache.org/commons/modeler/docs/api/index.html">
+JavaDocs</a> for the Modeler package.</p>
+
+</section>
+
+
+<section name="Documentation">
+
+<p>The <a href="http://jakarta.apache.org/commons/modeler/RELEASE-NOTES.txt">
+Release Notes</a> document the new features and bug fixes that have been
+included in this release.</p>
+
+<p>The <a href="http://jakarta.apache.org/commons/modeler/docs/api/index.html">
+JavaDoc API documents</a> for the current version are available online.</p>
+
+</section>
+
+
+<section name="Releases">
+
+<ul>
+<li><a href="http://jakarta.apache.org/builds/jakarta-commons/release/commons-modeler/v1.0/">Version 1.0</a></li>
+</ul>
+
+</section>
+
+
+</body>
+</document>
