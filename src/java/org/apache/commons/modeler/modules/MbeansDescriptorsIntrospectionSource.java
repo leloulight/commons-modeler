@@ -108,18 +108,18 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
         for (int j = 0; j < methods.length; ++j) {
             String name=methods[j].getName();
 
-            if( name.startsWith( "get" ) ) {
-                Class params[]=methods[j].getParameterTypes();
-                if( params.length != 0 ) {
-                    if( log.isDebugEnabled())
-                        log.debug("Wrong param count " + name + " " + params.length);
-                    continue;
-                }
-                if( ! Modifier.isPublic( methods[j].getModifiers() ) ) {
-                    if( log.isDebugEnabled())
-                        log.debug("Not public " + methods[j] );
-                    continue;
-                }
+            if( Modifier.isStatic(methods[j].getModifiers()))
+                continue;
+            if( ! Modifier.isPublic( methods[j].getModifiers() ) ) {
+                if( log.isDebugEnabled())
+                    log.debug("Not public " + methods[j] );
+                continue;
+            }
+            if( methods[j].getDeclaringClass() == Object.class )
+                continue;
+            Class params[]=methods[j].getParameterTypes();
+
+            if( name.startsWith( "get" ) && params.length==0) {
                 Class ret=methods[j].getReturnType();
                 if( ! supportedType( ret ) ) {
                     if( log.isDebugEnabled() )
@@ -131,19 +131,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 getAttMap.put( name, methods[j] );
                 // just a marker, we don't use the value
                 attMap.put( name, methods[j] );
-            } else if( name.startsWith( "is" ) ) {
-                // not used in our code. Add later
-                Class params[]=methods[j].getParameterTypes();
-                if( params.length != 0 ) {
-                    if( log.isDebugEnabled())
-                        log.debug("Wrong param count " + name + " " + params.length);
-                    continue;
-                }
-                if( ! Modifier.isPublic( methods[j].getModifiers() ) ) {
-                    if( log.isDebugEnabled())
-                        log.debug("Not public " + methods[j] );
-                    continue;
-                }
+            } else if( name.startsWith( "is" ) && params.length==0) {
                 Class ret=methods[j].getReturnType();
                 if( Boolean.TYPE != ret  ) {
                     if( log.isDebugEnabled() )
@@ -156,37 +144,31 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 // just a marker, we don't use the value
                 attMap.put( name, methods[j] );
 
-            } else if( name.startsWith( "set" ) ) {
-                Class params[]=methods[j].getParameterTypes();
-                if( params.length != 1 ) {
-                    if( log.isDebugEnabled())
-                        log.debug("Wrong param count " + name + " " + params.length);
-                    continue;
-                }
+            } else if( name.startsWith( "set" ) && params.length==1) {
                 if( ! supportedType( params[0] ) ) {
                     if( log.isDebugEnabled() )
                         log.debug("Unsupported type " + methods[j] + " " + params[0]);
-                    continue;
-                }
-                if( ! Modifier.isPublic( methods[j].getModifiers() ) ) {
-                    if( log.isDebugEnabled())
-                        log.debug("Not public " + name);
                     continue;
                 }
                 name=unCapitalize( name.substring(3));
                 setAttMap.put( name, methods[j] );
                 attMap.put( name, methods[j] );
             } else {
-                if( methods[j].getParameterTypes().length != 0 ) {
-                    continue;
+                if( params.length == 0 ) {
+                    if( specialMethods.get( methods[j].getName() ) != null )
+                        continue;
+                    invokeAttMap.put( name, methods[j]);
+                } else {
+                    boolean supported=true;
+                    for( int i=0; i<params.length; i++ ) {
+                        if( ! supportedType( params[i])) {
+                            supported=false;
+                            break;
+                        }
+                    }
+                    if( supported )
+                        invokeAttMap.put( name, methods[j]);
                 }
-                if( methods[j].getDeclaringClass() == Object.class )
-                    continue;
-                if( ! Modifier.isPublic( methods[j].getModifiers() ) )
-                    continue;
-                if( specialMethods.get( methods[j].getName() ) != null )
-                    continue;
-                invokeAttMap.put( name, methods[j]);
             }
         }
     }
@@ -264,6 +246,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                     for(int i=0; i<parms.length; i++ ) {
                         ParameterInfo pi=new ParameterInfo();
                         pi.setType(parms[i].getName());
+                        pi.setName( "param" + i);
                         op.addParameter(pi);
                     }
                     mbean.addOperation(op);
