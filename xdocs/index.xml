@@ -30,34 +30,25 @@ an XML description of each Model MBean to be supported.  In addition,
 Modeler provides a factory mechanism to create the actual Model MBean instances
 themselves.</p>
 
-<p>For further information, see the package description in the
-<a href="http://jakarta.apache.org/commons/modeler/docs/api/index.html">
-JavaDocs</a> for the Modeler package.</p>
-
-</section>
-
-
-<section name="Documentation">
-
-<p>The <a href="http://jakarta.apache.org/commons/modeler/RELEASE-NOTES-1.1.txt">
-Release Notes</a> document the new features and bug fixes that have been
-included in this release.</p>
-
-<p>The <a href="http://jakarta.apache.org/commons/modeler/docs/api/index.html">
-JavaDoc API documents</a> for the current version are available online.</p>
+<p>For further information, see the 
+<a href="http://jakarta.apache.org/commons/modeler/docs/api/org/apache/commons/modeler/package-summary.html">
+package description</a> for the Modeler package.</p>
 
 </section>
 
 
 <section name="Releases">
-
-<ul>
-<li><a href="http://www.apache.org/dist/jakarta/commons/modeler">Version 1.1</a></li>
-<li><a href="http://jakarta.apache.org/builds/jakarta-commons/release/commons-modeler/v1.0/">Version 1.0</a></li>
-</ul>
-
+    <p>
+       See the <a href="downloads.html">downloads</a> page for information on obtaining releases.
+    </p>
+<br/>
 </section>
 
+<section name="Documentation">
+  <p>
+     The <a href="apidocs/index.html">JavaDoc API documents</a> are available online.
+  </p>
+</section>
 
 </body>
 </document>

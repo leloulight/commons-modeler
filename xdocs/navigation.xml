@@ -15,10 +15,15 @@
   limitations under the License.
 -->
 <!DOCTYPE org.apache.commons.menus SYSTEM '../../commons-build/menus/menus.dtd'>
-<project name="Modeler">
-  <title>Modeler</title>
-  <organizationLogo href="http://jakarta.apache.org/images/jakarta-logo.gif">Jakarta</organizationLogo>
-  <body>
-    &common-menus;
-  </body>
+<project name="Commons Modeler">
+  <title>Commons Modeler</title>
+    <body>
+        <menu name="Commons&#xA0;Modeler">
+            <item name="Overview"                      href="/index.html" />
+            <item name="API&#xA0;Documentation"        href="/apidocs/index.html"/>
+            <item name="Downloads"                     href="/downloads.html"/>
+            <item name="Wiki"                          href="http://wiki.apache.org/jakarta-commons/Modeler"/>
+        </menu>
+        &common-menus;
+    </body>
 </project>
