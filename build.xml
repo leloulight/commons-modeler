@@ -3,7 +3,7 @@
 
 <!--
         "Modeler" component of the Jakarta Commons Subproject
-        $Id: build.xml,v 1.14 2003/04/13 18:52:22 costin Exp $
+        $Id: build.xml,v 1.15 2003/04/14 01:08:29 costin Exp $
 -->
 
 
@@ -56,7 +56,7 @@
   <property name="component.title"         value="Model MBeans Support Package"/>
 
   <!-- The current version number of this component -->
-  <property name="component.version"       value="1.1-dev"/>
+  <property name="component.version"       value="1.1-M1"/>
 
   <!-- The base directory for compilation targets -->
   <property name="build.home"              value="target"/>
