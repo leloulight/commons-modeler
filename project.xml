@@ -27,7 +27,7 @@
   <description>
     Commons Modeler
   </description>
-  <logo/>
+  <logo>/images/modeler-logo-white.png</logo>
   
   <url>http://jakarta.apache.org/commons/${pom.artifactId.substring(8)}/</url>
   <package>org.apache.commons.${pom.artifactId.substring(8)}</package>
@@ -35,7 +35,7 @@
   <organization>
     <name>The Apache Software Foundation</name>
     <url>http://jakarta.apache.org</url>
-    <logo>http://jakarta.apache.org/images/original-jakarta-logo.gif</logo>
+    <logo>http://jakarta.apache.org/images/jakarta-logo.gif</logo>
   </organization>
 
   <licenses>
@@ -62,13 +62,13 @@
       <name>Commons Dev List</name>
       <subscribe>commons-dev-subscribe@jakarta.apache.org</subscribe>
       <unsubscribe>commons-dev-unsubscribe@jakarta.apache.org</unsubscribe>
-      <archive>http://nagoya.apache.org/eyebrowse/SummarizeList?listName=commons-dev@jakarta.apache.org</archive>
+      <archive>http://mail-archives.apache.org/eyebrowse/SummarizeList?listName=commons-dev@jakarta.apache.org</archive>
     </mailingList>
     <mailingList>
       <name>Commons User List</name>
       <subscribe>commons-user-subscribe@jakarta.apache.org</subscribe>
       <unsubscribe>commons-user-unsubscribe@jakarta.apache.org</unsubscribe>
-      <archive>http://nagoya.apache.org/eyebrowse/SummarizeList?listName=commons-user@jakarta.apache.org</archive>
+      <archive>http://mail-archives.apache.org/eyebrowse/SummarizeList?listName=commons-user@jakarta.apache.org</archive>
     </mailingList>
   </mailingLists>
   
