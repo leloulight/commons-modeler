@@ -1,4 +1,4 @@
-Manifest-version: 1.0
+Manifest-version: 1.1
 Extension-Name: org.apache.commons.modeler
 Specification-Vendor: Apache Software Foundation
 Specification-Version: 1.1
