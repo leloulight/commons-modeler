@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.3 2002/08/08 05:36:54 costin Exp $
- * $Revision: 1.3 $
- * $Date: 2002/08/08 05:36:54 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/BaseModelMBean.java,v 1.4 2002/10/18 15:34:09 patrickl Exp $
+ * $Revision: 1.4 $
+ * $Date: 2002/10/18 15:34:09 $
  *
  * ====================================================================
  *
@@ -123,7 +123,7 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  * </ul>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.3 $ $Date: 2002/08/08 05:36:54 $
+ * @version $Revision: 1.4 $ $Date: 2002/10/18 15:34:09 $
  */
 
 public class BaseModelMBean implements ModelMBean {
@@ -317,7 +317,7 @@ public class BaseModelMBean implements ModelMBean {
         AttributeList response = new AttributeList();
         for (int i = 0; i < names.length; i++) {
             try {
-                response.add(getAttribute(names[i]));
+                response.add(new Attribute(names[i],getAttribute(names[i])));
             } catch (Exception e) {
                 ; // Not having a particular attribute in the response
                 ; // is the indication of a getter problem
