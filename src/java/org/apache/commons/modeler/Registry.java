@@ -83,7 +83,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.10 $ $Date: 2002/12/26 18:21:01 $
+ * @version $Revision: 1.11 $ $Date: 2002/12/29 18:01:42 $
  */
 public final class Registry extends BaseRegistry {
 
@@ -286,7 +286,6 @@ public final class Registry extends BaseRegistry {
         String moduleType=type + "Source";
         String sourceClassName=System.getProperty("org.apache.commons.modeler.source",
                 "org.apache.commons.modeler.modules." + moduleType);
-        // "org.apache.commons.modeler.modules.MBeansDescriptorsDigesterSource")
 
         Class c=Class.forName( sourceClassName );
         DescriptorSource ds=(DescriptorSource)c.newInstance();
@@ -337,11 +336,16 @@ public final class Registry extends BaseRegistry {
         }
         ManagedBean managed = registry.findManagedBean(type);
         if( managed==null ) {
-            // XXX use introspection ( or check super classes ?? )
-            // I think introspection + super classes ( i.e. use descriptions, etc)
+            // TODO: check package and parent packages
+
+            // TODO: check super-class
+
+            // introspection
+            managed=createManagedBean(domain, bean.getClass(), type);
+            addManagedBean(managed);
         }
 
-        // XXX The real mbean is created and registered
+        // The real mbean is created and registered
         ModelMBean mbean = managed.createMBean(bean);
 
         if( name==null ) {

@@ -106,6 +106,9 @@ public class DomUtil {
                 name.equals( node.getNodeName() ) ) {
                 return node;
             }
+            if( name == null ) {
+                return node;
+            }
         }
         return null;
     }
@@ -148,6 +151,8 @@ public class DomUtil {
              node = node.getNextSibling()) {
             if( node.getNodeType() != type ) continue;
             //System.out.println("getNode: " + name + " " + node.getNodeName());
+            if( name==null )
+                return node;
             if( name.equals( node.getNodeName() ) ) {
                 return node;
             }

@@ -1,9 +1,13 @@
 /*
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/Main.java,v 1.1 2002/12/29 18:01:42 costin Exp $
+ * $Revision: 1.1 $
+ * $Date: 2002/12/29 18:01:42 $
+ *
  * ====================================================================
  *
  * The Apache Software License, Version 1.1
  *
- * Copyright (c) 2001-2002 The Apache Software Foundation.  All rights
+ * Copyright (c) 1999 The Apache Software Foundation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -58,62 +62,71 @@
  */
 
 
-package org.apache.commons.modeler.ant;
+package org.apache.commons.modeler;
 
 
-import java.io.*;
-import java.net.*;
-import java.lang.reflect.*;
-import java.util.*;
-import org.apache.commons.modeler.BaseRegistry;
-import org.apache.commons.modeler.ManagedBean;
-import org.apache.tools.ant.BuildException;
+import org.apache.commons.modeler.util.IntrospectionUtils;
+
+import java.io.FileInputStream;
+
 
 /**
- * Load descriptors into registry.
+ *  Small main that loads mbeans.
+ *
+ *  Requires: commons-logging-api.jar, jaxp ( including DOM ), jmx
+ *
+ *  Arguments:
+ *   -file FILE
+ *       Will load mbeans from the file
+ *   -type TYPE
+ *       Type of the mbeans file
  *
  * @author Costin Manolache
  */
-public final class RegistryTask  {
 
-    public RegistryTask() {
+public class Main
+{
+    String file;
+    String home;
+    String type="Mbeans";
+
+    public void setFile( String f ) {
+        this.file=f;
     }
 
-    String resource;
-    String file;
-    String type="MbeansDescriptorsDOM";
+    // shortcut
+    public void setF( String f ) {
+        this.file=f;
+    }
 
-    /** Set the resource type that will be loaded
-     *
-     * @param type
-     */
     public void setType( String type ) {
         this.type=type;
     }
 
-    public void setFile( String file ) {
-        this.file=file;
-    }
-
-    public void setResource( String res ) {
-        this.resource=res;
-    }
-
-    public void execute() throws Exception {
-        InputStream is=null;
-        String id=null;
-
-        if( resource != null ) {
-            is=this.getClass().getClassLoader().getResourceAsStream(resource);
-            id=resource;
-        } else if( file != null ) {
-            is=new FileInputStream( file );
-            id=file;
-        } else {
-            throw new BuildException( "Resource or file attribute required");
+    public void execute( )
+        throws Exception
+    {
+        if( home==null ) {
+            home=IntrospectionUtils.guessInstall("install.dir", "home.dir",
+                "commons-modeler.jar", "org.apache.commons.modeler.Main");
         }
 
-        BaseRegistry.getBaseRegistry().loadDescriptors( resource, is, type );
+        if( file==null ) throw new Exception( "No file, use -file file.xml");
+
+        Registry reg=Registry.getRegistry();
+
+        reg.loadDescriptors(file, type, new FileInputStream( file ));
+    }
+
+    public static void main( String args[] ) {
+        try {
+            Main main=new Main();
+            IntrospectionUtils.processArgs(main, args);
+
+            main.execute();
+        } catch( Exception ex ) {
+            ex.printStackTrace();
+        }
+
     }
 }
- 

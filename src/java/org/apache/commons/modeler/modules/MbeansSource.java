@@ -7,8 +7,7 @@ import org.apache.commons.modeler.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
+import javax.management.*;
 import java.io.InputStream;
 
 
@@ -40,6 +39,8 @@ public class MbeansSource extends Registry.DescriptorSource
 
             if( firstMbeanN==null ) {
                 // maybe we have a single mlet
+                if( log.isDebugEnabled() )
+                    log.debug("No child " + descriptorsN);
                 firstMbeanN=descriptorsN;
             }
 
@@ -50,9 +51,17 @@ public class MbeansSource extends Registry.DescriptorSource
                  mbeanN= DomUtil.getNext(mbeanN, null, Node.ELEMENT_NODE))
             {
                 String nodeName=mbeanN.getNodeName();
+
                 if( "mbean".equals(nodeName) || "MLET".equals(nodeName)) {
                     String code=DomUtil.getAttribute( mbeanN, "code" );
-                    String name=DomUtil.getAttribute( mbeanN, "name" );
+                    String objectName=DomUtil.getAttribute( mbeanN, "objectName" );
+                    if( objectName==null ) {
+                        objectName=DomUtil.getAttribute( mbeanN, "name" );
+                    }
+
+                    if( log.isDebugEnabled())
+                        log.debug( "Processing mbean objectName=" + objectName +
+                                " code=" + code);
 
                     // args can be grouped in constructor or direct childs
                     Node constructorN=DomUtil.getChild(mbeanN, "constructor");
@@ -60,32 +69,45 @@ public class MbeansSource extends Registry.DescriptorSource
 
                     processArg(constructorN);
 
+                    try {
+                        ObjectName oname=new ObjectName(objectName);
+                        server.createMBean(code, oname);
+                        // XXX Arguments, loader !!!
+                    } catch( Exception ex ) {
+                        log.error( "Error creating mbean " + objectName, ex);
+                    }
+
                     Node firstAttN=DomUtil.getChild(mbeanN, "attribute");
                     for (Node descN = firstAttN; descN != null;
                          descN = DomUtil.getNext( descN ))
                     {
-                        String attName=DomUtil.getAttribute(descN, "name");
-                        String value=DomUtil.getAttribute(descN, "value");
-                        if( value==null ) {
-                            // The value may be specified as CDATA
-                            value=DomUtil.getContent(descN);
-                        }
+                        processAttribute(server, descN, objectName);
                     }
 
-                } else if("mbeans-descriptors".equals(nodeName) ) {
-                    // TODO support descriptors fragments inside <mbeans>
                 } else if("classpath".equals(nodeName) ) {
                     // TODO support classpath ( standard )
                 } else if("jmx-attribute".equals(nodeName) ) {
-                    // Do we need this ?
+                    // <jmx-attribute objectName="..." name="..." value="..."/>
+                    String objectName=DomUtil.getAttribute(mbeanN, "objectName");
+                    processAttribute(server, mbeanN, objectName);
                 } else if("jmx-operation".equals(nodeName) ) {
-                    String name=DomUtil.getAttribute(mbeanN, "name");
+                    String name=DomUtil.getAttribute(mbeanN, "objectName");
+                    if( name==null )
+                        name=DomUtil.getAttribute(mbeanN, "name");
+
                     String operation=DomUtil.getAttribute(mbeanN, "operation");
 
-                    ObjectName oname=new ObjectName(name);
+                    if( log.isDebugEnabled())
+                        log.debug( "Processing invoke objectName=" + name +
+                                " code=" + operation);
+                    try {
+                        ObjectName oname=new ObjectName(name);
 
-                    processArg( mbeanN );
-                    server.invoke( oname, operation, null, null);
+                        processArg( mbeanN );
+                        server.invoke( oname, operation, null, null);
+                    } catch (Exception e) {
+                        log.error( "Error in invoke " + name + " " + operation);
+                    }
                 }
 
                 ManagedBean managed=new ManagedBean();
@@ -109,6 +131,44 @@ public class MbeansSource extends Registry.DescriptorSource
         } catch( Exception ex ) {
             log.error( "Error reading mbeans ", ex);
         }
+    }
+
+    private void processAttribute(MBeanServer server,
+                                  Node descN, String objectName ) {
+        String attName=DomUtil.getAttribute(descN, "name");
+        String value=DomUtil.getAttribute(descN, "value");
+        String type=DomUtil.getAttribute(descN, "type");
+        if( value==null ) {
+            // The value may be specified as CDATA
+            value=DomUtil.getContent(descN);
+        }
+        try {
+            if( log.isDebugEnabled())
+                log.debug("Set attribute " + objectName + " " + attName +
+                        " " + value);
+            ObjectName oname=new ObjectName(objectName);
+            Object valueO=getValueObject( value, type);
+            server.setAttribute(oname, new Attribute(attName, valueO));
+        } catch( Exception ex) {
+            log.error("Error processing attribute " + objectName + " " +
+                    attName + " " + value, ex);
+        }
+
+    }
+
+    // XXX We should know the type from the mbean metadata
+    private Object getValueObject( String valueS, String type )
+            throws MalformedObjectNameException
+    {
+        if( type==null )
+            return valueS;
+        if( "int".equals( type ) || "java.lang.Integer".equals(type) ) {
+            return new Integer( valueS);
+        }
+        if( "ObjectName".equals( type ) || "javax.management.ObjectName".equals(type) ) {
+            return new ObjectName( valueS);
+        }
+        return valueS;
     }
 
     private void processArg(Node mbeanN) {
