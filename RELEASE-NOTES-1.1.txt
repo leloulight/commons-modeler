@@ -1,4 +1,4 @@
-$Id: RELEASE-NOTES-1.1.txt,v 1.6 2003/07/29 00:21:27 yoavs Exp $
+$Id$
 
                           Commons Modeler Package
                                 Version 1.1

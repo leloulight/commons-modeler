@@ -92,7 +92,7 @@ import org.apache.commons.modeler.modules.ModelerSource;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.27 $ $Date: 2004/02/28 13:31:21 $
+ * @version $Revision$ $Date$
  */
 
 public class BaseModelMBean implements ModelMBean, MBeanRegistration {

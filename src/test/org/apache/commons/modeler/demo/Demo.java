@@ -48,7 +48,7 @@ import org.apache.commons.modeler.Registry;
  * manipulates the objects through the MBean interfaces.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.4 $ $Date: 2004/02/28 13:31:22 $
+ * @version $Revision$ $Date$
  */
 
 public class Demo implements NotificationListener {

@@ -28,7 +28,7 @@ import javax.management.MBeanParameterInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.7 $ $Date: 2004/02/28 13:31:21 $
+ * @version $Revision$ $Date$
  */
 
 public class ParameterInfo extends FeatureInfo implements Serializable {

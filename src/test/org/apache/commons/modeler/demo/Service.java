@@ -26,7 +26,7 @@ import java.util.HashMap;
  * based on the Catalina architecture of Tomcat 4.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.3 $ $Date: 2004/02/28 13:31:22 $
+ * @version $Revision$ $Date$
  */
 
 public class Service {

@@ -32,7 +32,7 @@ import javax.management.NotificationFilter;
  * supplied by the application.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.5 $ $Date: 2004/02/28 13:31:21 $
+ * @version $Revision$ $Date$
  */
 
 public class BaseAttributeFilter implements NotificationFilter {

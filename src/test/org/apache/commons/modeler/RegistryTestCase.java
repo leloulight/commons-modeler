@@ -38,7 +38,7 @@ import junit.framework.TestSuite;
  * <p>Test Case for the Registry class.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.9 $ $Date: 2004/02/28 13:31:22 $
+ * @version $Revision$ $Date$
  */
 
 public class RegistryTestCase extends TestCase {
