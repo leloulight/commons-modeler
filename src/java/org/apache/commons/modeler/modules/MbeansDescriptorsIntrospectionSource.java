@@ -25,6 +25,7 @@ public class MbeansDescriptorsIntrospectionSource extends Registry.DescriptorSou
         try {
             ManagedBean managed=createManagedBean(registry, null, (Class)source, type);
             if( managed==null ) return;
+            managed.setName( type );
 
             registry.addManagedBean(managed);
 

@@ -1,7 +1,7 @@
 /*
- * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/Main.java,v 1.1 2002/12/29 18:01:42 costin Exp $
- * $Revision: 1.1 $
- * $Date: 2002/12/29 18:01:42 $
+ * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//modeler/src/java/org/apache/commons/modeler/Main.java,v 1.2 2003/01/11 07:30:06 costin Exp $
+ * $Revision: 1.2 $
+ * $Date: 2003/01/11 07:30:06 $
  *
  * ====================================================================
  *
@@ -68,6 +68,8 @@ package org.apache.commons.modeler;
 import org.apache.commons.modeler.util.IntrospectionUtils;
 
 import java.io.FileInputStream;
+import java.io.File;
+import java.net.URL;
 
 
 /**
@@ -114,8 +116,10 @@ public class Main
         if( file==null ) throw new Exception( "No file, use -file file.xml");
 
         Registry reg=Registry.getRegistry();
+        File fileF=new File( file );
+        URL url=new URL("file", null, fileF.getAbsolutePath());
 
-        reg.loadDescriptors(file, type, new FileInputStream( file ));
+        reg.loadDescriptors( type, url);
     }
 
     public static void main( String args[] ) {
