@@ -84,7 +84,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
     }
 
     private static String strArray[]=new String[0];
-
+    private static ObjectName objNameArray[]=new ObjectName[0];
     // createMBean == registerClass + registerMBean
 
     private boolean supportedType( Class ret ) {
@@ -96,8 +96,9 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 ret == java.io.File.class ||
                 ret == Boolean.class ||
                 ret == Boolean.TYPE ||
-                ret == strArray.getClass() || // XXX ???
-                ret == ObjectName.class
+                ret == strArray.getClass() || 
+                ret == ObjectName.class  ||
+                ret == objNameArray.getClass()
             ;
     }
 

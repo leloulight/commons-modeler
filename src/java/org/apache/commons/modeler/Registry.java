@@ -355,6 +355,15 @@ public final class Registry {
 
     // -------------------- Loading data from different sources  --------------
 
+    /** The registry will cache the metadata. In some cases we may
+     * want to reset the cache, to allow reloading of metadata to happen.
+     * 
+     */ 
+    public void resetMetadata() {
+        descriptorsByClass = new HashMap();
+        descriptors = new HashMap();
+    }
+    
     /**
      * Load the registry from the XML input found in the specified input
      * stream.

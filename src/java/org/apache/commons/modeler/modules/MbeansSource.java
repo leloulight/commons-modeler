@@ -226,21 +226,6 @@ public class MbeansSource extends ModelerSource
 
     }
 
-    // XXX We should know the type from the mbean metadata
-    private Object getValueObject( String valueS, String type )
-            throws MalformedObjectNameException
-    {
-        if( type==null )
-            return valueS;
-        if( "int".equals( type ) || "java.lang.Integer".equals(type) ) {
-            return new Integer( valueS);
-        }
-        if( "ObjectName".equals( type ) || "javax.management.ObjectName".equals(type) ) {
-            return new ObjectName( valueS);
-        }
-        return valueS;
-    }
-
     private void processArg(Node mbeanN) {
         Node firstArgN=DomUtil.getChild(mbeanN, "arg" );
         // process all args
