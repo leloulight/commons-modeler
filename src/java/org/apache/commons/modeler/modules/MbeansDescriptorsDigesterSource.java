@@ -14,9 +14,10 @@ public class MbeansDescriptorsDigesterSource extends Registry.DescriptorSource
             LogFactory.getLog(MbeansDescriptorsDigesterSource.class);
 
     public void loadDescriptors( Registry registry, String location,
-                                 String type, InputStream stream)
+                                 String type, Object source)
             throws Exception
     {
+        InputStream stream=(InputStream)source;
         long t1=System.currentTimeMillis();
 
         Digester digester = new Digester();

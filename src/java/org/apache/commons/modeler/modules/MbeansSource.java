@@ -20,10 +20,11 @@ public class MbeansSource extends Registry.DescriptorSource
     private static Log log = LogFactory.getLog(MbeansSource.class);
 
     public void loadDescriptors( Registry registry, String location,
-                                 String type, InputStream stream)
+                                 String type, Object source)
         throws Exception
     {
         try {
+            InputStream stream=(InputStream)source;
             long t1=System.currentTimeMillis();
             Document doc=DomUtil.readXml(stream);
 
