@@ -470,7 +470,7 @@ public final class IntrospectionUtils {
     }
 
     /** Replace ${NAME} with the property value
-     *  @deprecated. Use the explicit method
+     *  @deprecated Use the explicit method
      */
     public static String replaceProperties(String value,
 					   Object getter )

@@ -83,7 +83,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
- * @version $Revision: 1.12 $ $Date: 2003/01/06 05:55:44 $
+ * @version $Revision: 1.13 $ $Date: 2003/01/07 21:07:40 $
  */
 public final class Registry extends BaseRegistry {
 
@@ -421,11 +421,11 @@ public final class Registry extends BaseRegistry {
     }
 
     /**
-     * @todo Find if the 'className' is the name of the MBean or
-     *       the real class ( I suppose first )
-     * @todo Read (optional) descriptions from a .properties, generated
-     *       from source
-     * @todo Deal with constructors
+     *  todo Find if the 'className' is the name of the MBean or
+     *       the real class ( I suppose first ).
+     *  todo Read (optional) descriptions from a .properties, generated
+     *       from source.
+     *  todo Deal with constructors.
      *
      */
     public ManagedBean createManagedBean(String domain, Class realClass,

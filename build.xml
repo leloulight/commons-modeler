@@ -3,7 +3,7 @@
 
 <!--
         "Modeler" component of the Jakarta Commons Subproject
-        $Id: build.xml,v 1.6 2002/12/20 21:37:58 costin Exp $
+        $Id: build.xml,v 1.7 2003/01/07 21:07:40 craigmcc Exp $
 -->
 
 
@@ -34,6 +34,7 @@
 
 
   <!-- The locations of necessary jar files -->
+  <property name="ant.jar"                 value="${ant.home}/lib/ant.jar"/>
   <property name="jaxp.jaxp.jar"           value="${jaxp.home}/jaxp.jar"/>
   <property name="jaxp.parser.jar"         value="${jaxp.home}/crimson.jar"/>
   <property name="jaxp.xalan.jar"          value="${jaxp.home}/xalan.jar"/>
@@ -89,6 +90,7 @@
   <!-- Construct compile classpath -->
   <path id="compile.classpath">
     <pathelement location="${build.home}/classes"/>
+    <pathelement location="${ant.jar}"/>
     <pathelement location="${jaxp.jaxp.jar}"/>
     <pathelement location="${jaxp.parser.jar}"/>
     <pathelement location="${jaxp.xalan.jar}"/>
@@ -107,6 +109,7 @@
   <path id="test.classpath">
     <pathelement location="${build.home}/classes"/>
     <pathelement location="${build.home}/tests"/>
+    <pathelement location="${ant.jar}"/>
     <pathelement location="${jaxp.jaxp.jar}"/>
     <pathelement location="${jaxp.parser.jar}"/>
     <pathelement location="${jaxp.xalan.jar}"/>

@@ -121,7 +121,7 @@ public class DomUtil {
         return attN.getNodeValue();
     }
 
-    /** Get the first child's content ( i.e. it's included TEXT node )
+    /** Get the first child's content ( ie it's included TEXT node ).
      */
     public static String getChildContent( Node parent, String name ) {
         Node first=parent.getFirstChild();
