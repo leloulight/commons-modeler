@@ -16,16 +16,16 @@
   <developers>
     <developer>
       <name>Craig McClanahan</name>
-      <id></id>
-      <email></email>
-      <organization></organization>
+      <id>craigmcc</id>
+      <email>craigmcc@apache.org</email>
+      <organization>Apache</organization>
     </developer>
 
     <developer>
       <name>Yoav Shapira</name>
-      <id></id>
+      <id>yoavs</id>
       <email>yoavs@apache.org</email>
-      <organization></organization>
+      <organization>Apache</organization>
     </developer>
   </developers>
   
