@@ -55,6 +55,9 @@
 package org.apache.commons.modeler.ant;
 
 import org.apache.tools.ant.*;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
+
 import javax.management.*;
 import javax.management.ObjectName;
 import javax.management.MBeanServer;
@@ -74,33 +77,16 @@ import java.net.URL;
  *
  */
 public class MLETTask extends Task {
-
+    private static Log log = LogFactory.getLog(MLETTask.class);
     String code;
     String archive;
     String codebase;
-    String name;
+    String objectName;
 
     Vector args;
 
     // ant specific
     String loaderRef; // class loader ref
-
-
-    public static class Arg {
-        String type;
-        String value;
-
-        public Arg() {
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-    }
 
     public MLETTask() {
     }
@@ -124,7 +110,7 @@ public class MLETTask extends Task {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.objectName = name;
     }
 
     public void execute() throws BuildException {
@@ -139,16 +125,17 @@ public class MLETTask extends Task {
                     server=MBeanServerFactory.createMBeanServer();
                     MLet mlet=new MLet( new URL[0], this.getClass().getClassLoader());
                     server.registerMBean(mlet, defaultLoader);
-                    System.out.println("Creating mbean server and loader "+ mlet +
-                            " " + this.getClass().getClassLoader());
+                    if( log.isDebugEnabled())
+                        log.debug("Creating mbean server and loader "+ mlet +
+                                " " + this.getClass().getClassLoader());
                 }
                 project.addReference("jmx.server", server);
                 // Create the MLet object
             }
 
-            System.out.println("Using Mserver " + server );
+            if( log.isDebugEnabled()) log.debug("Using Mserver " + server );
 
-            ObjectName oname=new ObjectName( name );
+            ObjectName oname=new ObjectName( objectName );
             if( args==null ) {
                 // XXX Use the loader ref, if any
                 server.createMBean(code, oname, defaultLoader);
@@ -160,8 +147,8 @@ public class MLETTask extends Task {
                     Arg arg=(Arg)args.elementAt(i);
                     if( arg.type==null )
                         arg.type="java.lang.String";
-                    sigA[i]=arg.type;
-                    argsA[i]=arg.value;
+                    sigA[i]=arg.getType();
+                    argsA[i]=arg.getValue();
                     // XXX Deal with not string types - IntrospectionUtils
                 }
                 server.createMBean(code, oname, defaultLoader, argsA, sigA );
