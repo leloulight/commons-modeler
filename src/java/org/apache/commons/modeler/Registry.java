@@ -108,6 +108,9 @@ public final class Registry {
      */
     private HashMap descriptors = new HashMap();
 
+    /** List of managed byeans, keyed by class name
+     */
+    private HashMap descriptorsByClass = new HashMap();
 
     // ----------------------------------------------------------- Constructors
 
@@ -148,6 +151,9 @@ public final class Registry {
         // called from digester
         // XXX Use group + name
         descriptors.put(bean.getName(), bean);
+        if( bean.getType() != null ) {
+            descriptorsByClass.put( bean.getType(), bean );
+        }
     }
 
 
@@ -160,7 +166,10 @@ public final class Registry {
      * XXX Group ?? Use Group + Type
      */
     public ManagedBean findManagedBean(String name) {
-        return ((ManagedBean) descriptors.get(name));
+        ManagedBean mb=((ManagedBean) descriptors.get(name));
+        if( mb==null )
+            mb=(ManagedBean)descriptorsByClass.get(name);
+        return mb;
     }
 
 
@@ -211,6 +220,7 @@ public final class Registry {
      */
     public void removeManagedBean(ManagedBean bean) {
         descriptors.remove(bean.getName());
+        descriptorsByClass.remove( bean.getType());
     }
 
     // -------------------- Access the mbean server  --------------------
@@ -303,7 +313,8 @@ public final class Registry {
     public void loadDescriptors( String sourceType, Object source, String param)
         throws Exception
     {
-        log.trace("loadDescriptors " + source );
+        if( log.isDebugEnabled())
+            log.debug("loadDescriptors " + source, new Throwable() );
         ModelerSource ds=getModelerSource(sourceType);
 
         if( source instanceof URL ) {
@@ -363,13 +374,13 @@ public final class Registry {
             nameStr=sb.toString();
             ObjectName oname=new ObjectName( nameStr );
 
-            if(  getServer().isRegistered( oname )) {
+            if(  getMBeanServer().isRegistered( oname )) {
                 if( log.isDebugEnabled())
                     log.debug("Unregistering existing component " + oname );
-                getServer().unregisterMBean( oname );
+                getMBeanServer().unregisterMBean( oname );
             }
 
-            getServer().registerMBean( mbean, oname);
+            getMBeanServer().registerMBean( mbean, oname);
         } catch( Exception ex) {
             log.error("Error registering " + nameStr, ex );
             throw ex;
@@ -381,7 +392,7 @@ public final class Registry {
             ObjectName oname=new ObjectName( domain + ":" + name );
 
             // XXX remove from our tables.
-            getServer().unregisterMBean( oname );
+            getMBeanServer().unregisterMBean( oname );
         } catch( Throwable t ) {
             log.error( "Error unregistering mbean ", t );
         }
@@ -459,6 +470,8 @@ public final class Registry {
 
     // -------------------- Implementation methods  --------------------
 
+    private HashMap searchedPaths=new HashMap();
+
     /** Lookup the component descriptor in the package and
      * in the parent packages.
      *
@@ -468,23 +481,37 @@ public final class Registry {
     private boolean findDescriptor( Object bean ) {
         String className=bean.getClass().getName();
         String res=className.replace( '.', '/');
-        int lastComp=res.lastIndexOf( "/");
-        if( lastComp <= 0 ) return false;
+        while( className.indexOf( "/") > 0 ) {
+            int lastComp=res.lastIndexOf( "/");
+            if( lastComp <= 0 ) return false;
 
-        String packageName=res.substring(0, lastComp);
-        String descriptors=packageName + "/mbeans-descriptors.xml";
-        if( log.isDebugEnabled() )
-            log.debug( "Finding " + descriptors );
-
-        URL dURL=bean.getClass().getClassLoader().getResource( descriptors );
-        if( dURL == null )
-            return false;
-
-        log.info( "Found " + dURL);
-        try {
-            loadDescriptors("MbeansDescriptorsDOMSource", dURL, null);
-        } catch(Exception ex ) {
-            log.error("Error loading " + dURL);
+            String packageName=res.substring(0, lastComp);
+            if( searchedPaths.get( packageName ) != null ) {
+                return false;
+            }
+            String descriptors=packageName + "/mbeans-descriptors.ser";
+            if( log.isDebugEnabled() )
+                log.debug( "Finding " + descriptors );
+            URL dURL=bean.getClass().getClassLoader().getResource( descriptors );
+            if( dURL == null ) {
+                descriptors=packageName + "/mbeans-descriptors.xml";
+                dURL=bean.getClass().getClassLoader().getResource( descriptors );
+                if( dURL == null ) {
+                    className=packageName;
+                    continue;
+                }
+            }
+            log.info( "Found " + dURL);
+            searchedPaths.put( descriptors,  dURL );
+            try {
+                if( descriptors.endsWith(".xml" ))
+                    loadDescriptors("MbeansDescriptorsDOMSource", dURL, null);
+                else
+                    loadDescriptors("MbeansDescriptorsSerSource", dURL, null);
+                return true;
+            } catch(Exception ex ) {
+                log.error("Error loading " + dURL);
+            }
         }
 
         return false;
