@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.EOFException;
+import java.net.URL;
 
 
 public class MbeansDescriptorsSerSource extends Registry.DescriptorSource
@@ -22,19 +23,29 @@ public class MbeansDescriptorsSerSource extends Registry.DescriptorSource
     {
         long t1=System.currentTimeMillis();
         try {
-            InputStream stream=(InputStream)source;
+            InputStream stream=null;
+            if( source instanceof URL ) {
+                stream=((URL)source).openStream();
+            }
+            if( source instanceof InputStream ) {
+                stream=(InputStream)source;
+            }
+            if( stream==null ) {
+                throw new Exception( "Can't process "+ source);
+            }
             ObjectInputStream ois=new ObjectInputStream(stream);
+            Thread.currentThread().setContextClassLoader(ManagedBean.class.getClassLoader());
             Object obj=ois.readObject();
-            log.info("Reading " + obj);
+            //log.info("Reading " + obj);
             ManagedBean beans[]=(ManagedBean[])obj;
             // after all are read without error
-            Thread.currentThread().setContextClassLoader(ManagedBean.class.getClassLoader());
             for( int i=0; i<beans.length; i++ ) {
                 registry.addManagedBean(beans[i]);
             }
 
         } catch( Exception ex ) {
-            log.error( "Error reading descriptors " +  ex.toString());
+            log.error( "Error reading descriptors " + source + " " +  ex.toString(),
+                    ex);
             throw ex;
         }
         long t2=System.currentTimeMillis();
