@@ -389,7 +389,7 @@ public class ManagedBean implements java.io.Serializable
         // Set the managed resource (if any)
         try {
             if (instance != null)
-                mbean.setManagedResource(instance, "objectReference");
+                mbean.setManagedResource(instance, "ObjectReference");
         } catch (InstanceNotFoundException e) {
             throw e;
         } catch (InvalidTargetObjectTypeException e) {
