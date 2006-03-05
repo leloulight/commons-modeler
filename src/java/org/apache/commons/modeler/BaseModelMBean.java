@@ -394,7 +394,8 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
                  "Method name is null");
 
         if( log.isDebugEnabled()) log.debug("Invoke " + name);
-        Method method=(Method)invokeAttMap.get(name);
+	MethodKey mkey = new MethodKey(name, signature);
+        Method method=(Method)invokeAttMap.get(mkey);
         if( method==null ) {
             if (params == null)
                 params = new Object[0];
@@ -444,7 +445,7 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
                                               "Cannot find method " + name +
                                               " with this signature");
             }
-            invokeAttMap.put( name, method );
+            invokeAttMap.put( mkey, method );
         }
 
         // Invoke the selected method on the appropriate object
@@ -1376,5 +1377,41 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
         if( resource instanceof MBeanRegistration ) {
             ((MBeanRegistration)resource).postDeregister();
         }
+    }
+
+    static class MethodKey {
+	private String name;
+	private String[] signature;
+
+	MethodKey(String name, String[] signature) {
+	    this.name = name;
+	    if(signature == null) {
+		signature = new String[0];
+	    }
+	    this.signature = signature;
+	}
+
+	public boolean equals(Object other) {
+	    if(!(other instanceof MethodKey)) {
+		return false;
+	    }
+	    MethodKey omk = (MethodKey)other;
+	    if(!name.equals(omk.name)) {
+		return false;
+	    }
+	    if(signature.length != omk.signature.length) {
+		return false;
+	    }
+	    for(int i=0; i < signature.length; i++) {
+		if(!signature[i].equals(omk.signature[i])) {
+		    return false;
+		}
+	    }
+	    return true;
+	}
+
+	public int hashCode() {
+	    return name.hashCode();
+	}
     }
 }
