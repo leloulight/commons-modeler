@@ -569,16 +569,10 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
         if (attrDesc == null)
             throw new AttributeNotFoundException("Cannot find attribute " + name + " descriptor");
 
-        try {
-            // XXX Is it before or after ?
-            Object oldValue=null;
-            if( getAttMap.get(name) != null )
-                oldValue=getAttribute( name );
-            sendAttributeChangeNotification(new Attribute( name, oldValue),
-                    attribute);
-        } catch( Exception ex ) {
-            log.error( "Error sending notification " + name, ex );
-        }
+        Object oldValue=null;
+        if( getAttMap.get(name) != null )
+            oldValue=getAttribute( name );
+
 
         // Extract the method from cache
         Method m=(Method)setAttMap.get( name );
@@ -644,7 +638,12 @@ public class BaseModelMBean implements ModelMBean, MBeanRegistration {
             throw new MBeanException
                 (e, "Exception invoking method " + name);
         }
-
+        try {
+            sendAttributeChangeNotification(new Attribute( name, oldValue),
+                    attribute);
+        } catch(Exception ex) {
+            log.error("Error sending notification " + name, ex);
+        }
         attributes.put( name, value );
         if( source != null ) {
             // this mbean is asscoiated with a source - maybe we want to persist
