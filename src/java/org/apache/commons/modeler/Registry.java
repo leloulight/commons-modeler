@@ -505,7 +505,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * @deprecated Use the instance method
      */
     public static void setServer(MBeanServer mbeanServer) {
-        Registry.getRegistry().setServer(mbeanServer);
+        Registry.getRegistry().setMBeanServer(mbeanServer);
     }
 
     /**
