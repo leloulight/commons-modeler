@@ -18,9 +18,10 @@
 -->
 <project>
   <pomVersion>3</pomVersion>
-  
+
   <name>Modeler</name>
   <groupId>commons-modeler</groupId>
+  <artifactId>commons-modeler</artifactId>
   <currentVersion>1.2-SNAPSHOT</currentVersion>
   <inceptionYear>2002</inceptionYear>
   <shortDescription>Commons Modeler</shortDescription>
@@ -28,7 +29,7 @@
     Commons Modeler
   </description>
   <logo>/images/modeler-logo-white.png</logo>
-  
+
   <url>http://jakarta.apache.org/commons/${pom.artifactId.substring(8)}/</url>
   <package>org.apache.commons.${pom.artifactId.substring(8)}</package>
 
@@ -45,17 +46,17 @@
       <distribution>repo</distribution>
       </license>
   </licenses>
-  
+
   <gumpRepositoryId>jakarta</gumpRepositoryId>
   <issueTrackingUrl>http://issues.apache.org/jira/</issueTrackingUrl>
   <siteAddress>people.apache.org</siteAddress>
   <siteDirectory>/www/jakarta.apache.org/commons/${pom.artifactId.substring(8)}/</siteDirectory>
-  
+
   <repository>
     <connection>scm:svn:http://svn.apache.org/repos/asf/jakarta/commons/proper/${pom.artifactId.substring(8)}/trunk</connection>
     <url>http://svn.apache.org/repos/asf/jakarta/commons/proper/${pom.artifactId.substring(8)}/trunk</url>
   </repository>
-  
+
   <mailingLists>
     <mailingList>
       <name>Commons Dev List</name>
@@ -70,7 +71,7 @@
       <archive>http://mail-archives.apache.org/eyebrowse/SummarizeList?listName=commons-user@jakarta.apache.org</archive>
     </mailingList>
   </mailingLists>
-  
+
   <developers>
     <developer>
       <name>Craig McClanahan</name>
@@ -86,7 +87,7 @@
       <organization>Apache</organization>
     </developer>
   </developers>
-  
+
   <dependencies>
 
     <dependency>
@@ -130,7 +131,7 @@
         <optional>true</optional>
       </properties>
     </dependency>
- 
+
     <dependency>
       <groupId>maven</groupId>
       <artifactId>maven-xdoc-plugin</artifactId>
