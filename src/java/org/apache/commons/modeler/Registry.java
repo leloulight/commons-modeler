@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Collections;
+import java.util.Map;
 
 import javax.management.DynamicMBean;
 import javax.management.MBeanAttributeInfo;
@@ -106,16 +108,15 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * The set of ManagedBean instances for the beans this registry
      * knows about, keyed by name.
      */
-    private HashMap descriptors = new HashMap();
+    private final HashMap descriptors = new HashMap();
 
     /** List of managed byeans, keyed by class name
      */
-    private HashMap descriptorsByClass = new HashMap();
+    private final HashMap descriptorsByClass = new HashMap();
 
     // map to avoid duplicated searching or loading descriptors 
-    private HashMap searchedPaths=new HashMap();
+    private final Map searchedPaths= Collections.synchronizedMap(new HashMap());
     
-    private Object key;
     private Object guard;
 
     // Id - small ints to use array access. No reset on stop()
@@ -160,7 +161,6 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
                 localRegistry=(Registry)perLoaderRegistries.get(key);
                 if( localRegistry == null ) {
                     localRegistry=new Registry();
-                    localRegistry.key=key;
                     localRegistry.guard=guard;
                     perLoaderRegistries.put( key, localRegistry );
                     return localRegistry;
@@ -218,9 +218,11 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * @since 1.1
      */ 
     public void stop() {
-        descriptorsByClass = new HashMap();
-        descriptors = new HashMap();
-        searchedPaths=new HashMap();
+        synchronized(descriptors) {
+            descriptorsByClass.clear();
+            descriptors.clear();
+            searchedPaths.clear();
+        }
     }
     
     /** 
@@ -261,7 +263,6 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     public void loadMetadata(Object source ) throws Exception {
         if( source instanceof ClassLoader ) {
             loadMetaInfDescriptors((ClassLoader)source);
-            return;
         } else {
             loadDescriptors( null, source, null );
         }
@@ -411,9 +412,11 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      */
     public void addManagedBean(ManagedBean bean) {
         // XXX Use group + name
-        descriptors.put(bean.getName(), bean);
-        if( bean.getType() != null ) {
-            descriptorsByClass.put( bean.getType(), bean );
+        synchronized(descriptors) {
+            descriptors.put(bean.getName(), bean);
+            if( bean.getType() != null ) {
+                descriptorsByClass.put( bean.getType(), bean );
+            }
         }
     }
 
@@ -428,10 +431,12 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      */
     public ManagedBean findManagedBean(String name) {
         // XXX Group ?? Use Group + Type
-        ManagedBean mb=((ManagedBean) descriptors.get(name));
-        if( mb==null )
-            mb=(ManagedBean)descriptorsByClass.get(name);
-        return mb;
+        synchronized(descriptors) {
+            ManagedBean mb=((ManagedBean) descriptors.get(name));
+            if( mb==null )
+                mb=(ManagedBean)descriptorsByClass.get(name);
+            return mb;
+        }
     }
     
     /**
@@ -441,7 +446,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * @since 1.0
      */
     public String[] findManagedBeans() {
-        return ((String[]) descriptors.keySet().toArray(new String[0]));
+        synchronized(descriptors) {
+            return ((String[]) descriptors.keySet().toArray(new String[0]));
+        }
     }
 
 
@@ -456,13 +463,16 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     public String[] findManagedBeans(String group) {
 
         ArrayList results = new ArrayList();
-        Iterator items = descriptors.values().iterator();
-        while (items.hasNext()) {
-            ManagedBean item = (ManagedBean) items.next();
-            if ((group == null) && (item.getGroup() == null)) {
-                results.add(item.getName());
-            } else if (group.equals(item.getGroup())) {
-                results.add(item.getName());
+        synchronized (descriptors) {
+            for (Iterator items = descriptors.values().iterator(); items.hasNext(); ) {
+                ManagedBean item = (ManagedBean) items.next();
+                if (group == null) {
+                    if (item.getGroup() == null) {
+                        results.add(item.getName());
+                    }
+                } else if (group.equals(item.getGroup())) {
+                    results.add(item.getName());
+                }
             }
         }
         String values[] = new String[results.size()];
@@ -479,8 +489,10 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      */
     public void removeManagedBean(ManagedBean bean) {
        // TODO: change this to use group/name
-        descriptors.remove(bean.getName());
-        descriptorsByClass.remove( bean.getType());
+        synchronized (descriptors) {
+            descriptors.remove(bean.getName());
+            descriptorsByClass.remove( bean.getType());
+        }
     }
 
     // -------------------- Deprecated 1.0 methods  --------------------
@@ -546,7 +558,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     public String getType( ObjectName oname, String attName )
     {
         String type=null;
-        MBeanInfo info=null;
+        MBeanInfo info;
         try {
             info=server.getMBeanInfo(oname);
         } catch (Exception e) {
@@ -573,7 +585,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     public MBeanOperationInfo getMethodInfo( ObjectName oname, String opName )
     {
         String type=null;
-        MBeanInfo info=null;
+        MBeanInfo info;
         try {
             info=server.getMBeanInfo(oname);
         } catch (Exception e) {
@@ -718,7 +730,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             objValue = new Long( value );
         } else if( "java.lang.Boolean".equals( type ) ||
                 "boolean".equals( type )) {
-            objValue=new Boolean( value );
+            objValue=Boolean.valueOf( value );
         }
         return objValue;
     }
@@ -840,7 +852,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      *
      * @param packageName
      */
-    public void loadDescriptors( String packageName, ClassLoader classLoader  ) {
+    public synchronized void loadDescriptors( String packageName, ClassLoader classLoader  ) {
         String res=packageName.replace( '.', '/');
 
         if( log.isTraceEnabled() ) {
@@ -869,12 +881,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
                 loadDescriptors("MbeansDescriptorsDOMSource", dURL, null);
             else
                 loadDescriptors("MbeansDescriptorsSerSource", dURL, null);
-            return;
         } catch(Exception ex ) {
             log.error("Error loading " + dURL);
         }
-
-        return;
     }
 
     /** Experimental. Will become private, some code may still use it
@@ -939,9 +948,8 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         if( classLoader==null ) {
             classLoader=this.getClass().getClassLoader();
         }
-        
-        String className=type;
-        String pkg=className;
+
+        String pkg=type;
         while( pkg.indexOf( ".") > 0 ) {
             int lastComp=pkg.lastIndexOf( ".");
             if( lastComp <= 0 ) return;
@@ -951,7 +959,6 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             }
             loadDescriptors(pkg, classLoader);
         }
-        return;
     }
 
     private ModelerSource getModelerSource( String type )
