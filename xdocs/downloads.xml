@@ -23,8 +23,6 @@
 
    <body>
       <section name="Releases">
-         <p>There are no releases available.</p>
-
          <p>The following releases are available:</p>
          <ul>
            <li>Release 1.1 - 10 Aug 2003 - <a href="http://svn.apache.org/viewvc/jakarta/commons/proper/modeler/tags/MODELER_1_1/RELEASE-NOTES-1.1.txt?view=co">(release notes)</a></li>
@@ -32,12 +30,9 @@
          </ul>
          <br/>
          <p>
-            The latest binary release is always available on the 
-            <a href="http://jakarta.apache.org/site/binindex.cgi#commons-modeler">
-            Jakarta Binary Downloads page</a>,
-            its source is available from 
-            <a href="http://jakarta.apache.org/site/sourceindex.cgi#commons-modeler">
-            Jakarta Source Downloads page</a>.
+            The latest binary and source releases are always available on the 
+            <a href="http://jakarta.apache.org/site/downloads/downloads_commons-modeler.cgi">
+            Commons Modeler Downloads page</a>.
          </p>
          <p>
             Older releases are retained by the Apache Software Foundation but are 
