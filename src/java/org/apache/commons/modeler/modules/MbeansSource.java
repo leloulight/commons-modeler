@@ -180,7 +180,7 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
                     Node constructorN=DomUtil.getChild(mbeanN, "constructor");
                     if( constructorN == null ) constructorN=mbeanN;
 
-                    processArg(constructorN);
+                    ArgsInfo info = processArg(constructorN);
 
                     try {
                         ObjectName oname=new ObjectName(objectName);
@@ -188,11 +188,26 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
                             // We wrap everything in a model mbean.
                             // XXX need to support "StandardMBeanDescriptorsSource"
                             String modelMBean=BaseModelMBean.class.getName();                            
-                            server.createMBean(modelMBean, oname,
-                                    new Object[] { code, this},
-                                    new String[] { String.class.getName(),
-                                                  ModelerSource.class.getName() } 
-                                    );
+                            if(info == null) {
+                                server.createMBean(modelMBean, oname,
+                                                   new Object[] { code, this},
+                                                   new String[] { String.class.getName(),
+                                                                  ModelerSource.class.getName() } 
+                                                   );
+                            } else {
+                                server.createMBean(modelMBean, oname,
+                                                   new Object[] { code, this,
+                                                                  info.getValues(),
+                                                                  info.getSigs()
+                                                   },
+                                                   new String[] { String.class.getName(),
+                                                                  ModelerSource.class.getName(),
+                                                                  Object[].class.getName(),
+                                                                  String[].class.getName()
+                                                   }
+                                                   );
+                            }
+                                                   
                             mbeans.add(oname);
                         }
                         object2Node.put( oname, mbeanN );
@@ -220,8 +235,12 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
                     try {
                         ObjectName oname=new ObjectName(name);
 
-                        processArg( mbeanN );
-                        server.invoke( oname, operation, null, null);
+                        ArgsInfo info = processArg( mbeanN );
+                        if(info == null) {
+                            server.invoke( oname, operation, null, null);
+                        } else {
+                            server.invoke( oname, operation, info.getValues(), info.getSigs());
+			}
                     } catch (Exception e) {
                         log.error( "Error in invoke " + name + " " + operation);
                     }
@@ -333,8 +352,12 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
 
     }
 
-    private void processArg(Node mbeanN) {
+    private ArgsInfo processArg(Node mbeanN) {
         Node firstArgN=DomUtil.getChild(mbeanN, "arg" );
+        if(firstArgN == null) {
+            return null;
+        }
+        ArgsInfo info = new ArgsInfo();
         // process all args
         for (Node argN = firstArgN; argN != null;
              argN = DomUtil.getNext( argN ))
@@ -345,6 +368,29 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
                 // The value may be specified as CDATA
                 value=DomUtil.getContent(argN);
             }
+            info.addArgPair(type, registry.convertValue(type,value));
+        }
+        return info;
+    }
+
+    private static class ArgsInfo {
+        private List sigs = new ArrayList();
+        private List values = new ArrayList();
+
+        ArgsInfo() {
+        }
+
+        public String [] getSigs() {
+            return (String [])sigs.toArray(new String[sigs.size()]);
+        }
+
+        public Object[] getValues () {
+            return values.toArray(new Object[values.size()]);
+        }
+
+        public void addArgPair(String name, Object val) {
+            sigs.add(name);
+            values.add(val);
         }
     }
 }
