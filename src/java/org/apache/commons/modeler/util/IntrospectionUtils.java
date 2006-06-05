@@ -57,7 +57,7 @@ public final class IntrospectionUtils {
 	    throw new RuntimeException("No method " + method + " in " +
                     proxy.getClass() );
 	}
-	executeM.invoke(proxy, null );
+	executeM.invoke(proxy, (Object [])null );
     }
 
     /**
@@ -376,7 +376,7 @@ public final class IntrospectionUtils {
 		Class paramT[]=methods[i].getParameterTypes();
 		if( getter.equals( methods[i].getName() ) &&
 		    paramT.length == 0 ) {
-		    return methods[i].invoke( o, null );
+		    return methods[i].invoke( o, (Object [])null );
 		}
 
 		if( "getProperty".equals( methods[i].getName())) {
@@ -790,6 +790,10 @@ public final class IntrospectionUtils {
     }
 
     static Hashtable objectMethods=new Hashtable();
+
+    public static void clear() {
+        objectMethods.clear();
+    }
 
     public static Method[] findMethods( Class c ) {
 	Method methods[]= (Method [])objectMethods.get( c );
