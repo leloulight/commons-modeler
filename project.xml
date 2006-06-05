@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
- Copyright 2001-2004 The Apache Software Foundation.
+ Copyright 2001-2006 The Apache Software Foundation.
  
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@
   <organization>
     <name>The Apache Software Foundation</name>
     <url>http://jakarta.apache.org</url>
-    <logo>http://jakarta.apache.org/images/jakarta-logo.gif</logo>
+    <logo>http://jakarta.apache.org/images/original-jakarta-logo.gif</logo>
   </organization>
 
   <licenses>

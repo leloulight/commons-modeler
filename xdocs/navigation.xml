@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
-  Copyright 2002,2004 The Apache Software Foundation.
+  Copyright 2002,2006 The Apache Software Foundation.
   
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -14,16 +14,20 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<!DOCTYPE org.apache.commons.menus SYSTEM '../../commons-build/menus/menus.dtd'>
+<!DOCTYPE org.apache.commons.menus SYSTEM 'http://jakarta.apache.org/commons/build/maven-build.dtd'>
 <project name="Commons Modeler">
   <title>Commons Modeler</title>
     <body>
+        <links>
+            <item name="Jakarta Commons" href="http://jakarta.apache.org/commons/"/>
+        </links>
+
         <menu name="Commons&#xA0;Modeler">
             <item name="Overview"                      href="/index.html" />
             <item name="API&#xA0;Documentation"        href="/apidocs/index.html"/>
             <item name="Downloads"                     href="/downloads.html"/>
             <item name="Wiki"                          href="http://wiki.apache.org/jakarta-commons/Modeler"/>
         </menu>
-        &common-menus;
+        &commons;
     </body>
 </project>
