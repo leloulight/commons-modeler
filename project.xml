@@ -19,7 +19,7 @@
 <project>
   <pomVersion>3</pomVersion>
 
-  <name>Modeler</name>
+  <name>Commons Modeler</name>
   <groupId>commons-modeler</groupId>
   <artifactId>commons-modeler</artifactId>
   <currentVersion>1.2-SNAPSHOT</currentVersion>
@@ -51,6 +51,7 @@
   <issueTrackingUrl>http://issues.apache.org/jira/browse/${pom.artifactId.substring(8).toUpperCase()}</issueTrackingUrl>
   <siteAddress>people.apache.org</siteAddress>
   <siteDirectory>/www/jakarta.apache.org/commons/${pom.artifactId.substring(8)}/</siteDirectory>
+  <distributionDirectory>/www/jakarta.apache.org/builds/jakarta-commons/${pom.artifactId.substring(8)}/</distributionDirectory>
 
   <repository>
     <connection>scm:svn:http://svn.apache.org/repos/asf/jakarta/commons/proper/${pom.artifactId.substring(8)}/trunk</connection>
@@ -93,6 +94,14 @@
       <email>billbarker@apache.org</email>
       <organization>Apache</organization>
     </developer>
+
+    <developer>
+      <name>Davanum Srinivas</name>
+      <id>dims</id>
+      <email>dims@apache.org</email>
+      <organization>Apache</organization>
+    </developer>
+
   </developers>
 
   <dependencies>
