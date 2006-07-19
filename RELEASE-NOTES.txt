@@ -14,6 +14,27 @@ Modeler package, and highlights changes since the previous version.
 For more information on Jakarta Commons Modeler, see
 o http://jakarta.apache.org/commons/modeler/
 
+API CHANGES:
+============
+o In org.apache.commons.modeler.BaseModelMBean, getObjectName's method 
+  signature was as follows:
+    public javax.management.ObjectName getObjectName() 
+  Now it has been changed to 
+    public String getObjectName() 
+  NOTE: This was not logged as a modeler bug. More information can be 
+  found at the Sun Bug Database:
+    http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4909041
+o In org.apache.commons.modeler.BaseModelMBean, Folks who need the 
+  ObjectName can now use the new method:
+    public javax.management.ObjectName getJmxName()
+  NOTE: This was not logged as a modeler bug. More information can be 
+  found at the Sun Bug Database:
+    http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4909041
+o In org.apache.commons.modeler.util.IntrospectionUtils, A new method 
+  clear has been added:
+    public void clear()
+  NOTE: This was done as part of fix for MODELER-15
+
 BUG REPORTS ADDRESSED:
 =====================
 
