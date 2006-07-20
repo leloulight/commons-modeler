@@ -31,8 +31,8 @@ Modeler provides a factory mechanism to create the actual Model MBean instances
 themselves.</p>
 
 <p>For further information, see the 
-<a href="http://jakarta.apache.org/commons/modeler/docs/api/org/apache/commons/modeler/package-summary.html">
-package description</a> for the Modeler package.</p>
+<a href="apidocs/org/apache/commons/modeler/package-summary.html"> package description</a> 
+for the Modeler package.</p>
 
 </section>
 
