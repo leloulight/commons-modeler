@@ -50,7 +50,7 @@
   <gumpRepositoryId>jakarta</gumpRepositoryId>
   <issueTrackingUrl>http://issues.apache.org/jira/browse/${pom.artifactId.substring(8).toUpperCase()}</issueTrackingUrl>
   <siteAddress>people.apache.org</siteAddress>
-  <siteDirectory>public_html/commons-modeler-2.0-RC1/site</siteDirectory>
+  <siteDirectory>/www/jakarta.apache.org/commons/${pom.artifactId.substring(8)}/</siteDirectory>
   <distributionDirectory>/www/jakarta.apache.org/builds/jakarta-commons/${pom.artifactId.substring(8)}/</distributionDirectory>
 
   <repository>
