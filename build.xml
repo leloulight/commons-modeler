@@ -53,7 +53,7 @@
   <property name="component.title"         value="Model MBeans Support Package"/>
 
   <!-- The current version number of this component -->
-  <property name="component.version"       value="2.0"/>
+  <property name="component.version"       value="2.1-dev"/>
 
   <!-- The base directory for compilation targets -->
   <property name="build.home"              value="target"/>
@@ -316,8 +316,8 @@
 <!-- ========== Release Targets ===================================== -->
 
   <target name="release" description="Create the release">
-    <property name="ver" value="2.0" />
-    <property name="tag" value="MODELER_2_0_DEV" />
+    <property name="ver" value="2.1-dev" />
+    <property name="tag" value="MODELER_2_1_DEV" />
     <delete dir="release" />
     <mkdir dir="release" />
     <cvs command="checkout" 
