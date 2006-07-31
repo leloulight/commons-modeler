@@ -316,8 +316,8 @@
 <!-- ========== Release Targets ===================================== -->
 
   <target name="release" description="Create the release">
-    <property name="ver" value="1.2-dev" />
-    <property name="tag" value="MODELER_1_2_DEV" />
+    <property name="ver" value="2.0" />
+    <property name="tag" value="MODELER_2_0_DEV" />
     <delete dir="release" />
     <mkdir dir="release" />
     <cvs command="checkout" 
