@@ -27,9 +27,25 @@
 
         <menu name="Commons&#xA0;Modeler">
             <item name="Overview"                      href="/index.html" />
-            <item name="API&#xA0;Documentation"        href="/apidocs/index.html"/>
             <item name="Downloads"                     href="/downloads.html"/>
+            <item name="Dependencies"                  href="/dependencies.html"/>
+            <item name="License"                       href="/license.html"/>
             <item name="Wiki"                          href="http://wiki.apache.org/jakarta-commons/Modeler"/>
+        </menu>
+
+        <menu name="2.0 Release">
+            <item name="Release Notes"           href="http://jakarta.apache.org/commons/modeler/commons-modeler-2.0/RELEASE-NOTES.txt"/>
+            <item name="JavaDoc"                 href="http://jakarta.apache.org/commons/modeler/commons-modeler-2.0/apidocs//"/>
+        </menu>
+
+        <menu name="1.1 Release">
+            <item name="Release Notes"           href="http://jakarta.apache.org/commons/modeler/commons-modeler-1.1/RELEASE-NOTES-1.1.txt"/>
+            <item name="JavaDoc"                 href="http://jakarta.apache.org/commons/modeler/commons-modeler-1.1/docs/api/"/>
+        </menu>
+
+        <menu name="1.0 Release">
+            <item name="Release Notes"           href="http://jakarta.apache.org/commons/modeler/commons-modeler-1.0/RELEASE-NOTES.txt"/>
+            <item name="JavaDoc"                 href="http://jakarta.apache.org/commons/modeler/commons-modeler-1.0/docs/api/"/>
         </menu>
     
         <menu name="Development">
