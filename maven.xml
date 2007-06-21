@@ -56,8 +56,6 @@
       <fileset file="${basedir}/RELEASE-NOTES.txt"/>
       <fileset file="${basedir}/build.properties.sample"/>
       <fileset file="${basedir}/build.properties.default"/>
-      <fileset file="${basedir}/checkstyle.xml"/>
-      <fileset file="${basedir}/license-header.txt"/>
     </copy>
 
     <!-- Copy xdoc files -->
