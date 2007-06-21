@@ -226,6 +226,7 @@
         <directory>src/java</directory>
         <includes>
           <include>**/ant.properties</include>
+          <include>**/mbeans-descriptors.dtd</include>
         </includes>
       </resource>
     </resources>

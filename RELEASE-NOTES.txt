@@ -24,3 +24,4 @@ BUG REPORTS ADDRESSED:
 o MODELER-20 	 ant jar in trunk fails
 o MODELER-21 	 MbeansDescriptorsDigesterSource.java is never build if just setting commons-digester.jar property in build.properties
 o MODELER-22 	 ant.properties is missing from the Modeler jar
+o MODELER-23 	 mbeans-descriptors.dtd is missing from the Modeler jar and binary distro

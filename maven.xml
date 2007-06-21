@@ -41,6 +41,7 @@
     <copy todir="${maven.dist.bin.assembly.dir}">
       <fileset file='${basedir}/NOTICE.txt'/>
       <fileset file="${basedir}/RELEASE-NOTES.txt"/>
+      <fileset file="${basedir}/src/java/org/apache/commons/modeler/mbeans-descriptors.dtd"/>
     </copy>
 
   </postGoal>
