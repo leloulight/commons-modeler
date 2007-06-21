@@ -1,7 +1,7 @@
 $Id$
 
                           Commons Modeler Package
-                                Version 2.0
+                                Version 2.0.1
                                Release Notes
 
 
@@ -14,45 +14,13 @@ Modeler package, and highlights changes since the previous version.
 For more information on Jakarta Commons Modeler, see
 o http://jakarta.apache.org/commons/modeler/
 
-API CHANGES:
-============
-o In org.apache.commons.modeler.BaseModelMBean, getObjectName's method 
-  signature was as follows:
-    public javax.management.ObjectName getObjectName() 
-  Now it has been changed to 
-    public String getObjectName() 
-  NOTE: This was not logged as a modeler bug. More information can be 
-  found at the Sun Bug Database:
-    http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4909041
-o In org.apache.commons.modeler.BaseModelMBean, Folks who need the 
-  ObjectName can now use the new method:
-    public javax.management.ObjectName getJmxName()
-  NOTE: This was not logged as a modeler bug. More information can be 
-  found at the Sun Bug Database:
-    http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4909041
-o In org.apache.commons.modeler.util.IntrospectionUtils, A new method 
-  clear has been added:
-    public void clear()
-  NOTE: This was done as part of fix for MODELER-15
+Compatibility with 2.0
+======================
+Modeler 2.0.1 is binary and source compatible with Modeler 2.0
 
 BUG REPORTS ADDRESSED:
 =====================
 
-o MODELER-18 	 support for general descriptors
-o MODELER-17 	 [modeler] MbeansSource don't use args at mbeans and operations
-o MODELER-16 	 [modeler] download links broken  
-o MODELER-15 	 [modeler] IntrospectionUtils memory leak  
-o MODELER-14 	 After setting an Attribute the Notification Listener will not performed  
-o MODELER-13 	 [modeler] BaseModelMBean class setModeledType method should be setModelerType  
-o MODELER-12 	 [modeler] ManagedBean uses the wrong case for ObjectReference  
-o MODELER-11 	 [modeler] Null Pointer Exception - Non-Singleton Registry  
-o MODELER-10 	 [modeler] DTD violation when using simple wrapping  
-o MODELER-9 	 [modeler] Registry.convertValue doesn't support longs  
-o MODELER-8 	 [modeler] AttributeChangeNotification sent before attribute changes  
-o MODELER-7 	 sendAttributeChangeNotification on setAttribute  
-o MODELER-6 	 [modeler] wiki page is immutable and out-of-date  
-o MODELER-5 	 [modeler] setServer stack overflow  
-o MODELER-4 	 [modeler] Overloaded operations throw "wrong number of parameters" exception  
-o MODELER-3 	 [modeler] maven build fails on os x with test failure.  
-o MODELER-2 	 [modeler] Registry insufficiently synchronized  
-o MODELER-1 	 ClassNotFoundException while using the Notification  
+o MODELER-20 	 ant jar in trunk fails
+o MODELER-21 	 MbeansDescriptorsDigesterSource.java is never build if just setting commons-digester.jar property in build.properties
+o MODELER-22 	 ant.properties is missing from the Modeler jar

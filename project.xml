@@ -110,7 +110,7 @@
     <dependency>
       <groupId>commons-digester</groupId>
       <artifactId>commons-digester</artifactId>
-      <version>1.2</version>
+      <version>1.4.1</version>
       <url>http://jakarta.apache.org/commons/digester/</url>
     </dependency>
 
@@ -126,12 +126,18 @@
       <artifactId>mx4j-jmx</artifactId>
       <version>2.1.1</version>
       <url>http://mx4j.sourceforge.net/</url>
+      <properties>
+        <scope>provided</scope>
+      </properties>
     </dependency>
 
     <dependency>
       <groupId>xml-apis</groupId>
       <artifactId>xml-apis</artifactId>
       <version>2.0.2</version>
+      <properties>
+        <scope>provided</scope>
+      </properties>
     </dependency>
 
     <dependency>
