@@ -227,6 +227,8 @@
              tofile="${build.home}/classes/META-INF/ant.properties"/>
     <copy      file="LICENSE.txt"
              tofile="${build.home}/classes/META-INF/LICENSE.txt"/>
+    <copy      file="NOTICE.txt"
+             tofile="${build.home}/classes/META-INF/NOTICE.txt"/>
     <jar jarfile="${dist.home}/commons-${component.name}.jar"
          index="true"
          basedir="${build.home}/classes"
@@ -234,6 +236,7 @@
        <include name="org/apache/commons/modeler/**" />
        <include name="META-INF/ant.properties" />
        <include name="META-INF/LICENSE.txt" />
+       <include name="META-INF/NOTICE.txt" />
     </jar>
   </target>
 
@@ -255,9 +258,13 @@
 
     <!-- the src is similar with the JDK sources - and very useful for users of
          IDEs, where the jar can be "mounted" and used when debugging -->
-    <jar file="${dist.home}/commons-modeler-src.jar">
-         <fileset dir="src/java" includes="**" />        
-         <fileset dir="src/conf" includes="MANIFEST.MF" />
+    <jar file="${dist.home}/commons-modeler-src.jar"
+         manifest="src/conf/MANIFEST.MF">
+         <fileset dir="src/java" includes="**/*.java" />
+         <fileset dir="src/java" includes="**/*.dtd" />
+         <fileset dir="src/java" includes="**/*.properties" />
+         <fileset dir="." includes="LICENSE.txt" />
+         <fileset dir="." includes="NOTICE.txt" />
      </jar>
  
      <copy      file="src/java/org/apache/commons/modeler/mbeans-descriptors.dtd"
