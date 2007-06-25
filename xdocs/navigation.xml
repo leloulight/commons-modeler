@@ -34,9 +34,14 @@
             <item name="Wiki"                          href="http://wiki.apache.org/jakarta-commons/Modeler"/>
         </menu>
 
+        <menu name="2.0.1 Release">
+            <item name="Release Notes"           href="http://jakarta.apache.org/commons/modeler/commons-modeler-2.0.1/RELEASE-NOTES.txt"/>
+            <item name="JavaDoc"                 href="http://jakarta.apache.org/commons/modeler/commons-modeler-2.0.1/apidocs/"/>
+        </menu>
+
         <menu name="2.0 Release">
             <item name="Release Notes"           href="http://jakarta.apache.org/commons/modeler/commons-modeler-2.0/RELEASE-NOTES.txt"/>
-            <item name="JavaDoc"                 href="http://jakarta.apache.org/commons/modeler/commons-modeler-2.0/apidocs//"/>
+            <item name="JavaDoc"                 href="http://jakarta.apache.org/commons/modeler/commons-modeler-2.0/apidocs/"/>
         </menu>
 
         <menu name="1.1 Release">
