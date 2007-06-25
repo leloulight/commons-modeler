@@ -69,7 +69,7 @@
   <property name="component.title"         value="Model MBeans Support Package"/>
 
   <!-- The current version number of this component -->
-  <property name="component.version"       value="2.1-dev"/>
+  <property name="component.version"       value="2.1-SNAPSHOT"/>
 
   <!-- The base directory for compilation targets -->
   <property name="build.home"              value="target"/>

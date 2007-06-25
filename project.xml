@@ -23,7 +23,7 @@
   <name>Commons Modeler</name>
   <groupId>commons-modeler</groupId>
   <artifactId>commons-modeler</artifactId>
-  <currentVersion>2.1-dev</currentVersion>
+  <currentVersion>2.1-SNAPSHOT</currentVersion>
   <inceptionYear>2002</inceptionYear>
   <shortDescription>Commons Modeler</shortDescription>
   <description>
