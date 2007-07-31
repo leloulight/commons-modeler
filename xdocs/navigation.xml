@@ -15,14 +15,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-<!DOCTYPE org.apache.commons.menus SYSTEM 'http://jakarta.apache.org/commons/build/maven-build.dtd'>
+<!DOCTYPE org.apache.commons.menus SYSTEM 'http://commons.apache.org/build/maven-build.dtd'>
 <project name="Commons Modeler">
   <title>Commons Modeler</title>
     <body>
         <links>
             <item name="Apache"  href="http://www.apache.org"/>
             <item name="Jakarta" href="http://jakarta.apache.org"/>
-            <item name="Commons" href="http://jakarta.apache.org/commons/"/>
+            <item name="Commons" href="http://commons.apache.org/"/>
         </links>
 
         <menu name="Commons&#xA0;Modeler">
@@ -35,23 +35,23 @@
         </menu>
 
         <menu name="2.0.1 Release">
-            <item name="Release Notes"           href="http://jakarta.apache.org/commons/modeler/commons-modeler-2.0.1/RELEASE-NOTES.txt"/>
-            <item name="JavaDoc"                 href="http://jakarta.apache.org/commons/modeler/commons-modeler-2.0.1/apidocs/"/>
+            <item name="Release Notes"           href="http://commons.apache.org/modeler/commons-modeler-2.0.1/RELEASE-NOTES.txt"/>
+            <item name="JavaDoc"                 href="http://commons.apache.org/modeler/commons-modeler-2.0.1/apidocs/"/>
         </menu>
 
         <menu name="2.0 Release">
-            <item name="Release Notes"           href="http://jakarta.apache.org/commons/modeler/commons-modeler-2.0/RELEASE-NOTES.txt"/>
-            <item name="JavaDoc"                 href="http://jakarta.apache.org/commons/modeler/commons-modeler-2.0/apidocs/"/>
+            <item name="Release Notes"           href="http://commons.apache.org/modeler/commons-modeler-2.0/RELEASE-NOTES.txt"/>
+            <item name="JavaDoc"                 href="http://commons.apache.org/modeler/commons-modeler-2.0/apidocs/"/>
         </menu>
 
         <menu name="1.1 Release">
-            <item name="Release Notes"           href="http://jakarta.apache.org/commons/modeler/commons-modeler-1.1/RELEASE-NOTES-1.1.txt"/>
-            <item name="JavaDoc"                 href="http://jakarta.apache.org/commons/modeler/commons-modeler-1.1/docs/api/"/>
+            <item name="Release Notes"           href="http://commons.apache.org/modeler/commons-modeler-1.1/RELEASE-NOTES-1.1.txt"/>
+            <item name="JavaDoc"                 href="http://commons.apache.org/modeler/commons-modeler-1.1/docs/api/"/>
         </menu>
 
         <menu name="1.0 Release">
-            <item name="Release Notes"           href="http://jakarta.apache.org/commons/modeler/commons-modeler-1.0/RELEASE-NOTES.txt"/>
-            <item name="JavaDoc"                 href="http://jakarta.apache.org/commons/modeler/commons-modeler-1.0/docs/api/"/>
+            <item name="Release Notes"           href="http://commons.apache.org/modeler/commons-modeler-1.0/RELEASE-NOTES.txt"/>
+            <item name="JavaDoc"                 href="http://commons.apache.org/modeler/commons-modeler-1.0/docs/api/"/>
         </menu>
     
         <menu name="Development">

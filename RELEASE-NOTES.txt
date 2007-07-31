@@ -11,8 +11,8 @@ INTRODUCTION:
 This document contains the release notes for this version of the Commons
 Modeler package, and highlights changes since the previous version.
 
-For more information on Jakarta Commons Modeler, see
-o http://jakarta.apache.org/commons/modeler/
+For more information on Apache Commons Modeler, see
+o http://commons.apache.org/modeler/
 
 Compatibility with 2.0
 ======================
