@@ -15,8 +15,8 @@
   </description>
     <repository>
       <SVNRepository>
-        <browse rdf:resource="http://svn.apache.org/repos/asf/jakarta/commons/proper/modeler/trunk"/>
-        <location rdf:resource="http://svn.apache.org/repos/asf/jakarta/commons/proper/modeler"/>
+        <browse rdf:resource="http://svn.apache.org/repos/asf/commons/proper/modeler/trunk"/>
+        <location rdf:resource="http://svn.apache.org/repos/asf/commons/proper/modeler"/>
       </SVNRepository>
     </repository>
     <release>
