@@ -30,7 +30,7 @@
             <item name="JavaDoc"                       href="/apidocs/index.html"/>
             <item name="Dependencies"                  href="/dependencies.html"/>
             <item name="License"                       href="/license.html"/>
-            <item name="Wiki"                          href="http://wiki.apache.org/jakarta-commons/Modeler"/>
+            <item name="Wiki"                          href="http://wiki.apache.org/commons/Modeler"/>
         </menu>
 
         <menu name="2.0.1 Release">
