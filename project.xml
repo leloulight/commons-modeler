@@ -103,6 +103,27 @@
       <organization>Apache</organization>
     </developer>
 
+    <developer>
+      <name>Remy Maucherat</name>
+      <id>remm</id>
+      <email>remm@apache.org</email>
+      <organization>Apache</organization>
+    </developer>
+
+    <developer>
+      <name>Amy Roh</name>
+      <id>amyroh</id>
+      <email>amyroh@apache.org</email>
+      <organization>Apache</organization>
+    </developer>
+
+    <developer>
+      <name>Costin Manolache</name>
+      <id>costin</id>
+      <email>costin@apache.org</email>
+      <organization>Apache</organization>
+    </developer>
+
   </developers>
 
   <dependencies>
