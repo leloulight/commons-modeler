@@ -25,7 +25,7 @@
     <body>
         <menu name="Modeler">
             <item name="Overview"      href="/index.html"/>
-            <item name="Download"      href="http://commons.apache.org/downloads/download_modeler.cgi"/>
+            <item name="Download"      href="http://commons.apache.org/modeler/download_modeler.cgi"/>
             <item name="Dependencies"  href="/dependencies.html"/>
             <item name="Wiki"          href="http://wiki.apache.org/commons/Modeler"/>
         </menu>
