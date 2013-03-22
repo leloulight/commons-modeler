@@ -36,7 +36,7 @@
       data using an XML descriptor. In addition, Modeler provides a factory
       mechanism to create the actual Model MBean instances. 
   </description>
-  <url>http://commons.apache.org/modeler/</url>
+  <url>http://commons.apache.org/proper/commons-modeler/</url>
 
   <issueManagement>
     <system>jira</system>
