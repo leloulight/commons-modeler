@@ -28,10 +28,10 @@
   <groupId>commons-modeler</groupId>
   <artifactId>commons-modeler</artifactId>
   <version>2.1-SNAPSHOT</version>
-  <name>Commons Modeler</name>
+  <name>Apache Commons Modeler</name>
   <inceptionYear>2002</inceptionYear>
   <description>
-      Commons Modeler makes the process of setting up JMX (Java
+      Apache Commons Modeler makes the process of setting up JMX (Java
       Management Extensions) MBeans easier by configuring the required meta
       data using an XML descriptor. In addition, Modeler provides a factory
       mechanism to create the actual Model MBean instances. 
